@@ -50,6 +50,7 @@
 #include "PikaHomogenizedKernel.h"
 #include "PikaMomentum.h"
 <<<<<<< HEAD
+<<<<<<< HEAD
 #include "PhaseBoussinesq.h"
 #include "PhaseMass.h"
 #include "PikaConvection.h"
@@ -57,6 +58,9 @@
 #include "PhaseNoSlipForcing.h"
 =======
 >>>>>>>  added Navier stokes module to ppika and working on momentum still
+=======
+#include "PhaseBoussinesq.h"
+>>>>>>>  first compiled momentum equations and boussinesq kernel, getting nans in convection_bubble.i
 
 // AuxKernels
 #include "ErrorFunctionAux.h"
