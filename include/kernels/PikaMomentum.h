@@ -58,6 +58,7 @@ protected:
   virtual Real computeQpJacobian();
   virtual Real computeQpOffDiagJacobian(unsigned jvar);
 
+<<<<<<< HEAD
   /**
    *  All Coupled variables
    */
@@ -74,17 +75,26 @@ protected:
   /**
    * Variable numberings for identifying which part of the jacobian to compute
    */
+  VariableGradient& _grad_u_vel;
+  VariableGradient& _grad_v_vel;
+  VariableGradient& _grad_w_vel;
+
+  // Variable numberings
   unsigned _u_vel_var_number;
   unsigned _v_vel_var_number;
   unsigned _w_vel_var_number;
   unsigned _p_var_number;
   unsigned _phase_var_number;
+
 /** 
  * Constant Values required for computations.
  * Note rho is not entered but taken from the user object value store/set in Pika Material dry air density.
  */
   Real _mu;
   Real _rho;
+  RealVectorValue _gravity;
+
+  // Parameters
   unsigned _component;
   Real _xi;
 };
