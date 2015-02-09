@@ -7,9 +7,9 @@ InputParameters validParams<PikaMomentum>()
   params+=validParams<PropertyUserObjectInterface>();
 
   // Coupled variables
-  params.addRequiredCoupledVar("u", "x-velocity");
-  params.addCoupledVar("v", "y-velocity"); // only required in 2D and 3D
-  params.addCoupledVar("w", "z-velocity"); // only required in 3D
+  params.addRequiredCoupledVar("vel_x", "x-velocity");
+  params.addCoupledVar("vel_y", "y-velocity"); // only required in 2D and 3D
+  params.addCoupledVar("vel_z", "z-velocity"); // only required in 3D
   params.addRequiredCoupledVar("p", "pressure");
   params.addRequiredCoupledVar("phase", "variable containing the phase");
 
@@ -28,23 +28,23 @@ PikaMomentum::PikaMomentum(const std::string & name, InputParameters parameters)
   Kernel(name, parameters),
   PropertyUserObjectInterface(name, parameters),
 
-
   // Coupled variables
-  _u_vel(coupledValue("u")),
-  _v_vel(_mesh.dimension() >= 2 ? coupledValue("v") : _zero),
-  _w_vel(_mesh.dimension() == 3 ? coupledValue("w") : _zero),
+  _u_vel(coupledValue("vel_x")),
+  _v_vel(_mesh.dimension() >= 2 ? coupledValue("vel_y") : _zero),
+  _w_vel(_mesh.dimension() == 3 ? coupledValue("vel_z") : _zero),
   _p(coupledValue("p")),
   _phase(coupledValue("phase")),
 
   // Gradients
-  _grad_u_vel(coupledGradient("u")),
-  _grad_v_vel(_mesh.dimension() >= 2 ? coupledGradient("v") : _grad_zero),
-  _grad_w_vel(_mesh.dimension() == 3 ? coupledGradient("w") : _grad_zero),
+  _grad_u_vel(coupledGradient("vel_x")),
+  _grad_v_vel(_mesh.dimension() >= 2 ? coupledGradient("vel_y") : _grad_zero),
+  _grad_w_vel(_mesh.dimension() == 3 ? coupledGradient("vel_z") : _grad_zero),
+  _grad_phase(coupledGradient("phase")),
 
   // Variable numberings
-  _u_vel_var_number(coupled("u")),
-  _v_vel_var_number(_mesh.dimension() >= 2 ? coupled("v") : libMesh::invalid_uint),
-  _w_vel_var_number(_mesh.dimension() == 3 ? coupled("w") : libMesh::invalid_uint),
+  _u_vel_var_number(coupled("vel_x")),
+  _v_vel_var_number(_mesh.dimension() >= 2 ? coupled("vel_y") : libMesh::invalid_uint),
+  _w_vel_var_number(_mesh.dimension() == 3 ? coupled("vel_z") : libMesh::invalid_uint),
   _p_var_number(coupled("p")),
   _phase_var_number(coupled("phase")),
 
@@ -58,18 +58,24 @@ PikaMomentum::PikaMomentum(const std::string & name, InputParameters parameters)
 {
 }
 
-Real PikaMomentum::computeQpResidual()
+Real PikaMomentum::Convective()
 {
   // The convection part, rho * (u.grad) * u_component * v.
   // Note: _grad_u is the gradient of the _component entry of the velocity vector.
-  Real convective_part = _rho *
-    (_u_vel[_qp]*_grad_u[_qp](0) +
-     _v_vel[_qp]*_grad_u[_qp](1) +
-     _w_vel[_qp]*_grad_u[_qp](2)) * _test[_i][_qp];
+    return  _xi * _rho *
+            (_u_vel[_qp]*_grad_u[_qp](0) +
+             _v_vel[_qp]*_grad_u[_qp](1) +
+             _w_vel[_qp]*_grad_u[_qp](2)) * _test[_i][_qp];
 
+}
+Real PikaMomentum::Pressure()
+{
   // The pressure part, -p (div v)
-  Real pressure_part = -_p[_qp] * _grad_test[_i][_qp](_component);
+  return -_p[_qp] * _grad_test[_i][_qp](_component);
+}
 
+Real PikaMomentum::Viscous()
+{
   // The component'th row (or col, it's symmetric) of the viscous stress tensor
   RealVectorValue tau_row;
 
@@ -98,17 +104,12 @@ Real PikaMomentum::computeQpResidual()
   }
 
   // The viscous part, tau : grad(v)
-  Real viscous_part = _mu * (tau_row * _grad_test[_i][_qp]);
+  return _xi * _mu * (tau_row * _grad_test[_i][_qp]);
+}
 
-  // Simplified version: mu * Laplacian(u_component)
-  // Real viscous_part = _mu * (_grad_u[_qp] * _grad_test[_i][_qp]);
-
-  // Body force term.  For truly incompressible flow, this term is constant, and
-  // since it is proportional to g, can be written as the gradient of some scalar
-  // and absorbed into the pressure definition.
-  // Real body_force_part = - _rho * _gravity(_component);
-
-  return _xi * ((1.0-_phase[_qp])/2.0) * convective_part +  ((1.0-_phase[_qp])/2.0) * pressure_part + _xi * ((1.0-_phase[_qp])/2.0) * viscous_part /*+ body_force_part*/;
+Real PikaMomentum::computeQpResidual()
+{
+  return 0.5 * (1.0-_phase[_qp]) * (Convective() +  Pressure() +  Viscous());
 }
 
 Real PikaMomentum::computeQpJacobian()
@@ -126,11 +127,8 @@ Real PikaMomentum::computeQpJacobian()
   Real viscous_part = _mu * (_grad_phi[_j][_qp]             * _grad_test[_i][_qp] +
                              _grad_phi[_j][_qp](_component) * _grad_test[_i][_qp](_component));
 
-  return convective_part + viscous_part;
+  return 0.5 * (1.0-_phase[_qp]) * _xi * (convective_part + viscous_part);
 }
-
-
-
 
 Real PikaMomentum::computeQpOffDiagJacobian(unsigned jvar)
 {
@@ -140,7 +138,7 @@ Real PikaMomentum::computeQpOffDiagJacobian(unsigned jvar)
     Real convective_part = _phi[_j][_qp] * _grad_u[_qp](0) * _test[_i][_qp];
     Real viscous_part = _mu * _grad_phi[_j][_qp](_component) * _grad_test[_i][_qp](0);
 
-    return convective_part + viscous_part;
+    return 0.5 * (1.0-_phase[_qp]) * _xi * (convective_part + viscous_part);
   }
 
   else if (jvar == _v_vel_var_number)
@@ -148,7 +146,7 @@ Real PikaMomentum::computeQpOffDiagJacobian(unsigned jvar)
     Real convective_part = _phi[_j][_qp] * _grad_u[_qp](1) * _test[_i][_qp];
     Real viscous_part = _mu * _grad_phi[_j][_qp](_component) * _grad_test[_i][_qp](1);
 
-    return convective_part + viscous_part;
+    return 0.5 * (1.0-_phase[_qp]) * _xi * (convective_part + viscous_part);
   }
 
   else if (jvar == _w_vel_var_number)
@@ -156,12 +154,14 @@ Real PikaMomentum::computeQpOffDiagJacobian(unsigned jvar)
     Real convective_part = _phi[_j][_qp] * _grad_u[_qp](2) * _test[_i][_qp];
     Real viscous_part = _mu * _grad_phi[_j][_qp](_component) * _grad_test[_i][_qp](2);
 
-    return convective_part + viscous_part;
+    return 0.5 * (1.0-_phase[_qp]) * _xi * (convective_part + viscous_part);
   }
 
   else if (jvar == _p_var_number)
     return -_phi[_j][_qp] * _grad_test[_i][_qp](_component);
 
+  else if (jvar == _phase_var_number)
+      return -0.5 * _phi[_j][_qp]* PikaMomentum::computeQpResidual();
   else
-    return 0;
+    return 0.0;
 }
