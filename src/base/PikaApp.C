@@ -49,11 +49,14 @@
 #include "IbexShortwaveForcingFunction.h"
 #include "PikaHomogenizedKernel.h"
 #include "PikaMomentum.h"
+<<<<<<< HEAD
 #include "PhaseBoussinesq.h"
 #include "PhaseMass.h"
 #include "PikaConvection.h"
 #include "PhaseTimeDerivative.h"
 #include "PhaseNoSlipForcing.h"
+=======
+>>>>>>>  added Navier stokes module to ppika and working on momentum still
 
 // AuxKernels
 #include "ErrorFunctionAux.h"
