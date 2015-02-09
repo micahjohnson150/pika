@@ -49,6 +49,7 @@
 #include "IbexShortwaveForcingFunction.h"
 #include "PikaHomogenizedKernel.h"
 #include "PikaMomentum.h"
+#include "PhaseBoussinesq.h"
 
 // AuxKernels
 #include "ErrorFunctionAux.h"
@@ -139,6 +140,7 @@ PikaApp::registerObjects(Factory & factory)
   registerKernel(IbexShortwaveForcingFunction);
   registerKernel(PikaHomogenizedKernel);
   registerKernel(PikaMomentum);
+  registerKernel(PhaseBoussinesq);
 
   // InitialConditions
   registerInitialCondition(KaempferAnalyticPhaseIC);

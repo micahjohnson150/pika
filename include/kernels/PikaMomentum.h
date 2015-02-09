@@ -24,6 +24,9 @@ public:
   virtual ~PikaMomentum(){}
 
 protected:
+  virtual Real Convective();
+  virtual Real Pressure();
+  virtual Real Viscous();
   virtual Real computeQpResidual();
   virtual Real computeQpJacobian();
   virtual Real computeQpOffDiagJacobian(unsigned jvar);
@@ -39,6 +42,7 @@ protected:
   VariableGradient& _grad_u_vel;
   VariableGradient& _grad_v_vel;
   VariableGradient& _grad_w_vel;
+  VariableGradient& _grad_phase;
 
   // Variable numberings
   unsigned _u_vel_var_number;
