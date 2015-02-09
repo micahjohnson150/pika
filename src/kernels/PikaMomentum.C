@@ -53,7 +53,7 @@ PikaMomentum::PikaMomentum(const std::string & name, InputParameters parameters)
   _rho(getParam<Real>("rho")),
   _gravity(getParam<RealVectorValue>("gravity")),
   _component(getParam<unsigned>("component")),
-  _xi(_property_uo.getParam<Real>("property_scaling"))
+  _xi(_property_uo.getParam<Real>("temporal_scaling"))
 
 {
 }
