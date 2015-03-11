@@ -9,39 +9,27 @@
 /*                      With the U. S. Department of Energy                       */
 /**********************************************************************************/
 
-#ifndef PHASEBOUSSINESQ_H
-#define PHASEBOUSSINESQ_H
+#ifndef PHASECONVECTION_H
+#define PHASECONVECTION_H
 
 // MOOSE includes
-#include "Boussinesq.h"
+#include "Kernel.h"
 
 // Pika includes
 #include "PropertyUserObjectInterface.h"
-#include "CoefficientKernelInterface.h"
 
 //Forward Declarations
-class PhaseBoussinesq;
+class PhaseConvection;
 
 template<>
-InputParameters validParams<PhaseBoussinesq>();
+InputParameters validParams<PhaseConvection>();
 
 /**
- * A coefficient diffusion Kernel
+ * A convection Kernel
  *
- * This Kernel allows to a coefficient to be applied to the diffusion term, that
- * coefficient may be either a scalar value or a scalar material property.
- *
- * This Kernel includes the ability to scale and offset the coefficient. The
- * coefficient (material or scalar) is applied as:
- *     (scale * coefficient + offset) * div(coefficient \nabla u)
- *
- * Also, include the ability to toggle the additional temporal scaling parameter (\xi)
- * as defined by Kaempfer and Plapp (2009). This temporal scalling is applied in
- * additions to the coefficient scaling:
- *     xi * (scale * coefficient + offset) * div(coefficient \nabla u)
  */
-class PhaseBoussinesq :
-  public Boussinesq,
+class PhaseConvection :
+  public Kernel,
   public PropertyUserObjectInterface
 {
 public:
@@ -49,33 +37,41 @@ public:
   /**
    * Class constructor
    */
-  PhaseBoussinesq(const std::string & name, InputParameters parameters);
+  PhaseConvection(const std::string & name, InputParameters parameters);
 
 protected:
 
   /**
    * Compute residual
-   * Utilizes Boussinesq::computeQpResidual with phase dependency added
-
    */
   virtual Real computeQpResidual();
 
   /**
    * Compute Jacobian
-   * Utilizes Boussinesq::computeQpJacobian with phase dependency added
    */
   virtual Real computeQpJacobian();
 
  /**
    * Compute off diagonal jacobian
-   * Utilizes Boussinesq::computeQpOffDiagJacobian  with phase dependency added
    */
 
 
   virtual Real computeQpOffDiagJacobian(unsigned jvar);
 
+  // Coupled variables
+  VariableValue& _u_vel;
+  VariableValue& _v_vel;
+  VariableValue& _w_vel;
+  
+  // Variable numberings
+  unsigned _u_vel_var_number;
+  unsigned _v_vel_var_number;
+  unsigned _w_vel_var_number;
+
   VariableValue& _phase;
   unsigned _phase_var_number;
+  Real _rho;
+  Real _xi;
 
 };
 

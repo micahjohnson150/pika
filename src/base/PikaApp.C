@@ -50,6 +50,8 @@
 #include "PikaHomogenizedKernel.h"
 #include "PikaMomentum.h"
 #include "PhaseBoussinesq.h"
+#include "PhaseMass.h"
+#include "PhaseConvection.h"
 
 // AuxKernels
 #include "ErrorFunctionAux.h"
@@ -141,6 +143,8 @@ PikaApp::registerObjects(Factory & factory)
   registerKernel(PikaHomogenizedKernel);
   registerKernel(PikaMomentum);
   registerKernel(PhaseBoussinesq);
+  registerKernel(PhaseMass);
+  registerKernel(PhaseConvection);
 
   // InitialConditions
   registerInitialCondition(KaempferAnalyticPhaseIC);
