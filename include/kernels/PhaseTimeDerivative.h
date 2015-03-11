@@ -61,7 +61,7 @@ protected:
 
   VariableValue& _phase;
   unsigned _phase_var_number;
-  Real _rho_vs_T0;
+  Real _rho;
 
 };
 

@@ -111,7 +111,24 @@
     v = v_y
     phase = phi
   [../]
-  [./x_momentum]
+  [./Boussinesq]
+    type = PhaseBoussinesq
+    variable = v_y
+    component = 1
+    T = T
+    T_ref = 263
+    phase = phi
+  [../]
+  [./v_y_momentum]
+    type = PikaMomentum
+    variable = v_y
+    vel_y = v_y
+    vel_x = v_x
+    component = 1
+    p = p
+    phase = phi
+  [../]
+  [./v_x_momentum]
     type = PikaMomentum
     variable = v_x
     vel_y = v_y
@@ -120,13 +137,28 @@
     p = p
     phase = phi
   [../]
-  [./y_momentum]
-    type = PikaMomentum
+  [./v_x_time]
+    type = PhaseTimeDerivative
+    variable = v_x
+    phase = phi
+  [../]
+  [./v_y_time]
+    type = PhaseTimeDerivative
     variable = v_y
-    vel_y = v_y
-    vel_x = v_x
-    component = 1
-    p = p
+    phase = phi
+  [../]
+  [./vapor_convection]
+    type = PhaseConvection
+    variable = u
+    u = v_x
+    v = v_y
+    phase = phi
+  [../]
+  [./heat_convection]
+    type = PhaseConvection
+    variable = T
+    u = v_x
+    v = v_y
     phase = phi
   [../]
 []
