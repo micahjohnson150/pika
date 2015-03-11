@@ -68,7 +68,9 @@ PropertyUserObject::objectParams()
   params.addParam<Real>("heat_capacity_air", 1.4e3, "Heat capacity of air, C_a [J/(m^3 K)]");
   params.addParam<Real>("water_vapor_diffusion_coefficient", 2.178e-5, "Diffusion coefficient water vapor in air, D_v [m^2/s]");
   params.addParam<Real>("density_air", 1.341, "Density of air, \rho_a [kg/m^3]");
-  params.addParamNamesToGroup("density_air conductivity_air heat_capacity_air water_vapor_diffusion_coefficient", "Vapor");
+  params.addParam<Real>("dry_air_viscosity", 1.599e-5, "viscosity of air, \\mu [kg s/m^2 ]");
+  params.addParam<Real>("thermal_expansion", 3.6e-3, "coefficient of thermal expansion, \\alpha [1/k ]");
+  params.addParamNamesToGroup("density_air conductivity_air heat_capacity_air water_vapor_diffusion_coefficient dry_air_viscosity thermal_expansion", "Vapor");
 
   // Phase-field properties
   params.addParam<Real>("interface_free_energy", 1.09e-1, "Interface free energy, \\gamma [J/m^2]");
@@ -84,9 +86,10 @@ PropertyUserObject::objectParams()
   params.addParam<Real>("latent_heat", 2.6e9, "Latent heat of sublimation, L_{sg} [J/m^3]");
   params.addParam<Real>("atmospheric_pressure", 1.01325e5, "Atmospheric pressure, P_a [Pa]");
   params.addParam<Real>("reference_temperature", 263.15, "Reference temperature, T_0 [K]");
+  params.addParam<RealVectorValue>("gravity", "gravity vector");
   params.addParam<bool>("debug", false, "Enable the creating of material properties for debugging");
 
-  params.addParamNamesToGroup("latent_heat reference_temperature atmospheric_pressure ", "Misc");
+  params.addParamNamesToGroup("latent_heat reference_temperature atmospheric_pressure gravity", "Misc");
 
   // Scaling terms
   params.addParam<Real>("temporal_scaling", 1e-5, "Snow metamorphosis time scaling value");

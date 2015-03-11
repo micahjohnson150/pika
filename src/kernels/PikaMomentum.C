@@ -14,9 +14,6 @@ InputParameters validParams<PikaMomentum>()
   params.addRequiredCoupledVar("phase", "variable containing the phase");
 
   // Required parameters
-  params.addRequiredParam<Real>("mu", "dynamic viscosity");
-  params.addRequiredParam<Real>("rho", "density");
-  params.addRequiredParam<RealVectorValue>("gravity", "Direction of the gravity vector");
   params.addRequiredParam<unsigned>("component", "0,1,2 depending on if we are solving the x,y,z component of the momentum equation");
 
   return params;
@@ -49,9 +46,9 @@ PikaMomentum::PikaMomentum(const std::string & name, InputParameters parameters)
   _phase_var_number(coupled("phase")),
 
   // Required parameters
-  _mu(getParam<Real>("mu")),
-  _rho(getParam<Real>("rho")),
-  _gravity(getParam<RealVectorValue>("gravity")),
+  _mu(_property_uo.getParam<Real>("dry_air_viscosity")),
+  _rho(_property_uo.equilibriumWaterVaporConcentrationAtSaturationAtReferenceTemperature()),
+  _gravity(_property_uo.getParam<RealVectorValue>("gravity")),
   _component(getParam<unsigned>("component")),
   _xi(_property_uo.getParam<Real>("temporal_scaling"))
 
