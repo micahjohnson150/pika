@@ -52,6 +52,7 @@
 #include "PhaseBoussinesq.h"
 #include "PhaseMass.h"
 #include "PhaseConvection.h"
+#include "PhaseTimeDerivative.h"
 
 // AuxKernels
 #include "ErrorFunctionAux.h"
@@ -145,6 +146,7 @@ PikaApp::registerObjects(Factory & factory)
   registerKernel(PhaseBoussinesq);
   registerKernel(PhaseMass);
   registerKernel(PhaseConvection);
+  registerKernel(PhaseTimeDerivative);
 
   // InitialConditions
   registerInitialCondition(KaempferAnalyticPhaseIC);
