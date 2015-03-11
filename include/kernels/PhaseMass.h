@@ -9,21 +9,21 @@
 /*                      With the U. S. Department of Energy                       */
 /**********************************************************************************/
 
-#ifndef PHASEBOUSSINESQ_H
-#define PHASEBOUSSINESQ_H
+#ifndef PHASEMASS_H
+#define PHASEMASS_H
 
 // MOOSE includes
-#include "Boussinesq.h"
+#include "INSMass.h"
 
 // Pika includes
 #include "PropertyUserObjectInterface.h"
 #include "CoefficientKernelInterface.h"
 
 //Forward Declarations
-class PhaseBoussinesq;
+class PhaseMass;
 
 template<>
-InputParameters validParams<PhaseBoussinesq>();
+InputParameters validParams<PhaseMass>();
 
 /**
  * A coefficient diffusion Kernel
@@ -40,35 +40,34 @@ InputParameters validParams<PhaseBoussinesq>();
  * additions to the coefficient scaling:
  *     xi * (scale * coefficient + offset) * div(coefficient \nabla u)
  */
-class PhaseBoussinesq :
-  public Boussinesq,
-  public PropertyUserObjectInterface
+class PhaseMass :
+  public INSMass
 {
 public:
 
   /**
    * Class constructor
    */
-  PhaseBoussinesq(const std::string & name, InputParameters parameters);
+  PhaseMass(const std::string & name, InputParameters parameters);
 
 protected:
 
   /**
    * Compute residual
-   * Utilizes Boussinesq::computeQpResidual with phase dependency added
+   * Utilizes INSMass::computeQpResidual with phase dependency added
 
    */
   virtual Real computeQpResidual();
 
   /**
    * Compute Jacobian
-   * Utilizes Boussinesq::computeQpJacobian with phase dependency added
+   * Utilizes INSMass::computeQpJacobian with phase dependency added
    */
   virtual Real computeQpJacobian();
 
  /**
    * Compute off diagonal jacobian
-   * Utilizes Boussinesq::computeQpOffDiagJacobian  with phase dependency added
+   * Utilizes INSMass::computeQpOffDiagJacobian  with phase dependency added
    */
 
 
@@ -79,4 +78,4 @@ protected:
 
 };
 
-#endif //MATDIFFUSION_H
+#endif //PHASEMASS

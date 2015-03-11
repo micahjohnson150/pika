@@ -11,49 +11,39 @@
 
 
 // MOOSE includes
-#include "PhaseBoussinesq.h"
+#include "PhaseMass.h"
 
 template<>
-InputParameters validParams<PhaseBoussinesq>()
+InputParameters validParams<PhaseMass>()
 {
-  InputParameters params = validParams<Boussinesq>();
+  InputParameters params = validParams<INSMass>();
   params.addCoupledVar("phase","variable containing the phase");
-  params.suppressParameter<Real>("rho");
-  params.suppressParameter<Real>("gravity");
-  params.suppressParameter<Real>("beta");
   return params;
 }
 
-PhaseBoussinesq::PhaseBoussinesq(const std::string & name, InputParameters parameters) :
-    Boussinesq(name, parameters),
-    PropertyUserObjectInterface(name,parameters),
+PhaseMass::PhaseMass(const std::string & name, InputParameters parameters) :
+    INSMass(name, parameters),
     _phase(coupledValue("phase")),
     _phase_var_number(coupled("phase"))
-
 {
-  _rho=_property_uo.equilibriumWaterVaporConcentrationAtSaturationAtReferenceTemperature();
-  _gravity=_property_uo.getParam<RealVectorValue>("gravity");
-  _beta=_property_uo.getParam<Real>("thermal_expansion");
-
 }
 
 Real
-PhaseBoussinesq::computeQpResidual()
+PhaseMass::computeQpResidual()
 {
-
-  return 0.5 * (1.0-_phase[_qp]) * Boussinesq::computeQpResidual();
+  return 0.5 * (1.0-_phase[_qp]) * INSMass::computeQpResidual();
 }
 
 Real
-PhaseBoussinesq::computeQpJacobian()
+PhaseMass::computeQpJacobian()
 {
-    return 0.5 * (1.0-_phase[_qp]) * Boussinesq::computeQpJacobian();
+    return 0.5 * (1.0-_phase[_qp]) * INSMass::computeQpJacobian();
 }
 Real
-PhaseBoussinesq::computeQpOffDiagJacobian(unsigned jvar)
+PhaseMass::computeQpOffDiagJacobian(unsigned jvar)
 {
   if (jvar==_phase_var_number)
-    return  -0.5 * _phi[_j][_qp]* Boussinesq::computeQpResidual();
+    return  -0.5 * _phi[_j][_qp]* INSMass::computeQpResidual();
   else
-    return Boussinesq::computeQpOffDiagJacobian(jvar);
+    return INSMass::computeQpOffDiagJacobian(jvar);
 }
