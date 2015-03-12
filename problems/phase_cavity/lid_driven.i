@@ -1,11 +1,22 @@
 [Mesh]
-  type = FileMesh
-  file = phi_initial.e
+  type = GeneratedMesh
   dim = 2
-  uniform_refine = 1
+  nx = 10
+  ny = 10
+  uniform_refine = 2
+  elem_type = QUAD9
+[]
+
+[MeshModifiers]
+  [./corner]
+    type = AddExtraNodeset
+    nodes = 0
+    new_boundary = 99
+  [../]
 []
 
 [Variables]
+  active = 'phi v_x v_y p'
   [./T]
   [../]
   [./u]
@@ -22,12 +33,8 @@
   [../]
 []
 
-[AuxVariables]
-  [./phi_aux]
-  [../]
-[]
-
 [Functions]
+  active = ''
   [./T_func]
     type = ParsedFunction
     value = -543*x+267.515
@@ -40,6 +47,7 @@
 []
 
 [Kernels]
+  active = 'v_x_time phi_double_well v_x_momentum v_y_time phi_square_gradient mass_cons v_y_momentum'
   [./heat_diffusion]
     type = PikaDiffusion
     variable = T
@@ -163,15 +171,8 @@
   [../]
 []
 
-[AuxKernels]
-  [./phi_aux_kernel]
-    type = PikaPhaseInitializeAux
-    variable = phi_aux
-    phase = phi
-  [../]
-[]
-
 [BCs]
+  active = 'no_slip y_no_slip pressure_pin lid'
   [./T_hot]
     type = DirichletBC
     variable = T
@@ -190,54 +191,43 @@
     boundary = 99
     value = 0
   [../]
-  [./x_no_slip]
-    type = DirichletBC
-    variable = v_x
-    boundary = 'top bottom left right'
-    value = 0
-  [../]
   [./y_no_slip]
     type = DirichletBC
     variable = v_y
-    boundary = 'top bottom left right'
+    boundary = top
     value = 0
   [../]
-[]
-
-[Postprocessors]
-[]
-
-[UserObjects]
-  [./phi_initial]
-    type = SolutionUserObject
-    mesh = phi_initial.e
-    system_variables = phi
+  [./no_slip]
+    type = DirichletBC
+    variable = phi
+    boundary = 'bottom left right'
+    value = 1
+  [../]
+  [./lid]
+    type = DirichletBC
+    variable = v_x
+    boundary = top
+    value = 0.005
   [../]
 []
 
 [Preconditioning]
   [./SMP_PJFNK]
     type = SMP
-    full = true
   [../]
 []
 
 [Executioner]
   # Preconditioned JFNK (default)
-  type = Transient
-  num_steps = 2
-  dt = 1e-2
+  type = Steady
   l_max_its = 100
   nl_max_its = 6
   solve_type = PJFNK
   petsc_options_iname = -ksp_gmres_restart
   petsc_options_value = 300
-  dtmax = 10
   nl_rel_tol = 1e-9
-  dtmin = 1e-2
   line_search = none
   l_tol = 1e-6
-  scheme = crank-nicolson
   [./TimeStepper]
     type = SolutionTimeAdaptiveDT
     dt = 1e-2
@@ -247,9 +237,9 @@
 
 [Adaptivity]
   max_h_level = 9
-  marker = combo_marker
+  marker = phi_grad_marker
   initial_steps = 3
-  initial_marker = combo_marker
+  initial_marker = phi_grad_marker
   [./Indicators]
     [./phi_grad_indicator]
       type = GradientJumpIndicator
@@ -289,10 +279,11 @@
 []
 
 [ICs]
+  active = 'phase_ic'
   [./phase_ic]
     variable = phi
-    type = FunctionIC
-    function = phi_func
+    type = ConstantIC
+    value = -1
   [../]
   [./temperature_ic]
     variable = T
@@ -309,7 +300,7 @@
 []
 
 [PikaMaterials]
-  temperature = T
+  temperature = 263
   interface_thickness = 1e-5
   temporal_scaling = 1e-4
   condensation_coefficient = .01
