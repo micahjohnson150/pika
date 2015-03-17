@@ -1,7 +1,9 @@
 [Mesh]
-  type = FileMesh
-  file = lid_driven_initial.e
+  type = GeneratedMesh
   dim = 2
+  nx = 16
+  ny = 16
+  uniform_refine = 2
 []
 
 [MeshModifiers]
@@ -46,7 +48,7 @@
 []
 
 [Kernels]
-  active = 'v_x_time phi_double_well v_x_momentum phi_time v_y_time phi_square_gradient mass_cons v_y_momentum'
+  active = 'phi_double_well v_x_momentum phi_square_gradient mass_cons v_y_momentum'
   [./heat_diffusion]
     type = PikaDiffusion
     variable = T
@@ -171,7 +173,7 @@
 []
 
 [BCs]
-  active = 'lid x_no_slip y_no_slip pressure_pin'
+  active = 'lid pressure_pin y_no_slip no_slip phi_neuman'
   [./T_hot]
     type = DirichletBC
     variable = T
@@ -200,13 +202,18 @@
     type = DirichletBC
     variable = v_x
     boundary = top
-    value = 1
+    value = .1
   [../]
-  [./x_no_slip]
+  [./no_slip]
     type = DirichletBC
     variable = v_x
     boundary = 'bottom left right'
     value = 0
+  [../]
+  [./phi_neuman]
+    type = NeumannBC
+    variable = phi
+    boundary = 'top bottom left right'
   [../]
 []
 
@@ -227,9 +234,7 @@
 
 [Executioner]
   # Preconditioned JFNK (default)
-  type = Transient
-  num_steps = 10
-  dt = .001
+  type = Steady
   l_max_its = 50
   nl_max_its = 10
   solve_type = PJFNK
@@ -242,54 +247,8 @@
   [./TimeStepper]
     type = IterationAdaptiveDT
     dt = 1e-2
-    linear_iteration_ratio = 5
+    linear_iteration_ratio = 1
     optimal_iterations = 3
-  [../]
-[]
-
-[Adaptivity]
-  max_h_level = 5
-  marker = combo_marker
-  initial_steps = 1
-  initial_marker = phi_grad_marker
-  steps = 2
-  [./Indicators]
-    [./phi_grad_indicator]
-      type = GradientJumpIndicator
-      variable = phi
-    [../]
-    [./v_x_grad_indicator]
-      type = GradientJumpIndicator
-      variable = v_x
-    [../]
-    [./v_y_grad_indicator]
-      type = GradientJumpIndicator
-      variable = v_y
-    [../]
-  [../]
-  [./Markers]
-    [./combo_marker]
-      type = ComboMarker
-      markers = 'phi_grad_marker  v_x_grad_marker v_y_grad_marker'
-    [../]
-    [./phi_grad_marker]
-      type = ErrorToleranceMarker
-      coarsen = 1e-7
-      indicator = phi_grad_indicator
-      refine = 1e-5
-    [../]
-    [./v_x_grad_marker]
-      type = ErrorToleranceMarker
-      coarsen = 1e-7
-      indicator = v_x_grad_indicator
-      refine = 1e-5
-    [../]
-    [./v_y_grad_marker]
-      type = ErrorToleranceMarker
-      coarsen = 1e-7
-      indicator = v_y_grad_indicator
-      refine = 1e-5
-    [../]
   [../]
 []
 
@@ -325,7 +284,7 @@
 [PikaMaterials]
   temperature = 263
   interface_thickness = 1e-5
-  temporal_scaling = 1
+  temporal_scaling = 1e-6
   condensation_coefficient = .01
   phase = phi
   gravity = '0 -1 0'
