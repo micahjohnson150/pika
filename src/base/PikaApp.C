@@ -19,6 +19,8 @@
 #include "PhaseFieldApp.h"
 #include "HeatConductionApp.h"
 #include "SolidMechanicsApp.h"
+#include "NavierStokesApp.h"
+
 
 // UserObjects
 #include "PropertyUserObject.h"
@@ -46,6 +48,11 @@
 #include "AntiTrapping.h"
 #include "IbexShortwaveForcingFunction.h"
 #include "PikaHomogenizedKernel.h"
+#include "PikaMomentum.h"
+#include "PhaseBoussinesq.h"
+#include "PhaseMass.h"
+#include "PhaseConvection.h"
+#include "PhaseTimeDerivative.h"
 
 // AuxKernels
 #include "ErrorFunctionAux.h"
@@ -85,12 +92,14 @@ PikaApp::PikaApp(const std::string & name, InputParameters parameters) :
   PhaseFieldApp::registerObjects(_factory);
   HeatConductionApp::registerObjects(_factory);
   SolidMechanicsApp::registerObjects(_factory);
+  NavierStokesApp::registerObjects(_factory);
   PikaApp::registerObjects(_factory);
 
   Moose::associateSyntax(_syntax, _action_factory);
   PhaseFieldApp::associateSyntax(_syntax, _action_factory);
   HeatConductionApp::associateSyntax(_syntax, _action_factory);
   SolidMechanicsApp::associateSyntax(_syntax, _action_factory);
+  NavierStokesApp::associateSyntax(_syntax, _action_factory);
   PikaApp::associateSyntax(_syntax, _action_factory);
 }
 
@@ -133,6 +142,11 @@ PikaApp::registerObjects(Factory & factory)
   registerKernel(AntiTrapping);
   registerKernel(IbexShortwaveForcingFunction);
   registerKernel(PikaHomogenizedKernel);
+  registerKernel(PikaMomentum);
+  registerKernel(PhaseBoussinesq);
+  registerKernel(PhaseMass);
+  registerKernel(PhaseConvection);
+  registerKernel(PhaseTimeDerivative);
 
   // InitialConditions
   registerInitialCondition(KaempferAnalyticPhaseIC);
