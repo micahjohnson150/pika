@@ -68,7 +68,7 @@ Real PikaMomentum::Convective()
 Real PikaMomentum::Pressure()
 {
   // The pressure part, -p (div v)
-  return -_p[_qp] * _grad_test[_i][_qp](_component);
+  return -_xi * _p[_qp] * _grad_test[_i][_qp](_component);
 }
 
 Real PikaMomentum::Viscous()
@@ -155,7 +155,7 @@ Real PikaMomentum::computeQpOffDiagJacobian(unsigned jvar)
   }
 
   else if (jvar == _p_var_number)
-    return -_phi[_j][_qp] * _grad_test[_i][_qp](_component);
+    return -_xi * _phi[_j][_qp] * _grad_test[_i][_qp](_component);
 
   else if (jvar == _phase_var_number)
       return -0.5 * _phi[_j][_qp]* PikaMomentum::computeQpResidual();

@@ -12,7 +12,7 @@
   [./BR_corner]
     type = AddExtraNodeset
     new_boundary = 99
-    coord = '0.005 0'
+    coord = '0.0025 0.0025'
   [../]
 []
 
@@ -75,8 +75,8 @@
 []
 
 [Adaptivity]
-  max_h_level = 7
-  initial_steps = 5
+  max_h_level = 5
+  initial_steps = 3
   marker = phi_marker
   initial_marker = phi_marker
   steps = 1
@@ -106,7 +106,6 @@
     file_base = lid_driven_initial
     additional_output_on = final
   [../]
-
 []
 
 [ICs]
