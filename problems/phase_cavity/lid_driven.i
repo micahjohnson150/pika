@@ -1,10 +1,7 @@
 [Mesh]
-  type = GeneratedMesh
+  type = FileMesh
+  file = lid_driven_initial.e
   dim = 2
-  nx = 10
-  ny = 10
-  uniform_refine = 2
-  elem_type = QUAD9
 []
 
 [MeshModifiers]
@@ -12,6 +9,8 @@
     type = AddExtraNodeset
     nodes = 0
     new_boundary = 99
+    tolerance = 1e-07
+    coord = '0.0025 0.0025'
   [../]
 []
 
@@ -34,7 +33,7 @@
 []
 
 [Functions]
-  active = ''
+  active = 'phi_func'
   [./T_func]
     type = ParsedFunction
     value = -543*x+267.515
@@ -42,12 +41,12 @@
   [./phi_func]
     type = SolutionFunction
     from_variable = phi
-    solution = phi_initial
+    solution = initial_uo
   [../]
 []
 
 [Kernels]
-  active = 'v_x_time phi_double_well v_x_momentum v_y_time phi_square_gradient mass_cons v_y_momentum'
+  active = 'v_x_time phi_double_well v_x_momentum phi_time v_y_time phi_square_gradient mass_cons v_y_momentum'
   [./heat_diffusion]
     type = PikaDiffusion
     variable = T
@@ -172,7 +171,7 @@
 []
 
 [BCs]
-  active = 'no_slip y_no_slip pressure_pin lid'
+  active = 'lid x_no_slip y_no_slip pressure_pin'
   [./T_hot]
     type = DirichletBC
     variable = T
@@ -194,77 +193,101 @@
   [./y_no_slip]
     type = DirichletBC
     variable = v_y
-    boundary = top
+    boundary = 'top left right bottom'
     value = 0
-  [../]
-  [./no_slip]
-    type = DirichletBC
-    variable = phi
-    boundary = 'bottom left right'
-    value = 1
   [../]
   [./lid]
     type = DirichletBC
     variable = v_x
     boundary = top
-    value = 0.005
+    value = 1
+  [../]
+  [./x_no_slip]
+    type = DirichletBC
+    variable = v_x
+    boundary = 'bottom left right'
+    value = 0
+  [../]
+[]
+
+[UserObjects]
+  [./initial_uo]
+    type = SolutionUserObject
+    mesh = lid_driven_initial.e
+    system_variables = phi
   [../]
 []
 
 [Preconditioning]
   [./SMP_PJFNK]
     type = SMP
+    full = true
   [../]
 []
 
 [Executioner]
   # Preconditioned JFNK (default)
-  type = Steady
-  l_max_its = 100
-  nl_max_its = 6
+  type = Transient
+  num_steps = 10
+  dt = .001
+  l_max_its = 50
+  nl_max_its = 10
   solve_type = PJFNK
   petsc_options_iname = -ksp_gmres_restart
   petsc_options_value = 300
   nl_rel_tol = 1e-9
   line_search = none
   l_tol = 1e-6
+  nl_abs_step_tol = 1e-9
   [./TimeStepper]
-    type = SolutionTimeAdaptiveDT
+    type = IterationAdaptiveDT
     dt = 1e-2
-    percent_change = 1
+    linear_iteration_ratio = 5
+    optimal_iterations = 3
   [../]
 []
 
 [Adaptivity]
-  max_h_level = 9
-  marker = phi_grad_marker
-  initial_steps = 3
+  max_h_level = 5
+  marker = combo_marker
+  initial_steps = 1
   initial_marker = phi_grad_marker
+  steps = 2
   [./Indicators]
     [./phi_grad_indicator]
       type = GradientJumpIndicator
       variable = phi
     [../]
-    [./u_grad_indicator]
+    [./v_x_grad_indicator]
       type = GradientJumpIndicator
-      variable = u
+      variable = v_x
+    [../]
+    [./v_y_grad_indicator]
+      type = GradientJumpIndicator
+      variable = v_y
     [../]
   [../]
   [./Markers]
     [./combo_marker]
       type = ComboMarker
-      markers = 'phi_grad_marker u_grad_marker'
-    [../]
-    [./u_grad_marker]
-      type = ErrorToleranceMarker
-      coarsen = 1e-10
-      indicator = u_grad_indicator
-      refine = 1e-8
+      markers = 'phi_grad_marker  v_x_grad_marker v_y_grad_marker'
     [../]
     [./phi_grad_marker]
       type = ErrorToleranceMarker
       coarsen = 1e-7
       indicator = phi_grad_indicator
+      refine = 1e-5
+    [../]
+    [./v_x_grad_marker]
+      type = ErrorToleranceMarker
+      coarsen = 1e-7
+      indicator = v_x_grad_indicator
+      refine = 1e-5
+    [../]
+    [./v_y_grad_marker]
+      type = ErrorToleranceMarker
+      coarsen = 1e-7
+      indicator = v_y_grad_indicator
       refine = 1e-5
     [../]
   [../]
@@ -282,8 +305,8 @@
   active = 'phase_ic'
   [./phase_ic]
     variable = phi
-    type = ConstantIC
-    value = -1
+    type = FunctionIC
+    function = phi_func
   [../]
   [./temperature_ic]
     variable = T
@@ -302,7 +325,7 @@
 [PikaMaterials]
   temperature = 263
   interface_thickness = 1e-5
-  temporal_scaling = 1e-4
+  temporal_scaling = 1
   condensation_coefficient = .01
   phase = phi
   gravity = '0 -1 0'
