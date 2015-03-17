@@ -54,6 +54,9 @@
   [../]
 []
 
+[BCs]
+[]
+
 [Executioner]
   # Preconditioned JFNK (default)
   type = Transient
@@ -100,21 +103,22 @@
   [./out]
     output_final = true
     type = Exodus
-    file_base = phi_initial
+    file_base = lid_driven_initial
     additional_output_on = final
   [../]
+
 []
 
 [ICs]
   [./phase_ic]
-    x1 = 0
-    y1 = 0
+    x1 = 1e-5
+    y1 = 1e-5
     variable = phi
     type = BoundingBoxIC
     y2 = 0.005
-    inside = 1
-    x2 = 0.0025
-    outside = -1
+    inside = -1
+    x2 = 0.00499
+    outside = 1
   [../]
 []
 
