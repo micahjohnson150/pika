@@ -1,19 +1,10 @@
 [Mesh]
-  type = GeneratedMesh
-  dim = 2
-  nx = 16
-  ny = 16
-  uniform_refine = 2
+  type = FileMesh
+  file=lid_driven_initial.e
+  uniform_refine = 1
 []
 
 [MeshModifiers]
-  [./corner]
-    type = AddExtraNodeset
-    nodes = 0
-    new_boundary = 99
-    tolerance = 1e-07
-    coord = '0.0025 0.0025'
-  [../]
 []
 
 [Variables]
@@ -236,13 +227,13 @@
   # Preconditioned JFNK (default)
   type = Steady
   l_max_its = 50
-  nl_max_its = 10
+  nl_max_its = 50
   solve_type = PJFNK
   petsc_options_iname = -ksp_gmres_restart
   petsc_options_value = 300
-  nl_rel_tol = 1e-9
+  nl_rel_tol = 1e-15
   line_search = none
-  l_tol = 1e-6
+  l_tol = 1e-9
   nl_abs_step_tol = 1e-9
   [./TimeStepper]
     type = IterationAdaptiveDT
