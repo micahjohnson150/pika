@@ -53,6 +53,7 @@
 #include "PhaseMass.h"
 #include "PhaseConvection.h"
 #include "PhaseTimeDerivative.h"
+#include "PhaseNoSlipForcing.h"
 
 // AuxKernels
 #include "ErrorFunctionAux.h"
@@ -75,6 +76,7 @@
 
 //BCS
 #include "PikaChemicalPotentialBC.h"
+#include "PhaseNoSlipBC.h"
 
 template<>
 InputParameters validParams<PikaApp>()
@@ -147,6 +149,7 @@ PikaApp::registerObjects(Factory & factory)
   registerKernel(PhaseMass);
   registerKernel(PhaseConvection);
   registerKernel(PhaseTimeDerivative);
+  registerKernel(PhaseNoSlipForcing);
 
   // InitialConditions
   registerInitialCondition(KaempferAnalyticPhaseIC);
@@ -163,6 +166,7 @@ PikaApp::registerObjects(Factory & factory)
   // BoundaryConditions
   registerBoundaryCondition(IbexSurfaceFluxBC);
   registerBoundaryCondition(PikaChemicalPotentialBC);
+  registerBoundaryCondition(PhaseNoSlipBC);
 }
 
 void
