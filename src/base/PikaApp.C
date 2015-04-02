@@ -69,14 +69,11 @@
 
 // BoundaryConditions
 #include "IbexSurfaceFluxBC.h"
+#include "PikaChemicalPotentialBC.h"
 
 // Actions
 #include "PikaMaterialAction.h"
 #include "PikaCriteriaAction.h"
-
-//BCS
-#include "PikaChemicalPotentialBC.h"
-#include "PhaseNoSlipBC.h"
 
 template<>
 InputParameters validParams<PikaApp>()
@@ -166,7 +163,6 @@ PikaApp::registerObjects(Factory & factory)
   // BoundaryConditions
   registerBoundaryCondition(IbexSurfaceFluxBC);
   registerBoundaryCondition(PikaChemicalPotentialBC);
-  registerBoundaryCondition(PhaseNoSlipBC);
 }
 
 void
