@@ -44,7 +44,7 @@
 []
 
 [Kernels]
-  active = 'v_x_momentum mass_cons v_y_momentum no_slip_x no_slip_y'
+  active = 'v_x_momentum mass_cons no_slip_x no_slip_y v_y_momentum'
   [./heat_diffusion]
     type = PikaDiffusion
     variable = T
@@ -279,9 +279,9 @@
 []
 
 [ICs]
-  active = ''
+  active = 'phase_ic'
   [./phase_ic]
-    variable = phi
+    variable = phi_aux
     type = FunctionIC
     function = phi_func
   [../]
