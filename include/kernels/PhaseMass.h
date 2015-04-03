@@ -13,11 +13,7 @@
 #define PHASEMASS_H
 
 // MOOSE includes
-#include "INSMass.h"
-
-// Pika includes
-#include "PropertyUserObjectInterface.h"
-#include "CoefficientKernelInterface.h"
+#include "Kernel.h"
 
 //Forward Declarations
 class PhaseMass;
@@ -26,22 +22,12 @@ template<>
 InputParameters validParams<PhaseMass>();
 
 /**
- * A coefficient diffusion Kernel
+ * div[ ((1-phase) / 2.0 ) * vec{v} ]
  *
- * This Kernel allows to a coefficient to be applied to the diffusion term, that
- * coefficient may be either a scalar value or a scalar material property.
- *
- * This Kernel includes the ability to scale and offset the coefficient. The
- * coefficient (material or scalar) is applied as:
- *     (scale * coefficient + offset) * div(coefficient \nabla u)
- *
- * Also, include the ability to toggle the additional temporal scaling parameter (\xi)
- * as defined by Kaempfer and Plapp (2009). This temporal scalling is applied in
- * additions to the coefficient scaling:
- *     xi * (scale * coefficient + offset) * div(coefficient \nabla u)
+ * Incompressible mass conservation for one sided momentum equations 
  */
 class PhaseMass :
-  public INSMass
+  public Kernel
 {
 public:
 
@@ -54,26 +40,35 @@ protected:
 
   /**
    * Compute residual
-   * Utilizes INSMass::computeQpResidual with phase dependency added
-
    */
   virtual Real computeQpResidual();
 
   /**
    * Compute Jacobian
-   * Utilizes INSMass::computeQpJacobian with phase dependency added
    */
   virtual Real computeQpJacobian();
 
  /**
    * Compute off diagonal jacobian
-   * Utilizes INSMass::computeQpOffDiagJacobian  with phase dependency added
    */
 
-
   virtual Real computeQpOffDiagJacobian(unsigned jvar);
-
+  //Coupled Variables
+  VariableValue& _u_vel;
+  VariableValue& _v_vel;
+  VariableValue& _w_vel;
   VariableValue& _phase;
+
+  // Gradients
+  VariableGradient& _grad_u_vel;
+  VariableGradient& _grad_v_vel;
+  VariableGradient& _grad_w_vel;
+  VariableGradient& _grad_phase;
+
+  // Variable numberings
+  unsigned _u_vel_var_number;
+  unsigned _v_vel_var_number;
+  unsigned _w_vel_var_number;
   unsigned _phase_var_number;
 
 };

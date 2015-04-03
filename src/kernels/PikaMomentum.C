@@ -68,7 +68,7 @@ Real PikaMomentum::Convective()
 Real PikaMomentum::Pressure()
 {
   // The pressure part, -p (div v)
-  return -_xi * _p[_qp] * _grad_test[_i][_qp](_component);
+  return -_xi *  _p[_qp] * _grad_test[_i][_qp](_component);
 }
 
 Real PikaMomentum::Viscous()

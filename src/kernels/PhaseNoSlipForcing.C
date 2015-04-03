@@ -52,10 +52,8 @@ Real PhaseNoSlipForcing::computeQpJacobian()
 
 Real PhaseNoSlipForcing::computeQpOffDiagJacobian(unsigned jvar)
 {
-/* if(jvar == _T_var_number)
-    return -0.5 * (1.0-_phase[_qp])* _rho * (1.0 -  _alpha * _phi[_j][_qp] * _test[_i][_qp] * _gravity(_component));
-  else if(jvar == _phase_var_number)
-    return -0.5 * _phi[_j][_qp]* _rho * (1.0 -  _alpha * (_T[_qp]-_T_ref) * _test[_i][_qp] * _gravity(_component));
-  else */
+  if(jvar == _phase_var_number)
+    return - _mu * 0.5 *  _phase[_qp] * _h * _u[_qp] / _w_2[_qp];
+  else
     return 0.0; 
 }
