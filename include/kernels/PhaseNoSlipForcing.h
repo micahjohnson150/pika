@@ -18,8 +18,8 @@ InputParameters validParams<PhaseNoSlipForcing>();
  * for continuous media
  */
 class PhaseNoSlipForcing : 
-    public Kernel//,
- //   public PropertyUserObjectInterface
+    public Kernel,
+    public PropertyUserObjectInterface
 {
 public:
   PhaseNoSlipForcing(const std::string & name, InputParameters parameters);
@@ -34,7 +34,9 @@ protected:
   // Coupled variables
   VariableValue& _phase;
   unsigned _phase_var_number;
-  Real _a;
-  Real _rho;
+  Real _h;
+  MaterialProperty<Real> &  _w_2;
+  Real _mu;
+  //Real _rho;
 };
 #endif // PHASENOSLIPFORCING_H
