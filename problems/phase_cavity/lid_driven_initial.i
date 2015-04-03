@@ -35,9 +35,10 @@
     property = relaxation_time
   [../]
   [./phase_diffusion]
-    type = PikaDiffusion
+    type = ACInterface
     variable = phi
-    property = interface_thickness_squared
+    mob_name = mobility
+    kappa_name = interface_thickness_squared
   [../]
   [./phase_double_well]
     type = DoubleWellPotential
@@ -110,7 +111,7 @@
 
 [ICs]
   [./phase_ic]
-    x1 = 1e-5
+    x1 = 0.001
     y1 = 1e-5
     variable = phi
     type = BoundingBoxIC
