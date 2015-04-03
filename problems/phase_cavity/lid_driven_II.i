@@ -8,7 +8,7 @@
 []
 
 [Variables]
-  active = 'phi v_x v_y p'
+  active = 'v_x v_y p'
   [./T]
   [../]
   [./u]
@@ -22,6 +22,11 @@
     order = SECOND
   [../]
   [./p]
+  [../]
+[]
+
+[AuxVariables]
+  [./phi_aux]
   [../]
 []
 
@@ -39,7 +44,7 @@
 []
 
 [Kernels]
-  active = 'phi_double_well v_x_momentum phi_square_gradient mass_cons v_y_momentum no_slip_x no_slip_y'
+  active = 'v_x_momentum mass_cons v_y_momentum no_slip_x no_slip_y'
   [./heat_diffusion]
     type = PikaDiffusion
     variable = T
@@ -110,7 +115,7 @@
     p = p
     u = v_x
     v = v_y
-    phase = phi
+    phase = phi_aux
   [../]
   [./Boussinesq]
     type = PhaseBoussinesq
@@ -126,7 +131,7 @@
     vel_x = v_x
     component = 1
     p = p
-    phase = phi
+    phase = phi_aux
   [../]
   [./v_x_momentum]
     type = PikaMomentum
@@ -135,7 +140,7 @@
     vel_x = v_x
     component = 0
     p = p
-    phase = phi
+    phase = phi_aux
   [../]
   [./v_x_time]
     type = PhaseTimeDerivative
@@ -164,17 +169,29 @@
   [./no_slip_x]
     type = PhaseNoSlipForcing
     variable = v_x
-    phase = phi
+    phase = phi_aux
+    h = .005
   [../]
   [./no_slip_y]
     type = PhaseNoSlipForcing
     variable = v_y
-    phase = phi
+    phase = phi_aux
+    h = .005
+  [../]
+[]
+
+[AuxKernels]
+  [./phi_solution]
+    type = SolutionAux
+    variable = phi_aux
+    from_variable = phi
+    solution = initial_uo
+    execute_on = timestep_begin
   [../]
 []
 
 [BCs]
-  active = 'lid y_no_slip pressure_pin'
+  active = 'lid no_slip y_no_slip pressure_pin'
   [./T_hot]
     type = DirichletBC
     variable = T
@@ -196,25 +213,25 @@
   [./y_no_slip]
     type = DirichletBC
     variable = v_y
-    boundary = top
+    boundary = 'top bottom left right'
     value = 0
   [../]
   [./lid]
     type = DirichletBC
     variable = v_x
     boundary = top
-    value = .1
+    value = 1
+  [../]
+  [./no_slip]
+    type = DirichletBC
+    variable = v_x
+    boundary = 'bottom left right'
+    value = 0
   [../]
   [./phi_neuman]
     type = NeumannBC
     variable = phi
     boundary = 'top bottom left right'
-  [../]
-  [./x_no_slip]
-    type = DirichletBC
-    variable = v_x
-    boundary = 'bottom left right'
-    value = 0
   [../]
 []
 
@@ -223,21 +240,21 @@
     type = SolutionUserObject
     mesh = lid_driven_initial.e
     system_variables = phi
+    transformation_order = 'translation scale rotation0'
   [../]
 []
 
 [Preconditioning]
   [./SMP_PJFNK]
     type = SMP
-    full = true
   [../]
 []
 
 [Executioner]
   # Preconditioned JFNK (default)
   type = Steady
-  l_max_its = 50
-  nl_max_its = 50
+  l_max_its = 150
+  nl_max_its = 15
   solve_type = PJFNK
   petsc_options_iname = -ksp_gmres_restart
   petsc_options_value = 300
@@ -262,7 +279,7 @@
 []
 
 [ICs]
-  active = 'phase_ic'
+  active = ''
   [./phase_ic]
     variable = phi
     type = FunctionIC
@@ -285,9 +302,9 @@
 [PikaMaterials]
   temperature = 263
   interface_thickness = 1e-5
-  temporal_scaling = 1e-6
+  temporal_scaling = 1 # 1e-6
   condensation_coefficient = .01
-  phase = phi
+  phase = phi_aux
   gravity = '0 -1 0'
 []
 
