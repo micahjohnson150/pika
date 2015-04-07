@@ -70,7 +70,6 @@ protected:
   unsigned _v_vel_var_number;
   unsigned _w_vel_var_number;
   unsigned _phase_var_number;
-
 };
 
 #endif //PHASEMASS
