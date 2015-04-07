@@ -42,6 +42,7 @@ protected:
   VariableGradient& _grad_u_vel;
   VariableGradient& _grad_v_vel;
   VariableGradient& _grad_w_vel;
+  VariableGradient& _grad_p;
   VariableGradient& _grad_phase;
 
   // Variable numberings

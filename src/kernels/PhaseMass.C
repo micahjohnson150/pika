@@ -53,9 +53,9 @@ Real
 PhaseMass::computeQpResidual()
 {
   //Arbitrarily multiplied by -1 to match - grad P, Shouldn't matter...I think. 
-  return -0.5 * (  - _grad_phase[_qp](0) * _u_vel[_qp] + (1.0-_phase[_qp]) *_grad_u_vel[_qp](0)
+  return -0.5 * (  - _grad_phase[_qp](0) * _u_vel[_qp] + (1.0 - _phase[_qp]) *_grad_u_vel[_qp](0)
                   - _grad_phase[_qp](1) * _v_vel[_qp] + (1.0 - _phase[_qp]) *  _grad_v_vel[_qp](1)
-                  - _grad_phase[_qp](2) * _v_vel[_qp] + (1.0 - _phase[_qp]) *  _grad_v_vel[_qp](2));
+                  - _grad_phase[_qp](2) * _v_vel[_qp] + (1.0 - _phase[_qp]) *  _grad_v_vel[_qp](2)) * _test[_i][_qp];
 }
 
 Real

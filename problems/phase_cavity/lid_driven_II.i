@@ -1,7 +1,6 @@
 [Mesh]
   type = FileMesh
   file = lid_driven_initial.e
-  uniform_refine = 1
 []
 
 [MeshModifiers]
@@ -112,10 +111,9 @@
   [./mass_cons]
     type = PhaseMass
     variable = p
-    p = p
-    u = v_x
-    v = v_y
     phase = phi_aux
+    vel_y = v_y
+    vel_x = v_x
   [../]
   [./Boussinesq]
     type = PhaseBoussinesq
@@ -170,13 +168,11 @@
     type = PhaseNoSlipForcing
     variable = v_x
     phase = phi_aux
-    h = .005
   [../]
   [./no_slip_y]
     type = PhaseNoSlipForcing
     variable = v_y
     phase = phi_aux
-    h = .005
   [../]
 []
 
@@ -217,10 +213,11 @@
     value = 0
   [../]
   [./lid]
-    type = DirichletBC
+    type = PhaseDirichletBC
     variable = v_x
     boundary = top
-    value = 1
+    value = 0.01
+    phase_variable = phi_aux
   [../]
   [./no_slip]
     type = DirichletBC
@@ -253,8 +250,7 @@
 [Executioner]
   # Preconditioned JFNK (default)
   type = Steady
-  l_max_its = 150
-  nl_max_its = 15
+  l_max_its = 200
   solve_type = PJFNK
   petsc_options_iname = -ksp_gmres_restart
   petsc_options_value = 300
