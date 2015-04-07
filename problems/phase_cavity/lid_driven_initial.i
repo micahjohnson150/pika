@@ -3,17 +3,9 @@
   dim = 2
   nx = 3
   ny = 3
-  xmax = 0.005
-  ymax = 0.005
+  xmax = .007
+  ymax = 0.006
   elem_type = QUAD9
-[]
-
-[MeshModifiers]
-  [./BR_corner]
-    type = AddExtraNodeset
-    new_boundary = 99
-    coord = '0.0025 0.0025'
-  [../]
 []
 
 [Variables]
@@ -56,6 +48,11 @@
 []
 
 [BCs]
+  [./phi_neuman]
+    type = ImplicitNeumannBC
+    variable = phi
+    boundary = 'top bottom left right '
+  [../]
 []
 
 [Executioner]
@@ -80,7 +77,7 @@
   initial_steps = 3
   marker = phi_marker
   initial_marker = phi_marker
-  steps = 1
+  steps = 3
   [./Indicators]
     [./phi_grad_indicator]
       type = GradientJumpIndicator
@@ -90,9 +87,9 @@
   [./Markers]
     [./phi_marker]
       type = ErrorToleranceMarker
-      coarsen = 1e-7
+      coarsen = 1
       indicator = phi_grad_indicator
-      refine = 1e-5
+      refine = 1e-4
     [../]
   [../]
 []
@@ -112,12 +109,12 @@
 [ICs]
   [./phase_ic]
     x1 = 0.001
-    y1 = 1e-5
+    y1 = 0.001
     variable = phi
     type = BoundingBoxIC
-    y2 = 0.005
+    y2 = 0.0061
     inside = -1
-    x2 = 0.00499
+    x2 = 0.006
     outside = 1
   [../]
 []

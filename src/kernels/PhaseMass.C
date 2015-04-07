@@ -45,7 +45,6 @@ PhaseMass::PhaseMass(const std::string & name, InputParameters parameters) :
     _v_vel_var_number(_mesh.dimension() >= 2 ? coupled("vel_y") : libMesh::invalid_uint),
     _w_vel_var_number(_mesh.dimension() == 3 ? coupled("vel_z") : libMesh::invalid_uint),
     _phase_var_number(coupled("phase"))
-
 {
 }
 
@@ -55,13 +54,14 @@ PhaseMass::computeQpResidual()
   //Arbitrarily multiplied by -1 to match - grad P, Shouldn't matter...I think. 
   return -0.5 * (  - _grad_phase[_qp](0) * _u_vel[_qp] + (1.0 - _phase[_qp]) *_grad_u_vel[_qp](0)
                   - _grad_phase[_qp](1) * _v_vel[_qp] + (1.0 - _phase[_qp]) *  _grad_v_vel[_qp](1)
-                  - _grad_phase[_qp](2) * _v_vel[_qp] + (1.0 - _phase[_qp]) *  _grad_v_vel[_qp](2)) * _test[_i][_qp];
+                  - _grad_phase[_qp](2) * _w_vel[_qp] + (1.0 - _phase[_qp]) *  _grad_w_vel[_qp](2)) * _test[_i][_qp];
 }
 
 Real
 PhaseMass::computeQpJacobian()
 {
-    return 0.0; //0.5 * (1.0-_phase[_qp]) * Kernel::computeQpJacobian();
+  //the derivative of the residual wrt p = 0.
+  return 0.0;
 }
 Real
 PhaseMass::computeQpOffDiagJacobian(unsigned jvar)

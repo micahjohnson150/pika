@@ -19,8 +19,6 @@ InputParameters validParams<PikaMomentum>()
   return params;
 }
 
-
-
 PikaMomentum::PikaMomentum(const std::string & name, InputParameters parameters) :
   Kernel(name, parameters),
   PropertyUserObjectInterface(name, parameters),
@@ -33,9 +31,6 @@ PikaMomentum::PikaMomentum(const std::string & name, InputParameters parameters)
   _phase(coupledValue("phase")),
 
   // Gradients
-  _grad_u_vel(coupledGradient("vel_x")),
-  _grad_v_vel(_mesh.dimension() >= 2 ? coupledGradient("vel_y") : _grad_zero),
-  _grad_w_vel(_mesh.dimension() == 3 ? coupledGradient("vel_z") : _grad_zero),
   _grad_p(coupledGradient("p")),
   _grad_phase(coupledGradient("phase")),
 
@@ -46,10 +41,9 @@ PikaMomentum::PikaMomentum(const std::string & name, InputParameters parameters)
   _p_var_number(coupled("p")),
   _phase_var_number(coupled("phase")),
 
-  // Required parameters
+  // constant
   _mu(_property_uo.getParam<Real>("dry_air_viscosity")),
   _rho(_property_uo.equilibriumWaterVaporConcentrationAtSaturationAtReferenceTemperature()),
-  _gravity(_property_uo.getParam<RealVectorValue>("gravity")),
   _component(getParam<unsigned>("component")),
   _xi(_property_uo.getParam<Real>("temporal_scaling"))
 
@@ -58,7 +52,7 @@ PikaMomentum::PikaMomentum(const std::string & name, InputParameters parameters)
 
 Real PikaMomentum::Convective()
 {
-  // The convection part, rho * (u.grad) * u_component * v.
+  // The convection part
   // Note: _grad_u is the gradient of the _component entry of the velocity vector.
     return  _xi * _rho *
             0.5 *(1.0-_phase[_qp]) * (_u_vel[_qp]*_grad_u[_qp](0) +
@@ -68,50 +62,48 @@ Real PikaMomentum::Convective()
 }
 Real PikaMomentum::Pressure()
 {
-  // The pressure part, -p (div v)
+  // The pressure part
   return _xi * 0.5 * (1.0-_phase[_qp]) *  _p[_qp] * _grad_test[_i][_qp](_component);
 }
 
 Real PikaMomentum::Viscous()
 {
-  // The component'th row (or col, it's symmetric) of the viscous stress tensor
+  //Viscous part
   RealVectorValue tau_row;
   tau_row(0)= - _grad_phase[_qp](0)* _u[_qp] + _grad_u[_qp](0) * (1.0 - _phase[_qp]);
   tau_row(1)= - _grad_phase[_qp](1)* _u[_qp] + _grad_u[_qp](1) * (1.0 - _phase[_qp]);
   tau_row(2)= - _grad_phase[_qp](2)* _u[_qp] + _grad_u[_qp](2) * (1.0 - _phase[_qp]);
 
-/*  
- tau_row(0)= _grad_u[_qp](0) - _grad_phase[_qp](0)* _u[_qp] + _grad_u[_qp](0) * _phase[_qp];
-  tau_row(1)= _grad_u[_qp](1) - _grad_phase[_qp](1)* _u[_qp] + _grad_u[_qp](1) * _phase[_qp];
-  tau_row(2)= _grad_u[_qp](2) - _grad_phase[_qp](2)* _u[_qp] + _grad_u[_qp](2) * _phase[_qp];
-  */
   return 0.5 * _xi * _mu * (tau_row * _grad_test[_i][_qp]);
 }
 
 Real PikaMomentum::computeQpResidual()
 {
   //return Convective() +  Pressure() +  Viscous();
-  return  Pressure() +  Viscous();
+  return  Convective() + Pressure() +  Viscous();
 }
 
 Real PikaMomentum::computeQpJacobian()
-{/*
+{
+  Real convective;
   RealVectorValue U(_u_vel[_qp], _v_vel[_qp], _w_vel[_qp]);
 
-  // Convective part
-  Real convective_part = _rho * ((U*_grad_phi[_j][_qp]) + _phi[_j][_qp]*_grad_u[_qp](_component)) * _test[_i][_qp];
+ //Jacobian of convective part
 
-  // Viscous part, Stokes/Laplacian version
-  // Real viscous_part = _mu * (_grad_phi[_j][_qp] * _grad_test[_i][_qp]);
+  convective = (_xi * _rho * 0.5 *(1.0-_phase[_qp]) *
+       (U*_grad_phi[_j][_qp] + (_phi[_j][_qp]*_grad_u[_qp](_component)))) * _test[_i][_qp];
+           
+  //Jacobian part of pressure = 0
 
-  // Viscous part, full stress tensor.  The extra contribution comes from the "2"
-  // on the diagonal of the viscous stress tensor.
-  Real viscous_part = _mu * (_grad_phi[_j][_qp]             * _grad_test[_i][_qp] +
-                             _grad_phi[_j][_qp](_component) * _grad_test[_i][_qp](_component));
-
-  return 0.5 * (1.0-_phase[_qp]) * _xi * (convective_part + viscous_part);
-  */
-  return 0.0;
+  //Jacobian of viscous part 
+  RealVectorValue tau;
+  tau(0)= - _grad_phase[_qp](0)* _phi[_j][_qp] + _grad_phi[_j][_qp](0) * (1.0 - _phase[_qp]);
+  tau(1)= - _grad_phase[_qp](1)* _phi[_j][_qp] + _grad_phi[_j][_qp](1) * (1.0 - _phase[_qp]);
+  tau(2)= - _grad_phase[_qp](2)* _phi[_j][_qp] + _grad_phi[_j][_qp](2) * (1.0 - _phase[_qp]);
+  Real viscous = 0.5 * _xi * _mu * tau *_grad_test[_i][_qp];
+return convective + viscous;
+//return 0.0;
+  
 }
 
 Real PikaMomentum::computeQpOffDiagJacobian(unsigned jvar)
@@ -123,7 +115,7 @@ Real PikaMomentum::computeQpOffDiagJacobian(unsigned jvar)
     Real convective_part = _phi[_j][_qp] * _grad_u[_qp](0) * _test[_i][_qp];
     Real viscous_part = _mu * _grad_phi[_j][_qp](_component) * _grad_test[_i][_qp](0);
 
-    return 0.5 * (1.0-_phase[_qp]) * _xi * (convective_part + viscous_part);
+    eturn 0.5 * (1.0-_phase[_qp]) * _xi * (convective_part + viscous_part);
   }
 
   else if (jvar == _v_vel_var_number)
