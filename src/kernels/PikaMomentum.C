@@ -108,14 +108,12 @@ return convective + viscous;
 
 Real PikaMomentum::computeQpOffDiagJacobian(unsigned jvar)
 {
-  /*
-  // In Stokes/Laplacian version, off-diag Jacobian entries wrt u,v,w are zero
   if (jvar == _u_vel_var_number)
   {
     Real convective_part = _phi[_j][_qp] * _grad_u[_qp](0) * _test[_i][_qp];
     Real viscous_part = _mu * _grad_phi[_j][_qp](_component) * _grad_test[_i][_qp](0);
 
-    eturn 0.5 * (1.0-_phase[_qp]) * _xi * (convective_part + viscous_part);
+    return 0.5 * (1.0-_phase[_qp]) * _xi * (convective_part + viscous_part);
   }
 
   else if (jvar == _v_vel_var_number)
@@ -141,6 +139,4 @@ Real PikaMomentum::computeQpOffDiagJacobian(unsigned jvar)
       return -0.5 * _phi[_j][_qp]* PikaMomentum::computeQpResidual();
   else
     return 0.0;
-    */
-  return 0.0;
 }
