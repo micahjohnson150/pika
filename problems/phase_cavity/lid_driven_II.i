@@ -1,9 +1,7 @@
 [Mesh]
   type = FileMesh
   file = lid_driven_initial.e
-[]
-
-[MeshModifiers]
+  uniform_refine = 1
 []
 
 [Variables]
@@ -187,7 +185,7 @@
 []
 
 [BCs]
-  active = 'lid no_slip y_no_slip pressure_pin'
+  active = 'lid no_slip y_no_slip'
   [./T_hot]
     type = DirichletBC
     variable = T
@@ -216,7 +214,7 @@
     type = PhaseDirichletBC
     variable = v_x
     boundary = top
-    value = 0.01
+    value = .953915
     phase_variable = phi_aux
   [../]
   [./no_slip]
@@ -244,6 +242,7 @@
 [Preconditioning]
   [./SMP_PJFNK]
     type = SMP
+    full = true
   [../]
 []
 
