@@ -1,11 +1,19 @@
 [Mesh]
   type = FileMesh
   file = lid_driven_initial.e
-  uniform_refine = 1
+[]
+
+[MeshModifiers]
+  [./pressure_pin]
+    type = AddExtraNodeset
+    new_boundary = 99
+    tolerance = 1e-04
+    coord = '0.003 0.0035'
+  [../]
 []
 
 [Variables]
-  active = 'v_x v_y p'
+  active = 'phi v_x v_y p'
   [./T]
   [../]
   [./u]
@@ -19,11 +27,6 @@
     order = SECOND
   [../]
   [./p]
-  [../]
-[]
-
-[AuxVariables]
-  [./phi_aux]
   [../]
 []
 
@@ -41,7 +44,7 @@
 []
 
 [Kernels]
-  active = 'v_x_momentum mass_cons no_slip_x no_slip_y v_y_momentum'
+  active = 'phi_double_well v_x_momentum phi_square_gradient mass_cons no_slip_x no_slip_y v_y_momentum'
   [./heat_diffusion]
     type = PikaDiffusion
     variable = T
@@ -109,7 +112,7 @@
   [./mass_cons]
     type = PhaseMass
     variable = p
-    phase = phi_aux
+    phase = phi
     vel_y = v_y
     vel_x = v_x
   [../]
@@ -127,7 +130,7 @@
     vel_x = v_x
     component = 1
     p = p
-    phase = phi_aux
+    phase = phi
   [../]
   [./v_x_momentum]
     type = PikaMomentum
@@ -136,7 +139,7 @@
     vel_x = v_x
     component = 0
     p = p
-    phase = phi_aux
+    phase = phi
   [../]
   [./v_x_time]
     type = PhaseTimeDerivative
@@ -165,27 +168,17 @@
   [./no_slip_x]
     type = PhaseNoSlipForcing
     variable = v_x
-    phase = phi_aux
+    phase = phi
   [../]
   [./no_slip_y]
     type = PhaseNoSlipForcing
     variable = v_y
-    phase = phi_aux
-  [../]
-[]
-
-[AuxKernels]
-  [./phi_solution]
-    type = SolutionAux
-    variable = phi_aux
-    from_variable = phi
-    solution = initial_uo
-    execute_on = timestep_begin
+    phase = phi
   [../]
 []
 
 [BCs]
-  active = 'lid no_slip y_no_slip'
+  active = 'lid no_slip y_no_slip pressure_pin phi_bc'
   [./T_hot]
     type = DirichletBC
     variable = T
@@ -214,8 +207,8 @@
     type = PhaseDirichletBC
     variable = v_x
     boundary = top
-    value = .953915
-    phase_variable = phi_aux
+    value = 9.53915
+    phase_variable = phi
   [../]
   [./no_slip]
     type = DirichletBC
@@ -227,6 +220,12 @@
     type = NeumannBC
     variable = phi
     boundary = 'top bottom left right'
+  [../]
+  [./phi_bc]
+    type = DirichletBC
+    variable = phi
+    boundary = 'top bottom left right'
+    value = -1
   [../]
 []
 
@@ -240,16 +239,22 @@
 []
 
 [Preconditioning]
+  active = 'SMP_PJFNK'
   [./SMP_PJFNK]
     type = SMP
-    full = true
+    off_diag_row = 'v_x v_y p'
+    off_diag_column = 'phi phi phi'
+  [../]
+  [./FDP_PJFNK]
+    type = FDP
   [../]
 []
 
 [Executioner]
   # Preconditioned JFNK (default)
   type = Steady
-  l_max_its = 200
+  l_max_its = 50
+  nl_max_its = 30
   solve_type = PJFNK
   petsc_options_iname = -ksp_gmres_restart
   petsc_options_value = 300
@@ -274,9 +279,9 @@
 []
 
 [ICs]
-  active = 'phase_ic'
+  active = 'phi_const'
   [./phase_ic]
-    variable = phi_aux
+    variable = phi
     type = FunctionIC
     function = phi_func
   [../]
@@ -292,6 +297,11 @@
     phase_variable = phi
     temperature = T
   [../]
+  [./phi_const]
+    variable = phi
+    type = ConstantIC
+    value = -1
+  [../]
 []
 
 [PikaMaterials]
@@ -299,7 +309,7 @@
   interface_thickness = 1e-5
   temporal_scaling = 1 # 1e-6
   condensation_coefficient = .01
-  phase = phi_aux
+  phase = phi
   gravity = '0 -1 0'
 []
 
