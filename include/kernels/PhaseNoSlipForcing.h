@@ -33,6 +33,7 @@ protected:
 
   // Coupled variables
   VariableValue& _phase;
+  VariableGradient& _grad_phase;
   unsigned _phase_var_number;
   Real _h;
   MaterialProperty<Real> &  _w_2;
