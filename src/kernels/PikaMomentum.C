@@ -99,13 +99,13 @@ Real PikaMomentum::computeQpJacobian()
   tau(1)= - _grad_phase[_qp](1)* _phi[_j][_qp] + _grad_phi[_j][_qp](1) * (1.0 - _phase[_qp]);
   tau(2)= - _grad_phase[_qp](2)* _phi[_j][_qp] + _grad_phi[_j][_qp](2) * (1.0 - _phase[_qp]);
   Real viscous = 0.5 * _xi * _mu * tau *_grad_test[_i][_qp];
-return 0.0;
+return convective + viscous;
   
 }
 
 Real PikaMomentum::computeQpOffDiagJacobian(unsigned jvar)
 {
-/*  //Laplacian viscous term is zero for off diags.
+  //Laplacian viscous term is zero for off diags.
   
   // The off Diag Jac for u_vel when u_vel!= _u  in convection part
   if (jvar == _u_vel_var_number)
@@ -152,6 +152,6 @@ Real PikaMomentum::computeQpOffDiagJacobian(unsigned jvar)
     Real viscous = 0.5 * _xi * _mu * (tau_row * _grad_test[_i][_qp]);
     return convective + pressure + viscous;
   }
-  else*/
+  else
     return 0.0;
 }

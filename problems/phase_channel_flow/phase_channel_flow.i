@@ -36,7 +36,6 @@
     type = PhaseNoSlipForcing
     variable = v_x
     phase = phi
-    h = 6
   [../]
   [./y_momentum]
     type = PikaMomentum
@@ -51,7 +50,6 @@
     type = PhaseNoSlipForcing
     variable = v_y
     phase = phi
-    h = 6
   [../]
   [./mass_conservation]
     type = PhaseMass
@@ -74,7 +72,7 @@
 []
 
 [BCs]
-  active = 'vapor_phase_wall x_no_slip solid_phase_wall inlet y_no_slip'
+  active = 'inlet y_no_slip x_no_slip vapor_phase_wall solid_phase_wall'
   [./x_no_slip]
     type = DirichletBC
     variable = v_x
@@ -122,6 +120,7 @@
 [Preconditioning]
   [./SMP_PJFNK]
     type = SMP
+    full = true
   [../]
 []
 
