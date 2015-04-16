@@ -11,6 +11,15 @@
   elem_type = QUAD9
 []
 
+[MeshModifiers]
+  [./pressure pin]
+    type = AddExtraNodeset
+    new_boundary = 99
+    tolerance = 1e-4
+    coord = '0.01 0.01'
+  [../]
+[]
+
 [Variables]
   [./v_x]
     order = SECOND
@@ -38,7 +47,6 @@
     type = PhaseNoSlipForcing
     variable = v_x
     phase = phi
-    h = 10
   [../]
   [./y_momentum]
     type = PikaMomentum
@@ -53,7 +61,6 @@
     type = PhaseNoSlipForcing
     variable = v_y
     phase = phi
-    h = 10
   [../]
   [./mass_conservation]
     type = PhaseMass
@@ -76,7 +83,7 @@
 []
 
 [BCs]
-  active = 'lid y_no_slip vapor_phase_wall solid_phase_wall'
+  active = 'lid y_no_slip vapor_phase_wall solid_phase_wall pressure_pin'
   [./x_no_slip]
     type = DirichletBC
     variable = v_x
@@ -117,7 +124,13 @@
     type = DirichletBC
     variable = v_x
     boundary = top
-    value = 0.238479
+    value = 149.158
+  [../]
+  [./pressure_pin]
+    type = DirichletBC
+    variable = p
+    boundary = 99
+    value = 0
   [../]
 []
 
@@ -152,6 +165,8 @@
   l_max_its = 50
   nl_max_its = 40
   solve_type = PJFNK
+  l_tol = 1e-06
+  nl_rel_tol = 1e-15
 []
 
 [Outputs]
