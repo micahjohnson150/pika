@@ -83,7 +83,7 @@
 []
 
 [BCs]
-  active = 'lid y_no_slip vapor_phase_wall solid_phase_wall pressure_pin'
+  active = 'lid y_no_slip vapor_phase_wall solid_phase_wall'
   [./x_no_slip]
     type = DirichletBC
     variable = v_x
@@ -200,11 +200,6 @@
     variable = phi
     x1 = 0
     type = BoundingBoxIC
-  [../]
-  [./phase_const]
-    variable = phi
-    type = ConstantIC
-    value = -1
   [../]
 []
 
