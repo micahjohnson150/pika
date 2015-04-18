@@ -116,54 +116,12 @@
 []
 
 [BCs]
-  active = 'lid y_no_slip vapor_phase_wall solid_phase_wall T_hot T_cold'
-  [./x_no_slip]
-    type = DirichletBC
-    variable = v_x
-    boundary = top
-    value = 0
-  [../]
-  [./y_no_slip]
-    type = DirichletBC
-    variable = v_y
-    boundary = top
-    value = 0
-  [../]
+  active = 'solid_phase_wall T_hot T_cold'
   [./solid_phase_wall]
     type = DirichletBC
     variable = phi
-    boundary = 'bottom left right'
+    boundary = 'top bottom left right'
     value = 1
-  [../]
-  [./vapor_phase_wall]
-    type = DirichletBC
-    variable = phi
-    boundary = top
-    value = -1
-  [../]
-  [./phase_wall_no_slip_x]
-    type = DirichletBC
-    variable = v_x
-    boundary = bottom
-    value = 0
-  [../]
-  [./phase_wall_no_slip_y]
-    type = DirichletBC
-    variable = v_y
-    boundary = bottom
-    value = 0
-  [../]
-  [./lid]
-    type = DirichletBC
-    variable = v_x
-    boundary = top
-    value = 149.158
-  [../]
-  [./pressure_pin]
-    type = DirichletBC
-    variable = p
-    boundary = 99
-    value = 0
   [../]
   [./T_hot]
     type = DirichletBC
@@ -229,7 +187,7 @@
 
 [PikaMaterials]
   phase = phi
-  temperature = 263
+  temperature = T
   interface_thickness = 1e-05
   temporal_scaling = 1 # 1e-05
   gravity = '0 -1 0'
@@ -238,7 +196,7 @@
 [ICs]
   active = 'phase_ic'
   [./phase_ic]
-    y2 = 0.02001
+    y2 = 0.02
     y1 = 0
     inside = -1
     x2 = 0.02
