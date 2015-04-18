@@ -60,12 +60,11 @@ PikaConvection::computeQpResidual()
 Real
 PikaConvection::computeQpJacobian()
 {
-  RealVectorValue U(_u_vel[_qp], _v_vel[_qp], _w_vel[_qp]);
- 
- //Jacobian of convective part
-  
-  return ( 0.5 *coefficient(1.0-_phase[_qp]) *
-       (U*_grad_phi[_j][_qp] + (_phi[_j][_qp]*_grad_u[_qp](_component)))) * _test[_i][_qp];
+   return  0.5 * coefficient(_qp) * (
+                                _u_vel[_qp]*_grad_phi[_j][_qp](0) - _u_vel[_qp] * _phase[_qp] * _grad_phi[_j][_qp](0) +
+                                _v_vel[_qp]*_grad_phi[_j][_qp](1) - _v_vel[_qp] * _phase[_qp] * _grad_phi[_j][_qp](1) +
+                                _w_vel[_qp]*_grad_phi[_j][_qp](2) - _w_vel[_qp] * _phase[_qp] * _grad_phi[_j][_qp](2)) * _test[_i][_qp];
+
 }
 Real
 PikaConvection::computeQpOffDiagJacobian(unsigned jvar)
@@ -73,21 +72,33 @@ PikaConvection::computeQpOffDiagJacobian(unsigned jvar)
   // The off Diag Jacobian for u_vel 
   if (jvar == _u_vel_var_number)
   {
-    return 0.5 * coefficient(_qp) * (1.0-_phase[_qp]) * _phi[_j][_qp] * _grad_u[_qp](0) * _test[_i][_qp];
+   return  0.5 * coefficient(_qp) *( _phi[_j][_qp]*_grad_u[_qp](0) - _phi[_j][_qp] * _phase[_qp] * _grad_u[_qp](0)) * _test[_i][_qp];
   }
 
   // The off Diag Jacobian for v_vel 
   else if (jvar == _v_vel_var_number)
   {
 
-    return 0.5 * coefficient(_qp) * (1.0-_phase[_qp]) * _phi[_j][_qp] * _grad_u[_qp](1) * _test[_i][_qp];
+   return  0.5 * coefficient(_qp) *( _phi[_j][_qp]*_grad_u[_qp](1) - _phi[_j][_qp] * _phase[_qp] * _grad_u[_qp](1)) * _test[_i][_qp];
 
   }
 
   // The off Diag Jacobian for w_vel 
   else if (jvar == _w_vel_var_number)
   {
-    return 0.5 * coefficient(_qp) * (1.0-_phase[_qp]) * _phi[_j][_qp] * _grad_u[_qp](2) * _test[_i][_qp];
+
+   return  0.5 * coefficient(_qp) *( _phi[_j][_qp]*_grad_u[_qp](2) - _phi[_j][_qp] * _phase[_qp] * _grad_u[_qp](2)) * _test[_i][_qp];
+
+  }
+
+   // The off Diag Jac for phase in convection part
+  else if (jvar == _phase_var_number)
+  { 
+
+   return  0.5 * coefficient(_qp) * (
+                                 - _u_vel[_qp] * _phi[_j][_qp] * _grad_u[_qp](0) 
+                                 - _v_vel[_qp] * _phi[_j][_qp] * _grad_u[_qp](1) 
+                                 - _w_vel[_qp] * _phi[_j][_qp] * _grad_u[_qp](2)) * _test[_i][_qp];
   }
 
   else 
