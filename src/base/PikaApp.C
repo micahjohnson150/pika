@@ -51,7 +51,7 @@
 #include "PikaMomentum.h"
 #include "PhaseBoussinesq.h"
 #include "PhaseMass.h"
-#include "PhaseConvection.h"
+#include "PikaConvection.h"
 #include "PhaseTimeDerivative.h"
 #include "PhaseNoSlipForcing.h"
 
@@ -145,7 +145,7 @@ PikaApp::registerObjects(Factory & factory)
   registerKernel(PikaMomentum);
   registerKernel(PhaseBoussinesq);
   registerKernel(PhaseMass);
-  registerKernel(PhaseConvection);
+  registerKernel(PikaConvection);
   registerKernel(PhaseTimeDerivative);
   registerKernel(PhaseNoSlipForcing);
 
