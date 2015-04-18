@@ -9,35 +9,40 @@
 /*                      With the U. S. Department of Energy                       */
 /**********************************************************************************/
 
-#ifndef PHASECONVECTION_H
-#define PHASECONVECTION_H
+#ifndef PIKACONVECTION_H
+#define PIKACONVECTION_H
 
 // MOOSE includes
 #include "Kernel.h"
 
 // Pika includes
 #include "PropertyUserObjectInterface.h"
+#include "CoefficientKernelInterface.h"
 
 //Forward Declarations
-class PhaseConvection;
+class PikaConvection;
 
 template<>
-InputParameters validParams<PhaseConvection>();
+InputParameters validParams<PikaConvection>();
 
 /**
- * A convection Kernel
+ * A  phase dependent convection Kernel
+ * Defined as: 
+ *
+ * 0.5 * (1 - phi) * grad_u * test
  *
  */
-class PhaseConvection :
+class PikaConvection :
   public Kernel,
-  public PropertyUserObjectInterface
+  public PropertyUserObjectInterface,
+  public CoefficientKernelInterface
 {
 public:
 
   /**
    * Class constructor
    */
-  PhaseConvection(const std::string & name, InputParameters parameters);
+  PikaConvection(const std::string & name, InputParameters parameters);
 
 protected:
 
@@ -70,9 +75,7 @@ protected:
 
   VariableValue& _phase;
   unsigned _phase_var_number;
-  Real _rho;
-  Real _xi;
 
 };
 
-#endif //MATDIFFUSION_H
+#endif //PIKACONVECTION_H
