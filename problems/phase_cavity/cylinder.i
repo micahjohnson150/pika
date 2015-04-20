@@ -22,6 +22,19 @@
   [../]
 []
 
+[AuxVariables]
+  [./phi_aux]
+  [../]
+[]
+
+[Functions]
+  [./phase_func]
+    type = SolutionFunction
+    from_variable = phi
+    solution = initial_uo
+  [../]
+[]
+
 [Kernels]
   [./mass_conservation]
     type = PhaseMass
@@ -71,6 +84,14 @@
   [../]
 []
 
+[AuxKernels]
+  [./phi_aux_kernel]
+    type = PikaPhaseInitializeAux
+    variable = phi_aux
+    phase = phi
+  [../]
+[]
+
 [BCs]
   [./inlet]
     type = DirichletBC
@@ -84,19 +105,13 @@
     boundary = 'left right top bottom'
     value = -1
   [../]
-  [./pressure]
-    type = DirichletBC
-    variable = p
-    boundary = 'right '
-    value = 0
-  [../]
   [./x_no_slip]
     type = DirichletBC
     variable = v_x
     boundary = 'top bottom'
     value = 0
   [../]
-  [./y_no_slipi]
+  [./y_no_slip]
     type = DirichletBC
     variable = v_y
     boundary = 'left top right bottom'
@@ -159,15 +174,9 @@
 
 [ICs]
   [./phase_ic]
-    int_width = 1e-5
-    x1 = 0.01
-    y1 = 0.01
-    radius = 0.0025
-    outvalue = -1
+    type = FunctionIC
+    function = phase_func
     variable = phi
-    3D_spheres = false
-    invalue = 1
-    type = SmoothCircleIC
   [../]
 []
 
@@ -177,3 +186,9 @@
   temperature = 263
 []
 
+[UserObjects]
+  [./initial_uo]
+    type = SolutionUserObject
+    mesh = cylinder_initial.e-s001
+  [../]
+[]

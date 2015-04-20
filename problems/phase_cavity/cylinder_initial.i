@@ -13,6 +13,10 @@
   [./phi]
   [../]
 []
+[AuxVariables]
+  [./phi_aux]
+  [../]
+[]
 
 [Kernels]
   active = 'phase_diffusion phase_double_well'
@@ -34,6 +38,13 @@
   [../]
 []
 
+[AuxKernels]
+  [./phi_aux]
+    type = PikaPhaseInitializeAux
+    variable = phi_aux
+    phase = phi
+  [../]
+[]
 [BCs]
   [./vapor]
     type = DirichletBC
@@ -48,11 +59,6 @@
   [./SMP_PJFNK]
     type = SMP
     full = true
-  [../]
-  [./PBD]
-    type = PBP
-    solve_order = 'phi p v_x v_y'
-    preconditioner = 'LU LU'
   [../]
 []
 
@@ -91,8 +97,9 @@
   [../]
   [./exodus]
     type = Exodus
-    file_base = cylinder_intial
-    output_on = 'TIMESTEP_END initial'
+    file_base = cylinder_initial
+    output_final = true
+    interval = 1
   [../]
 []
 
