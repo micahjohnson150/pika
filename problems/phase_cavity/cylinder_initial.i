@@ -10,44 +10,12 @@
 []
 
 [Variables]
-  [./v_x]
-    order = SECOND
-  [../]
-  [./v_y]
-    order = SECOND
-  [../]
-  [./p]
-  [../]
   [./phi]
   [../]
 []
 
 [Kernels]
-  [./mass_conservation]
-    type = PhaseMass
-    variable = p
-    vel_y = v_y
-    vel_x = v_x
-    phase = phi
-  [../]
-  [./x_momentum]
-    type = PikaMomentum
-    variable = v_x
-    vel_y = v_y
-    vel_x = v_x
-    component = 0
-    p = p
-    phase = phi
-  [../]
-  [./y_momentum]
-    type = PikaMomentum
-    variable = v_y
-    vel_y = v_y
-    vel_x = v_x
-    component = 1
-    p = p
-    phase = phi
-  [../]
+  active = 'phase_diffusion phase_double_well'
   [./phase_diffusion]
     type = ACInterface
     variable = phi
@@ -59,48 +27,19 @@
     variable = phi
     mob_name = mobility
   [../]
-  [./x_no_slip]
-    type = PhaseNoSlipForcing
-    variable = v_x
-    phase = phi
-  [../]
-  [./y_no_slip]
-    type = PhaseNoSlipForcing
-    variable = v_y
-    phase = phi
+  [./phase_time]
+    type = PikaTimeDerivative
+    variable = phi
+    property = relaxation_time
   [../]
 []
 
 [BCs]
-  [./inlet]
-    type = DirichletBC
-    variable = v_x
-    boundary = left
-    value = 1
-  [../]
   [./vapor]
     type = DirichletBC
     variable = phi
     boundary = 'left right top bottom'
     value = -1
-  [../]
-  [./pressure]
-    type = DirichletBC
-    variable = p
-    boundary = 'right '
-    value = 0
-  [../]
-  [./x_no_slip]
-    type = DirichletBC
-    variable = v_x
-    boundary = 'top bottom'
-    value = 0
-  [../]
-  [./y_no_slipi]
-    type = DirichletBC
-    variable = v_y
-    boundary = 'left top right bottom'
-    value = 0
   [../]
 []
 
@@ -125,7 +64,7 @@
 
 [Adaptivity]
   cycles_per_step = 0
-  initial_steps = 5
+  initial_steps = 8
   initial_marker = phi_marker
   max_h_level = 8
   [./Indicators]
@@ -152,7 +91,7 @@
   [../]
   [./exodus]
     type = Exodus
-    file_base = cylinder
+    file_base = cylinder_intial
     output_on = 'TIMESTEP_END initial'
   [../]
 []
