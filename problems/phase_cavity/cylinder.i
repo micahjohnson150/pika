@@ -1,7 +1,12 @@
 [Mesh]
-  type = FileMesh
-  file = cylinder_initial.e
+  type = GeneratedMesh
   dim = 2
+  nx =32
+  ny = 32
+  xmax = 0.04
+  ymax = 0.04
+  elem_type = QUAD9
+  uniform_refine = 3
 []
 
 [Variables]
@@ -14,19 +19,6 @@
     order = SECOND
   [../]
   [./p]
-  [../]
-[]
-
-[AuxVariables]
-  [./phi_aux]
-  [../]
-[]
-
-[Functions]
-  [./phi_func]
-    type = SolutionFunction
-    from_variable = phi
-    solution = phi_initial
   [../]
 []
 
@@ -79,14 +71,6 @@
   [../]
 []
 
-[AuxKernels]
-  [./phi_aux_kernel]
-    type = PikaPhaseInitializeAux
-    variable = phi_aux
-    phase = phi
-  [../]
-[]
-
 [BCs]
   [./x_no_slip]
     type = DirichletBC
@@ -102,22 +86,19 @@
   [../]
   [./inlet]
     type = DirichletBC
-    variable = v_y
+    variable = v_x
     boundary = left
-    value = 10
+    value = 159.9
   [../]
-
+  [./vapor_walls]
+    type = DirichletBC
+    variable = phi
+    boundary = 'left right top bottom'
+    value = -1
+  [../]
 []
 
 [Postprocessors]
-[]
-
-[UserObjects]
-  [./phi_initial]
-    type = SolutionUserObject
-    mesh = cylinder_initial.e
-    system_variables = phi
-  [../]
 []
 
 [Preconditioning]
@@ -130,10 +111,10 @@
 [Executioner]
   type = Steady
   l_max_its = 100
-  nl_max_its = 6
+  nl_max_its = 1000
   solve_type = PJFNK
-  petsc_options_iname = -ksp_gmres_restart
-  petsc_options_value = 300
+  petsc_options_iname = '-ksp_gmres_restart'
+  petsc_options_value = '50'
   nl_rel_tol = 1e-9
   line_search = none
 []
@@ -145,12 +126,17 @@
   print_linear_residuals = true
   print_perf_log = true
 []
-
 [ICs]
   [./phase_ic]
+    int_width = 1e-5
+    x1 = 0.02
+    y1 = 0.02
+    radius = 0.0005
+    outvalue = -1
     variable = phi
-    type = FunctionIC
-    function = phi_func
+    3D_spheres = false
+    invalue = 1
+    type = SmoothCircleIC
   [../]
 []
 
