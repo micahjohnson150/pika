@@ -1,15 +1,12 @@
 [Mesh]
-  type = GeneratedMesh
+  type = FileMesh
+  file = cylinder_initial.e
   dim = 2
-  nx = 21
-  ny = 7
-  xmax = 0.05
-  ymax = 0.02
-  uniform_refine = 1
-  elem_type = QUAD9
 []
 
 [Variables]
+  [./phi]
+  [../]
   [./v_x]
     order = SECOND
   [../]
@@ -17,8 +14,6 @@
     order = SECOND
   [../]
   [./p]
-  [../]
-  [./phi]
   [../]
 []
 
@@ -28,10 +23,10 @@
 []
 
 [Functions]
-  [./phase_func]
+  [./phi_func]
     type = SolutionFunction
     from_variable = phi
-    solution = initial_uo
+    solution = phi_initial
   [../]
 []
 
@@ -93,18 +88,6 @@
 []
 
 [BCs]
-  [./inlet]
-    type = DirichletBC
-    variable = v_x
-    boundary = left
-    value = 1
-  [../]
-  [./vapor]
-    type = DirichletBC
-    variable = phi
-    boundary = 'left right top bottom'
-    value = -1
-  [../]
   [./x_no_slip]
     type = DirichletBC
     variable = v_x
@@ -114,81 +97,69 @@
   [./y_no_slip]
     type = DirichletBC
     variable = v_y
-    boundary = 'left top right bottom'
+    boundary = 'top bottom left right'
     value = 0
+  [../]
+  [./inlet]
+    type = DirichletBC
+    variable = v_y
+    boundary = left
+    value = 10
+  [../]
+
+[]
+
+[Postprocessors]
+[]
+
+[UserObjects]
+  [./phi_initial]
+    type = SolutionUserObject
+    mesh = cylinder_initial.e
+    system_variables = phi
   [../]
 []
 
 [Preconditioning]
-  active = 'SMP_PJFNK'
   [./SMP_PJFNK]
     type = SMP
     full = true
-  [../]
-  [./PBD]
-    type = PBP
-    solve_order = 'phi p v_x v_y'
-    preconditioner = 'LU LU'
   [../]
 []
 
 [Executioner]
   type = Steady
   l_max_its = 100
+  nl_max_its = 6
   solve_type = PJFNK
-[]
-
-[Adaptivity]
-  cycles_per_step = 0
-  initial_steps = 5
-  initial_marker = phi_marker
-  max_h_level = 8
-  [./Indicators]
-    [./phi_jump]
-      type = GradientJumpIndicator
-      variable = phi
-    [../]
-  [../]
-  [./Markers]
-    [./phi_marker]
-      type = ErrorFractionMarker
-      coarsen = 0.2
-      indicator = phi_jump
-      refine = 0.8
-    [../]
-  [../]
+  petsc_options_iname = -ksp_gmres_restart
+  petsc_options_value = 300
+  nl_rel_tol = 1e-9
+  line_search = none
 []
 
 [Outputs]
-  [./console]
-    type = Console
-    linear_residuals = true
-    nonlinear_residuals = true
-  [../]
-  [./exodus]
-    type = Exodus
-    file_base = cylinder
-    output_on = 'TIMESTEP_END initial'
-  [../]
+  output_initial = true
+  exodus = true
+  csv = true
+  print_linear_residuals = true
+  print_perf_log = true
 []
 
 [ICs]
   [./phase_ic]
-    type = FunctionIC
-    function = phase_func
     variable = phi
+    type = FunctionIC
+    function = phi_func
   [../]
 []
 
 [PikaMaterials]
-  phase = phi
-  temporal_scaling = 1
   temperature = 263
+  interface_thickness = 1e-5
+  temporal_scaling = 1
+  condensation_coefficient = .01
+  phase = phi
+  gravity = '0 -1 0'
 []
 
-[UserObjects]
-  [./initial_uo]
-    type = SolutionUserObject
-    mesh = cylinder_initial.e-s001
-  [../]
-[]
