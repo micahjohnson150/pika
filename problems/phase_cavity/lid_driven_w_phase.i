@@ -2,22 +2,13 @@
   type = GeneratedMesh
   dim = 2
   nx = 16
-  ny = 8
+  ny =16 
   xmin = -1e-5
   xmax = .02001
   ymin = -1e-5
   ymax = 0.02
-  uniform_refine = 3
+  uniform_refine = 4
   elem_type = QUAD9
-[]
-
-[MeshModifiers]
-  [./pressure pin]
-    type = AddExtraNodeset
-    new_boundary = 99
-    tolerance = 1e-4
-    coord = '0.01 0.01'
-  [../]
 []
 
 [Variables]
@@ -124,7 +115,7 @@
     type = DirichletBC
     variable = v_x
     boundary = top
-    value = 149.158
+    value = 1491.58
   [../]
   [./pressure_pin]
     type = DirichletBC
@@ -165,8 +156,10 @@
   l_max_its = 50
   nl_max_its = 40
   solve_type = PJFNK
-  l_tol = 1e-06
+  l_tol = 1e-07
   nl_rel_tol = 1e-15
+  petsc_options_iname = '-ksp_gmres_restart'
+  petsc_options_value = '20'
 []
 
 [Outputs]
