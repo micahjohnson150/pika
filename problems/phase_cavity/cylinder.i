@@ -1,12 +1,11 @@
 [Mesh]
   type = GeneratedMesh
   dim = 2
-  nx =32
+  nx = 32
   ny = 32
   xmax = 0.04
   ymax = 0.04
   elem_type = QUAD9
-  uniform_refine = 3
 []
 
 [Variables]
@@ -113,10 +112,41 @@
   l_max_its = 100
   nl_max_its = 1000
   solve_type = PJFNK
-  petsc_options_iname = '-ksp_gmres_restart'
-  petsc_options_value = '50'
+  petsc_options_iname = -ksp_gmres_restart
+  petsc_options_value = 50
   nl_rel_tol = 1e-9
   line_search = none
+[]
+
+[Adaptivity]
+  max_h_level = 8
+  initial_steps = 5
+  initial_marker = combo
+  [./Indicators]
+    [./phi_jump]
+      type = GradientJumpIndicator
+      variable = phi
+    [../]
+  [../]
+  [./Markers]
+    [./phi_marker]
+      type = ErrorFractionMarker
+      coarsen = 0.2
+      indicator = phi_jump
+      refine = 0.8
+    [../]
+    [./center_iine]
+      type = BoxMarker
+      bottom_left = '0 0.01 0'
+      top_right = '0.04 0.03 0'
+      inside = REFINE
+      outside = DO_NOTHING
+    [../]
+    [./combo]
+      type = ComboMarker
+      markers = 'center_iine phi_marker'
+    [../]
+  [../]
 []
 
 [Outputs]
@@ -126,6 +156,7 @@
   print_linear_residuals = true
   print_perf_log = true
 []
+
 [ICs]
   [./phase_ic]
     int_width = 1e-5
