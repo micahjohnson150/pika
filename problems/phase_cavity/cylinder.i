@@ -1,10 +1,10 @@
 [Mesh]
   type = GeneratedMesh
   dim = 2
-  nx = 8
-  ny = 8
-  xmax = 0.04
-  ymax = 0.04
+  nx = 4
+  ny = 4
+  xmax = 0.01
+  ymax = 0.01
   elem_type = QUAD9
 []
 
@@ -119,31 +119,65 @@
 []
 
 [Adaptivity]
-  max_h_level = 8
-  initial_steps = 3
-  initial_marker = center_line
+  max_h_level = 10
+  initial_steps = 6
+  initial_marker = unform
+  marker = combo
+  steps = 2
   [./Indicators]
     [./phi_jump]
       type = GradientJumpIndicator
       variable = phi
     [../]
+    [./v_x_jump]
+      type = GradientJumpIndicator
+      variable = v_x
+    [../]
+    [./v_y_jump]
+      type = GradientJumpIndicator
+      variable = v_y
+    [../]
+    [./pressure_jump]
+      type = GradientJumpIndicator
+      variable = p
+    [../]
   [../]
   [./Markers]
+    active = 'phi_marker v_y_marker combo p_marker v_x_marker unform'
     [./phi_marker]
+      type = ErrorFractionMarker
+      indicator = phi_jump
+      refine = 0.8
+    [../]
+    [./p_marker]
+      type = ErrorFractionMarker
+      indicator = pressure_jump
+      refine = 0.8
+    [../]
+    [./v_x_marker]
+      type = ErrorFractionMarker
+      indicator = v_x_jump
+      refine = 0.8
+    [../]
+    [./v_y_marker]
       type = ErrorFractionMarker
       indicator = phi_jump
       refine = 0.8
     [../]
     [./combo]
       type = ComboMarker
-      markers = 'center_line phi_marker'
+      markers = 'p_marker v_x_marker v_y_marker phi_marker'
     [../]
     [./center_line]
       type = BoxMarker
-      bottom_left = '0.017 0.015 0'
-      top_right = '0.04 0.025 0'
+      bottom_left = '0.004 0.004 0'
+      top_right = '0.01 0.006 0.0'
       inside = REFINE
       outside = DO_NOTHING
+    [../]
+    [./unform]
+      type = UniformMarker
+      mark = REFINE
     [../]
   [../]
 []
@@ -159,8 +193,8 @@
 [ICs]
   [./phase_ic]
     int_width = 1e-5
-    x1 = 0.02
-    y1 = 0.02
+    x1 = 0.005
+    y1 = 0.005
     radius = 0.0005
     outvalue = -1
     variable = phi
