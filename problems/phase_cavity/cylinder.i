@@ -1,8 +1,8 @@
 [Mesh]
   type = GeneratedMesh
   dim = 2
-  nx = 32
-  ny = 32
+  nx = 8
+  ny = 8
   xmax = 0.04
   ymax = 0.04
   elem_type = QUAD9
@@ -120,8 +120,8 @@
 
 [Adaptivity]
   max_h_level = 8
-  initial_steps = 5
-  initial_marker = combo
+  initial_steps = 3
+  initial_marker = center_line
   [./Indicators]
     [./phi_jump]
       type = GradientJumpIndicator
@@ -131,20 +131,19 @@
   [./Markers]
     [./phi_marker]
       type = ErrorFractionMarker
-      coarsen = 0.2
       indicator = phi_jump
       refine = 0.8
     [../]
-    [./center_iine]
-      type = BoxMarker
-      bottom_left = '0 0.01 0'
-      top_right = '0.04 0.03 0'
-      inside = REFINE
-      outside = DO_NOTHING
-    [../]
     [./combo]
       type = ComboMarker
-      markers = 'center_iine phi_marker'
+      markers = 'center_line phi_marker'
+    [../]
+    [./center_line]
+      type = BoxMarker
+      bottom_left = '0.017 0.015 0'
+      top_right = '0.04 0.025 0'
+      inside = REFINE
+      outside = DO_NOTHING
     [../]
   [../]
 []
