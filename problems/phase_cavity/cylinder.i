@@ -3,6 +3,13 @@
   file = cylinder_initial.e
   dim = 2
 []
+[MeshModifiers]
+  [./pressure_pin]
+    type = AddExtraNodeset
+    new_boundary= 99
+    coord = '0.01 0.01'
+  [../]
+[]
 
 [Variables]
   [./phi]
@@ -102,9 +109,27 @@
   [../]
   [./inlet]
     type = DirichletBC
-    variable = v_y
+    variable = v_x
     boundary = left
-    value = 10
+    value = 0.1
+  [../]
+  [./pressure]
+    type = DirichletBC
+    variable = p
+    boundary = right
+    value = 0
+  [../]
+  [./phase_cylinder]
+    type = DirichletBC
+    variable = phi
+    boundary = 99
+    value = 1
+  [../]
+  [./p_cylinder]
+    type = DirichletBC
+    variable = p
+    boundary = 99
+    value = 0
   [../]
 
 []
@@ -123,19 +148,17 @@
 [Preconditioning]
   [./SMP_PJFNK]
     type = SMP
-    full = true
+    full = false
   [../]
 []
 
 [Executioner]
   type = Steady
-  l_max_its = 100
-  nl_max_its = 6
+  l_max_its = 50
   solve_type = PJFNK
-  petsc_options_iname = -ksp_gmres_restart
-  petsc_options_value = 300
   nl_rel_tol = 1e-9
-  line_search = none
+  petsc_options_iname = '-ksp_gmres_restart'
+  petsc_options_value = 50
 []
 
 [Outputs]
