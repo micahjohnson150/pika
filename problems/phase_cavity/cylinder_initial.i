@@ -1,11 +1,11 @@
 [Mesh]
   type = GeneratedMesh
   dim = 2
-  nx = 21
-  ny = 7
+  nx = 90
+  ny =30
   xmax = 0.05
   ymax = 0.02
-  uniform_refine = 1
+  uniform_refine = 0
   elem_type = QUAD9
 []
 
@@ -70,7 +70,7 @@
 
 [Adaptivity]
   cycles_per_step = 0
-  initial_steps = 8
+  initial_steps = 6
   initial_marker = phi_marker
   max_h_level = 8
   [./Indicators]
@@ -86,6 +86,18 @@
       indicator = phi_jump
       refine = 0.8
     [../]
+   [./solid_marker]
+      type = ValueRangeMarker
+      lower_bound = 0.5
+      upper_bound = 1.0
+      variable = phi
+    [../]
+   [./combo_marker]
+      type = ComboMarker
+      markers = 'phi_marker solid_marker'
+    [../]
+
+
   [../]
 []
 
