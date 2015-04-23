@@ -2,6 +2,7 @@
   type = FileMesh
   file = cylinder_initial.e
   dim = 2
+  uniform_refine = 2
 []
 [MeshModifiers]
   [./pressure_pin]
@@ -111,7 +112,7 @@
     type = DirichletBC
     variable = v_x
     boundary = left
-    value = 0.1
+    value = 20.89
   [../]
   [./pressure]
     type = DirichletBC
@@ -148,13 +149,13 @@
 [Preconditioning]
   [./SMP_PJFNK]
     type = SMP
-    full = false
+    full = true
   [../]
 []
 
 [Executioner]
   type = Steady
-  l_max_its = 50
+  l_max_its = 20
   solve_type = PJFNK
   nl_rel_tol = 1e-9
   petsc_options_iname = '-ksp_gmres_restart'
