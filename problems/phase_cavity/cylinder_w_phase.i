@@ -7,7 +7,7 @@
   xmax = .02
   ymin = -0.02
   ymax = 0.02
-  uniform_refine = 3
+  uniform_refine = 2
   elem_type = QUAD9
 []
 
@@ -74,7 +74,7 @@
 []
 
 [BCs]
-  active = 'inlet pressure_pin y_no_slip x_no_slip vapor_phase_wall'
+  active = 'pressure_pin y_no_slip x_no_slip vapor_phase_wall inlet'
   [./x_no_slip]
     type = DirichletBC
     variable = v_x
@@ -115,7 +115,7 @@
     type = DirichletBC
     variable = v_x
     boundary = left
-    value = 149.158
+    value = .23847
   [../]
 []
 
