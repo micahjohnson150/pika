@@ -12,11 +12,11 @@
 []
 
 [MeshModifiers]
-  [./pressure pin]
+  [./pressure]
     type = AddExtraNodeset
     new_boundary = 99
-    tolerance = 1e-4
-    coord = '0.01 0.01'
+    tolerance = 1e-04
+    coord = '1e-5 1e-5'
   [../]
 []
 
@@ -104,7 +104,6 @@
     phase = phi
     variable = v_x
   [../]
-
   [./v_y_boussinesq]
     type = PhaseBoussinesq
     component = 1
@@ -112,11 +111,9 @@
     phase = phi
     variable = v_y
   [../]
-
 []
 
 [BCs]
-  active = 'solid_phase_wall T_hot T_cold'
   [./solid_phase_wall]
     type = DirichletBC
     variable = phi
@@ -133,6 +130,12 @@
     type = DirichletBC
     variable = T
     boundary = right
+    value = 0
+  [../]
+  [./pressure]
+    type = DirichletBC
+    variable = p
+    boundary = 99
     value = 0
   [../]
 []
@@ -165,7 +168,7 @@
 
 [Executioner]
   type = Steady
-  l_max_its = 50
+  l_max_its = 500
   nl_max_its = 40
   solve_type = PJFNK
   l_tol = 1e-06
@@ -194,7 +197,6 @@
 []
 
 [ICs]
-  active = 'phase_ic'
   [./phase_ic]
     y2 = 0.02
     y1 = 0
