@@ -6,8 +6,8 @@
   xmin = -1e-5
   xmax = .02001
   ymin = -1e-5
-  ymax = 0.02
-  uniform_refine = 3
+  ymax = 0.02001
+  uniform_refine = 4
   elem_type = QUAD9
 []
 
@@ -124,13 +124,13 @@
     type = DirichletBC
     variable = T
     boundary = left
-    value = 1
+    value = 263.211
   [../]
   [./T_cold]
     type = DirichletBC
     variable = T
     boundary = right
-    value = 0
+    value = 263.15
   [../]
   [./pressure]
     type = DirichletBC
@@ -168,7 +168,7 @@
 
 [Executioner]
   type = Steady
-  l_max_its = 500
+  l_max_its = 100
   nl_max_its = 40
   solve_type = PJFNK
   l_tol = 1e-06
@@ -206,6 +206,11 @@
     variable = phi
     x1 = 0
     type = BoundingBoxIC
+  [../]
+  [./T_ic]
+    variable = T
+    type = ConstantIC
+    value = 263.15
   [../]
 []
 
