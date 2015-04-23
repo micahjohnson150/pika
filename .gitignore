@@ -75,6 +75,10 @@ traceout*.txt
 doc/doxygen/html/
 *.#*
 
+#PBS generated files in problem folder
+*.e*
+*.o*
+
 # Allow .e files in gold directories (7 levels)
 !/gold/*.e
 !/*/gold/*.e

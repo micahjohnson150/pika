@@ -1,0 +1,17 @@
+[Jobs]
+  [./PBSJob]
+    notify_address                 = micahjohnson1@u.boisetstate.edu     # The email address to use for PBS notifications
+    template_script                = /home/mjohnson/projects/moose/framework/scripts/ClusterLauncher/pbs_submit.sh # The template job script to use.
+    input_file                     = convection_w_phase.i             # The input file name.
+    moose_application              = /home/mjohnson/projects/pika/pika-opt                 # The full path to the application to run.
+    test_name                      = CONV_W_PHASE                    # The name of the test
+    chunks                         = 2                              # The number of PBS chunks.
+    copy_files                     = *.e                            # A list of files specifically to copy
+    total_mpi_procs                = 24                             # The total number of MPI processes to use divided evenly among chunks.
+    walltime                       = 10:00:00                        # The requested walltime for this job.
+    job_name                       = CYL_W_PHASE                    # The name of the job
+    type                           = PBSJob
+    queue                          = MRI
+  [../]
+
+[]
