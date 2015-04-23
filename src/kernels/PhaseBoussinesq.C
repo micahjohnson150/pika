@@ -30,7 +30,7 @@ PhaseBoussinesq::PhaseBoussinesq(const std::string & name, InputParameters param
 
   // Parameters
   _alpha(_property_uo.getParam<Real>("thermal_expansion")),
-  _rho(_property_uo.equilibriumWaterVaporConcentrationAtSaturationAtReferenceTemperature()),
+  _rho(_property_uo.getParam<Real>("density_air")),
   _gravity(_property_uo.getParam<RealVectorValue>("gravity")),
   _component(getParam<unsigned>("component"))
 
