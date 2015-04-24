@@ -45,8 +45,7 @@ Real PhaseBoussinesq::computeQpResidual()
 Real PhaseBoussinesq::computeQpJacobian()
 {
 
-  return -0.5 * (1.0-_phase[_qp])* _rho * _alpha * _phi[_j][_qp] * _test[_i][_qp] * _gravity(_component);
- // return 0 ;
+ return 0.0 ;
 }
 
 Real PhaseBoussinesq::computeQpOffDiagJacobian(unsigned jvar)
