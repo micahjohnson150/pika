@@ -2,13 +2,22 @@
   type = GeneratedMesh
   dim = 2
   nx = 16
-  ny = 16
-  xmin = -0.02
-  xmax = .02
-  ymin = -0.02
-  ymax = 0.02
-  uniform_refine = 7
+  ny = 8
+  xmin = -1e-5
+  xmax = .02001
+  ymin = -1e-5
+  ymax = 0.02001
+  uniform_refine = 5
   elem_type = QUAD9
+[]
+
+[MeshModifiers]
+  [./pressure]
+    type = AddExtraNodeset
+    new_boundary = 99
+    tolerance = 1e-04
+    coord = '1e-5 1e-5'
+  [../]
 []
 
 [Variables]
@@ -21,6 +30,9 @@
   [./p]
   [../]
   [./phi]
+  [../]
+  [./T]
+    order = SECOND
   [../]
 []
 
@@ -71,51 +83,79 @@
     variable = phi
     mob_name = mobility
   [../]
+  [./heat_diffusion]
+    type = PikaDiffusion
+    variable = T
+    use_temporal_scaling = true
+    property = conductivity
+  [../]
+  [./heat_convection]
+    type = PikaConvection
+    property = heat_capacity
+    phase = phi
+    vel_x = v_x
+    vel_y = v_y
+    variable = T
+  [../]
+  [./v_x_boussinesq]
+    type = PhaseBoussinesq
+    component = 0
+    T = T
+    phase = phi
+    variable = v_x
+  [../]
+  [./v_y_boussinesq]
+    type = PhaseBoussinesq
+    component = 1
+    T = T
+    phase = phi
+    variable = v_y
+  [../]
 []
 
 [BCs]
-  active = 'inlet pressure_pin y_no_slip x_no_slip vapor_phase_wall'
-  [./x_no_slip]
-    type = DirichletBC
-    variable = v_x
-    boundary = top
-    value = 0
-  [../]
-  [./y_no_slip]
-    type = DirichletBC
-    variable = v_y
-    boundary = top
-    value = 0
-  [../]
-  [./vapor_phase_wall]
+  [./solid_phase_wall]
     type = DirichletBC
     variable = phi
     boundary = 'top bottom left right'
-    value = -1
+    value = 1
   [../]
-  [./phase_wall_no_slip_x]
+  [./T_hot]
     type = DirichletBC
-    variable = v_x
-    boundary = bottom
-    value = 0
+    variable = T
+    boundary = left
+    value = 263.211
   [../]
-  [./phase_wall_no_slip_y]
+  [./T_cold]
     type = DirichletBC
-    variable = v_y
-    boundary = bottom
-    value = 0
+    variable = T
+    boundary = right
+    value = 263.15
   [../]
-  [./pressure_pin]
+  [./pressure]
     type = DirichletBC
     variable = p
-    boundary = right
+    boundary = 99
     value = 0
   [../]
-  [./inlet]
-    type = DirichletBC
+[]
+
+[VectorPostprocessors]
+  [./vertical]
+    type = LineValueSampler
     variable = v_x
-    boundary = left
-    value = 149.158
+    num_points = 200
+    start_point = '0.01 -1e-5 0'
+    end_point = '0.01 0.02 0'
+    sort_by = y
+  [../]
+  [./horizontal]
+    type = LineValueSampler
+    variable = v_y
+    num_points = 200
+    start_point = '-1e-5 0.01 0'
+    end_point = '0.02001 0.01 0'
+    sort_by = x
   [../]
 []
 
@@ -128,7 +168,7 @@
 
 [Executioner]
   type = Steady
-  l_max_its = 50
+  l_max_its = 100
   nl_max_its = 40
   solve_type = PJFNK
   l_tol = 1e-06
@@ -150,21 +190,27 @@
 
 [PikaMaterials]
   phase = phi
-  temperature = 263
+  temperature = T
   interface_thickness = 1e-05
   temporal_scaling = 1 # 1e-05
+  gravity = '0 -1 0'
 []
 
 [ICs]
   [./phase_ic]
+    y2 = 0.02
     y1 = 0
+    inside = -1
+    x2 = 0.02
+    outside = 1
     variable = phi
     x1 = 0
-    type = SmoothCircleIC
-    int_width = 1e-5
-    radius = 0.0005
-    outvalue = 1
-    invalue = -1
+    type = BoundingBoxIC
+  [../]
+  [./T_ic]
+    variable = T
+    type = ConstantIC
+    value = 263.15
   [../]
 []
 
