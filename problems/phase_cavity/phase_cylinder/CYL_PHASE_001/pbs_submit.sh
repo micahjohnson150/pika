@@ -1,8 +1,8 @@
 #!/bin/bash
-#PBS -N CYL_W_PHASE_001
-#PBS -l select=4:ncpus=12:mpiprocs=12
+#PBS -N CYL_PHASE_001
+#PBS -l select=4:ncpus=4:mpiprocs=4
 #PBS -l place=scatter:excl
-#PBS -l walltime=4:00:00
+#PBS -l walltime=5:00:00
 
 #PBS -M micahjohnson1@u.boisetstate.edu
 

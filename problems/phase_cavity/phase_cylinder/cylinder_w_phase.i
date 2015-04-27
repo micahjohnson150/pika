@@ -7,7 +7,7 @@
   xmax = .02
   ymin = -0.02
   ymax = 0.02
-  uniform_refine = 7
+  uniform_refine = 5
   elem_type = QUAD9
 []
 
@@ -74,7 +74,7 @@
 []
 
 [BCs]
-  active = 'inlet pressure_pin y_no_slip x_no_slip vapor_phase_wall'
+  active = 'pressure_pin y_no_slip x_no_slip vapor_phase_wall inlet'
   [./x_no_slip]
     type = DirichletBC
     variable = v_x
@@ -115,7 +115,7 @@
     type = DirichletBC
     variable = v_x
     boundary = left
-    value = 149.158
+    value = .23847
   [../]
 []
 
@@ -130,7 +130,7 @@
   type = Steady
   l_max_its = 50
   nl_max_its = 40
-  solve_type = PJFNK
+  solve_type = JFNK
   l_tol = 1e-06
   nl_rel_tol = 1e-15
 []
@@ -153,6 +153,7 @@
   temperature = 263
   interface_thickness = 1e-05
   temporal_scaling = 1 # 1e-05
+  gravity = '0 -9.81 0'
 []
 
 [ICs]
