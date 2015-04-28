@@ -7,7 +7,7 @@
   xmax = .02
   ymin = -0.02
   ymax = 0.02
-  uniform_refine = 5
+  uniform_refine = 1
   elem_type = QUAD9
 []
 
@@ -74,7 +74,7 @@
 []
 
 [BCs]
-  active = 'pressure_pin y_no_slip x_no_slip vapor_phase_wall inlet'
+  active = 'vapor_phase_wall inlet'
   [./x_no_slip]
     type = DirichletBC
     variable = v_x
@@ -115,7 +115,7 @@
     type = DirichletBC
     variable = v_x
     boundary = left
-    value = .23847
+    value = .119239
   [../]
 []
 
@@ -133,6 +133,27 @@
   solve_type = JFNK
   l_tol = 1e-06
   nl_rel_tol = 1e-15
+[]
+
+[Adaptivity]
+  max_h_level = 8
+  initial_steps = 5
+  marker = phi_marker
+  initial_marker = phi_marker
+  [./Indicators]
+    [./phi_jump]
+      type = GradientJumpIndicator
+      variable = phi
+    [../]
+  [../]
+  [./Markers]
+    [./phi_marker]
+      type = ErrorFractionMarker
+      coarsen = 0.2
+      indicator = phi_jump
+      refine = 0.8
+    [../]
+  [../]
 []
 
 [Outputs]
@@ -163,9 +184,9 @@
     x1 = 0
     type = SmoothCircleIC
     int_width = 1e-5
-    radius = 0.0005
-    outvalue = 1
-    invalue = -1
+    radius = 0.001
+    outvalue = -1
+    invalue = 1
   [../]
 []
 
