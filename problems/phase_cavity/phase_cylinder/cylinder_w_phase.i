@@ -12,52 +12,52 @@
 []
 
 [Variables]
-  [./v_x]
-    order = SECOND
-  [../]
-  [./v_y]
-    order = SECOND
-  [../]
   [./p]
   [../]
   [./phi]
+  [../]
+  [./vx]
+    order = SECOND
+  [../]
+  [./vy]
+    order = SECOND
   [../]
 []
 
 [Kernels]
   [./x_momentum]
     type = PikaMomentum
-    variable = v_x
-    vel_y = v_y
-    vel_x = v_x
+    variable = vx
+    vel_y = vy
+    vel_x = vx
     component = 0
     p = p
     phase = phi
   [../]
   [./x_no_slip]
     type = PhaseNoSlipForcing
-    variable = v_x
+    variable = vx
     phase = phi
   [../]
   [./y_momentum]
     type = PikaMomentum
-    variable = v_y
-    vel_y = v_y
-    vel_x = v_x
+    variable = vy
+    vel_y = vy
+    vel_x = vx
     component = 1
     p = p
     phase = phi
   [../]
   [./y_no_slip]
     type = PhaseNoSlipForcing
-    variable = v_y
+    variable = vy
     phase = phi
   [../]
   [./mass_conservation]
     type = PhaseMass
     variable = p
-    vel_y = v_y
-    vel_x = v_x
+    vel_y = vy
+    vel_x = vx
     phase = phi
   [../]
   [./phi_diffusion]
@@ -113,7 +113,7 @@
   [../]
   [./inlet]
     type = DirichletBC
-    variable = v_x
+    variable = vx
     boundary = left
     value = .119239
   [../]
@@ -122,14 +122,13 @@
 [Preconditioning]
   [./SMP_PJFNK]
     type = SMP
-    full = true
   [../]
 []
 
 [Executioner]
   type = Steady
   l_max_its = 50
-  nl_max_its = 40
+  nl_max_its = 70
   solve_type = JFNK
   l_tol = 1e-06
   nl_rel_tol = 1e-15
@@ -137,7 +136,7 @@
 
 [Adaptivity]
   max_h_level = 8
-  initial_steps = 5
+  initial_steps = 7
   marker = phi_marker
   initial_marker = phi_marker
   [./Indicators]
@@ -149,7 +148,6 @@
   [./Markers]
     [./phi_marker]
       type = ErrorFractionMarker
-      coarsen = 0.2
       indicator = phi_jump
       refine = 0.8
     [../]
