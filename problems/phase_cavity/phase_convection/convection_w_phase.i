@@ -1,13 +1,13 @@
 [Mesh]
   type = GeneratedMesh
   dim = 2
-  nx = 16
-  ny = 8
+  nx = 120
+  ny = 120
   xmin = -1e-5
   xmax = .02001
   ymin = -1e-5
   ymax = 0.02001
-  uniform_refine = 5
+  uniform_refine =0
   elem_type = QUAD9
 []
 
@@ -149,11 +149,11 @@
 
 [Executioner]
   type = Steady
-  l_max_its = 200
-  nl_max_its = 40
+  l_max_its = 50
+  nl_max_its = 100
   solve_type = JFNK
-  l_tol = 1e-06
-  nl_rel_tol = 1e-15
+  l_tol = 1e-10
+  nl_rel_tol = 1e-20
 
 []
 
@@ -164,7 +164,7 @@
     output_nonlinear = true
   [../]
   [./exodus]
-    file_base = phase_LDC_out
+    file_base = phase_conv_out
     type = Exodus
     output_on = 'initial failed timestep_end'
   [../]
