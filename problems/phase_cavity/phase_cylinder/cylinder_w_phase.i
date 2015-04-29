@@ -1,13 +1,13 @@
 [Mesh]
   type = GeneratedMesh
   dim = 2
-  nx = 16
-  ny = 16
+  nx = 64
+  ny = 64
   xmin = -0.02
   xmax = .02
   ymin = -0.02
   ymax = 0.02
-  uniform_refine = 1
+  uniform_refine = 0
   elem_type = QUAD9
 []
 
@@ -128,7 +128,7 @@
 [Executioner]
   type = Steady
   l_max_its = 50
-  nl_max_its = 70
+  nl_max_its = 100
   solve_type = JFNK
   l_tol = 1e-06
   nl_rel_tol = 1e-15
@@ -136,9 +136,9 @@
 
 [Adaptivity]
   max_h_level = 8
-  initial_steps = 7
-  marker = phi_marker
-  initial_marker = phi_marker
+  initial_steps = 5
+  marker = combo
+  initial_marker = combo
   [./Indicators]
     [./phi_jump]
       type = GradientJumpIndicator
@@ -151,6 +151,17 @@
       indicator = phi_jump
       refine = 0.8
     [../]
+    [./box_marker]
+      type = BoxMarker
+      bottom_left = '0 -0.001 0'
+      top_right = '0.01 0.001 0'
+      inside = REFINE
+      outside = DONT_MARK
+    [../]
+    [./combo]
+      type = ComboMarker
+      markers = 'box_marker phi_marker'
+    [../]
   [../]
 []
 
@@ -161,7 +172,7 @@
     output_nonlinear = true
   [../]
   [./exodus]
-    file_base = phase_LDC_out
+    file_base = phase_cyl_out
     type = Exodus
     output_on = 'initial failed timestep_end'
   [../]
