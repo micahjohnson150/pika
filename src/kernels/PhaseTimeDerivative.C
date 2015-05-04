@@ -26,8 +26,10 @@ PhaseTimeDerivative::PhaseTimeDerivative(const std::string & name, InputParamete
     TimeDerivative(name, parameters),
     PropertyUserObjectInterface(name, parameters),
     _phase(coupledValue("phase")),
+    _phase_dot(coupledDot("phase")),
+    _phase_dot_du(coupledDotDu("phase")),
     _phase_var_number(coupled("phase")),
-    _rho(_property_uo.equilibriumWaterVaporConcentrationAtSaturationAtReferenceTemperature())
+    _rho(_property_uo.getParam<Real>("density_air"))
 
 {
 }
@@ -35,15 +37,13 @@ PhaseTimeDerivative::PhaseTimeDerivative(const std::string & name, InputParamete
 Real
 PhaseTimeDerivative::computeQpResidual()
 {
-  //return 0.5 * (1.0-_phase[_qp]) * _rho *  TimeDerivative::computeQpResidual();
-  return _rho *  TimeDerivative::computeQpResidual();
+  return 0.5 * _rho * (_u_dot[_qp] - _phase_dot[_qp] * _u[_qp] - _u_dot[_qp] * _phase[_qp]);
 }
 
 Real
 PhaseTimeDerivative::computeQpJacobian()
 {
-    //return 0.5 * (1.0-_phase[_qp]) * _rho * TimeDerivative::computeQpJacobian();
-    return _rho * TimeDerivative::computeQpJacobian();
+    return 0.0;
 }
 Real
 PhaseTimeDerivative::computeQpOffDiagJacobian(unsigned jvar)
@@ -53,5 +53,5 @@ PhaseTimeDerivative::computeQpOffDiagJacobian(unsigned jvar)
   else
     return   0.5 * (1.0-_phase[_qp]) *  _rho * TimeDerivative::computeQpOffDiagJacobian(jvar);
     */
-    return   _rho * TimeDerivative::computeQpOffDiagJacobian(jvar);
+    return  0.0;
 }
