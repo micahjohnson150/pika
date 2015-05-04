@@ -60,6 +60,8 @@ protected:
   virtual Real computeQpOffDiagJacobian(unsigned jvar);
 
   VariableValue& _phase;
+  VariableValue& _phase_dot;
+  VariableValue& _phase_dot_du;
   unsigned _phase_var_number;
   Real _rho;
 

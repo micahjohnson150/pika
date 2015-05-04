@@ -11,15 +11,6 @@
   elem_type = QUAD9
 []
 
-[MeshModifiers]
-  [./pressure pin]
-    type = AddExtraNodeset
-    new_boundary = 99
-    tolerance = 1e-4
-    coord = '0.01 0.01'
-  [../]
-[]
-
 [Variables]
   [./v_x]
     order = SECOND
