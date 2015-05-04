@@ -67,19 +67,15 @@ protected:
   VariableValue& _p;
   VariableValue& _phase;
 
-  // Gradients
+  /** 
+   * Gradients
+   */
   VariableGradient& _grad_p;
   VariableGradient& _grad_phase;
 
   /**
    * Variable numberings for identifying which part of the jacobian to compute
    */
-  VariableGradient& _grad_u_vel;
-  VariableGradient& _grad_v_vel;
-  VariableGradient& _grad_w_vel;
-  VariableGradient& _grad_phase;
-
-  // Variable numberings
   unsigned _u_vel_var_number;
   unsigned _v_vel_var_number;
   unsigned _w_vel_var_number;

@@ -24,7 +24,6 @@ ALL_MODULES := no
 PHASE_FIELD := yes
 HEAT_CONDUCTION := yes
 SOLID_MECHANICS := yes
-NAVIER_STOKES := yes
 
 include $(MOOSE_DIR)/modules/modules.mk
 ###############################################################################
