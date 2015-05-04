@@ -25,8 +25,6 @@ InputParameters validParams<PhaseBoussinesq>()
   // Coupled variables
   params.addRequiredCoupledVar("T", "Temperature");
   params.addRequiredCoupledVar("phase","variable containing the phase");
-
-=======
   return params;
 }
 
