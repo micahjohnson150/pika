@@ -13,6 +13,8 @@ InputParameters validParams<PikaMomentum>()
   params.addRequiredCoupledVar("p", "pressure");
   params.addRequiredCoupledVar("phase", "variable containing the phase");
 
+  // Required parameters
+  params.addRequiredParam<unsigned>("component", "0,1,2 depending on if we are solving the x,y,z component of the momentum equation");
   return params;
 }
 

@@ -9,8 +9,6 @@
 /*                      With the U. S. Department of Energy                       */
 /**********************************************************************************/
 
-
-// MOOSE includes
 #include "PhaseBoussinesq.h"
 
 template<>

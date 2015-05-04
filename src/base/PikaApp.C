@@ -19,7 +19,6 @@
 #include "PhaseFieldApp.h"
 #include "HeatConductionApp.h"
 #include "SolidMechanicsApp.h"
-#include "NavierStokesApp.h"
 
 
 // UserObjects
@@ -92,14 +91,12 @@ PikaApp::PikaApp(const std::string & name, InputParameters parameters) :
   PhaseFieldApp::registerObjects(_factory);
   HeatConductionApp::registerObjects(_factory);
   SolidMechanicsApp::registerObjects(_factory);
-  NavierStokesApp::registerObjects(_factory);
   PikaApp::registerObjects(_factory);
 
   Moose::associateSyntax(_syntax, _action_factory);
   PhaseFieldApp::associateSyntax(_syntax, _action_factory);
   HeatConductionApp::associateSyntax(_syntax, _action_factory);
   SolidMechanicsApp::associateSyntax(_syntax, _action_factory);
-  NavierStokesApp::associateSyntax(_syntax, _action_factory);
   PikaApp::associateSyntax(_syntax, _action_factory);
 }
 

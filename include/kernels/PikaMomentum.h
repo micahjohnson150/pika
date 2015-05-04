@@ -88,9 +88,7 @@ protected:
  */
   Real _mu;
   Real _rho;
-  RealVectorValue _gravity;
 
-  // Parameters
   unsigned _component;
   Real _xi;
 };
