@@ -1,22 +1,15 @@
 [Mesh]
-  type = GeneratedMesh
+  type = FileMesh
+  file = phi_initial_out.e
   dim = 2
-  nx = 120
-  ny = 120
-  xmin = -1e-5
-  xmax = .02001
-  ymin = -1e-5
-  ymax = 0.02001
-  uniform_refine =0
-  elem_type = QUAD9
 []
 
 [MeshModifiers]
-  [./pressure]
+  [./pin]
     type = AddExtraNodeset
     new_boundary = 99
+    coord = '0 0 '
     tolerance = 1e-04
-    coord = '1e-5 1e-5'
   [../]
 []
 
@@ -32,11 +25,23 @@
   [./phi]
   [../]
   [./T]
-    order = SECOND
+  [../]
+[]
+
+[Functions]
+  [./phi_func]
+    type = SolutionFunction
+    from_variable = phi
+    solution = uo_initial
   [../]
 []
 
 [Kernels]
+  [./x_momentum_time]
+    type = PhaseTimeDerivative
+    variable = v_x
+    phase = phi
+  [../]
   [./x_momentum]
     type = PikaMomentum
     variable = v_x
@@ -51,6 +56,11 @@
     variable = v_x
     phase = phi
   [../]
+  [./y_momentum_time]
+    type = PhaseTimeDerivative
+    variable = v_y
+    phase = phi
+  [../]
   [./y_momentum]
     type = PikaMomentum
     variable = v_y
@@ -63,6 +73,13 @@
   [./y_no_slip]
     type = PhaseNoSlipForcing
     variable = v_y
+    phase = phi
+  [../]
+  [./y_momentum_boussinesq]
+    type = PhaseBoussinesq
+    variable = v_y
+    component = 1
+    T = T
     phase = phi
   [../]
   [./mass_conservation]
@@ -83,78 +100,100 @@
     variable = phi
     mob_name = mobility
   [../]
-  [./heat_diffusion]
+  [./Heat_time]
+    type = PikaTimeDerivative
+    variable = T
+    property = heat_capacity
+  [../]
+  [./Heat_convection]
+    type = PikaConvection
+    variable = T
+    vel_x = v_x
+    use_temporal_scaling = true
+    phase = phi
+    property = heat_capacity
+    vel_y = v_y
+  [../]
+  [./Heat_diffusion]
     type = PikaDiffusion
     variable = T
     use_temporal_scaling = true
     property = conductivity
   [../]
-  [./heat_convection]
-    type = PikaConvection
-    property = heat_capacity
-    phase = phi
-    vel_x = v_x
-    vel_y = v_y
-    variable = T
-  [../]
-  [./v_x_boussinesq]
-    type = PhaseBoussinesq
-    component = 0
-    T = T
-    phase = phi
-    variable = v_x
-  [../]
-  [./v_y_boussinesq]
-    type = PhaseBoussinesq
-    component = 1
-    T = T
-    phase = phi
-    variable = v_y
-  [../]
 []
 
 [BCs]
+  [./x_no_slip]
+    type = DirichletBC
+    variable = v_x
+    boundary = 'top left right bottom'
+    value = 0
+  [../]
+  [./y_no_slip]
+    type = DirichletBC
+    variable = v_y
+    boundary = 'top bottom left right'
+    value = 0
+  [../]
   [./solid_phase_wall]
     type = DirichletBC
     variable = phi
-    boundary = 'top bottom left right'
+    boundary = left
     value = 1
+  [../]
+  [./vapor_phase_wall]
+    type = DirichletBC
+    variable = phi
+    boundary = right
+    value = -1
+  [../]
+  [./pressure_pin]
+    type = DirichletBC
+    variable = p
+    boundary = 99
+    value = 0
   [../]
   [./T_hot]
     type = DirichletBC
     variable = T
-    boundary = left
-    value = 263.211
+    boundary = right
+    value = 301.736921
   [../]
   [./T_cold]
     type = DirichletBC
     variable = T
-    boundary = right
+    boundary = left
     value = 263.15
   [../]
-  [./pressure]
-    type = DirichletBC
-    variable = p
-    boundary = right
-    value = 0
+[]
+
+[UserObjects]
+  [./uo_initial]
+    type = SolutionUserObject
+    execute_on = initial
+    mesh = phi_initial_out.e
+    timestep = 2
   [../]
 []
 
 [Preconditioning]
   [./SMP_PJFNK]
     type = SMP
-    full = false
   [../]
 []
 
 [Executioner]
-  type = Steady
+  type = Transient
+  num_steps = 5
+  dt = 0.1
   l_max_its = 50
-  nl_max_its = 100
   solve_type = JFNK
-  l_tol = 1e-10
-  nl_rel_tol = 1e-20
-
+  petsc_options_iname = -ksp_gmres_restart
+  petsc_options_value = ' 50'
+  l_tol = 1e-03
+  nl_rel_tol = 1e-10
+  line_search = none
+  nl_abs_tol = 1e-12
 []
 
 [Outputs]
@@ -162,9 +201,11 @@
     type = Console
     output_linear = true
     output_nonlinear = true
+    nonlinear_residuals = true
+    linear_residuals = true
   [../]
   [./exodus]
-    file_base = phase_conv_out
+    file_base = phase_LDC_out
     type = Exodus
     output_on = 'initial failed timestep_end'
   [../]
@@ -172,27 +213,22 @@
 
 [PikaMaterials]
   phase = phi
-  temperature = T
+  temperature = 263
   interface_thickness = 1e-05
-  temporal_scaling = 1 # 1e-05
   gravity = '0 -9.81 0'
+  temporal_scaling = 1
 []
 
 [ICs]
   [./phase_ic]
-    y2 = 0.02
-    y1 = 0
-    inside = -1
-    x2 = 0.02
-    outside = 1
     variable = phi
-    x1 = 0
-    type = BoundingBoxIC
+    type = FunctionIC
+    function = phi_func
   [../]
   [./T_ic]
+    function = 7717.38418*x+263.15
     variable = T
-    type = ConstantIC
-    value = 263.15
+    type = FunctionIC
   [../]
 []
 
