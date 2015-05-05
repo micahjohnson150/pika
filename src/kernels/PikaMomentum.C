@@ -53,25 +53,24 @@ Real PikaMomentum::Convective()
 {
   // The convection part
   // Note: _grad_u is the gradient of the _component entry of the velocity vector.
-    return  _xi * _rho * 0.5 * (
-                                _u_vel[_qp]*_grad_u[_qp](0) - _u_vel[_qp] * _phase[_qp] * _grad_u[_qp](0) +
-                                _v_vel[_qp]*_grad_u[_qp](1) - _v_vel[_qp] * _phase[_qp] * _grad_u[_qp](1) +
-                                _w_vel[_qp]*_grad_u[_qp](2) - _w_vel[_qp] * _phase[_qp] * _grad_u[_qp](2)) * _test[_i][_qp];
+    RealVectorValue U(_u_vel[_qp], _v_vel[_qp], _w_vel[_qp]);
+    return  _xi * _rho * 0.5 * (1.0 - _phase[_qp]) * U * _grad_u[_qp] * _test[_i][_qp];
 }
 Real PikaMomentum::Pressure()
 {
   // The pressure part
-  return -0.5 * _xi * (_p[_qp] - _phase[_qp] *_p[_qp]) * _grad_test[_i][_qp](_component);
+  //return -0.5 * _xi * (1.0 - _phase[_qp]) * _p[_qp] *  _grad_test[_i][_qp](_component);
+  return 0.5 * _xi * (1.0 - _phase[_qp]) * _grad_p[_qp](_component) *  _test[_i][_qp];
 }
 
 Real PikaMomentum::Viscous()
 {
-  RealVectorValue tau_row;
-  tau_row(0)= _grad_u[_qp](0) -_phase[_qp] * _grad_u[_qp](0) - _u[_qp] * _grad_phase[_qp](0);
+  RealVectorValue tau = -_grad_phase[_qp] * _u[_qp] + (1.0 - _phase[_qp]) * _grad_u[_qp];
+  /*tau_row(0)= _grad_u[_qp](0) -_phase[_qp] * _grad_u[_qp](0) - _u[_qp] * _grad_phase[_qp](0);
   tau_row(1)= _grad_u[_qp](1) -_phase[_qp] * _grad_u[_qp](1) - _u[_qp] * _grad_phase[_qp](1);
   tau_row(2)= _grad_u[_qp](2) -_phase[_qp] * _grad_u[_qp](2) - _u[_qp] * _grad_phase[_qp](2);
-
-  return 0.5 * _xi * _mu * (tau_row * _grad_test[_i][_qp]);
+*/
+  return 0.5 * _xi * _mu * (tau * _grad_test[_i][_qp]);
 }
 
 Real PikaMomentum::computeQpResidual()
@@ -84,19 +83,18 @@ Real PikaMomentum::computeQpJacobian()
   Real convective;
   RealVectorValue U(_u_vel[_qp], _v_vel[_qp], _w_vel[_qp]);
 
- //Jacobian of convective part
+  //Jacobian of convective part
 
-  convective = (_xi * _rho * 0.5 *(1.0-_phase[_qp]) *
-       (U*_grad_phi[_j][_qp] + (_phi[_j][_qp]*_grad_u[_qp](_component)))) * _test[_i][_qp];
+  convective = _xi * _rho * 0.5 * (1.0 - _phase[_qp]) * (U * _grad_phi[_j][_qp] + + _phi[_j][_qp] * _grad_u[_qp](_component)  )* _test[_i][_qp];
            
   //Jacobian part of pressure = 0
 
   //Jacobian of viscous part 
-  RealVectorValue tau;
-  tau(0)= - _grad_phase[_qp](0)* _phi[_j][_qp] + _grad_phi[_j][_qp](0) * (1.0 - _phase[_qp]);
-  tau(1)= - _grad_phase[_qp](1)* _phi[_j][_qp] + _grad_phi[_j][_qp](1) * (1.0 - _phase[_qp]);
-  tau(2)= - _grad_phase[_qp](2)* _phi[_j][_qp] + _grad_phi[_j][_qp](2) * (1.0 - _phase[_qp]);
+  //tau= _grad_phi[_j][_qp] -_phase[_qp] * _grad_phi[_j][_qp] - _phi[_j][_qp] * _grad_phase[_qp];
+  RealVectorValue tau = -_grad_phase[_qp] * _phi[_j][_qp] + (1.0 - _phase[_qp]) * _grad_phi[_j][_qp];
+
   Real viscous = 0.5 * _xi * _mu * tau *_grad_test[_i][_qp];
+
 return convective + viscous;
   
 }
@@ -106,46 +104,31 @@ Real PikaMomentum::computeQpOffDiagJacobian(unsigned jvar)
   //Laplacian viscous term is zero for off diags.
   
   // The off Diag Jac for u_vel when u_vel!= _u  in convection part
-  if (jvar == _u_vel_var_number)
+  if (jvar == _u_vel_var_number || jvar == _v_vel_var_number || jvar == _w_vel_var_number )
   {
-    Real convective_part = _rho *  _phi[_j][_qp] * _grad_u[_qp](0) * _test[_i][_qp];
-    return 0.5 * (1.0-_phase[_qp]) * _xi * convective_part;
-  }
-  // The off Diag Jac for v_vel when v_vel!= _u  in convection part
-  else if (jvar == _v_vel_var_number)
-  {
-    Real convective_part = _rho *  _phi[_j][_qp] * _grad_u[_qp](1) * _test[_i][_qp];
-    return 0.5 * (1.0-_phase[_qp]) * _xi * convective_part;
-  }
-
-  // The off Diag Jac for w_vel when w_vel!= _u  in convection part
-  else if (jvar == _w_vel_var_number)
-  {
-    Real convective_part = _rho *  _phi[_j][_qp] * _grad_u[_qp](2) * _test[_i][_qp];
-    return 0.5 * (1.0-_phase[_qp]) * _xi * convective_part;
+    RealVectorValue U(_u_vel[_qp], _v_vel[_qp], _w_vel[_qp]);
+    return  _xi * _rho * 0.5 * (1.0 - _phase[_qp]) * _phi[_j][_qp] * _grad_u[_qp](_component) * _test[_i][_qp];
   }
 
   // The off Diag Jac for pressure
   else if (jvar == _p_var_number)
-    return -_xi * 0.5 * (1.0-_phase[_qp]) *  _phi[_j][_qp] * _grad_test[_i][_qp](_component);
+  {
+    // return -_xi * 0.5 * (1.0-_phase[_qp]) *  _phi[_j][_qp] * _grad_test[_i][_qp](_component);
+    return 0.5 * _xi * (1.0 - _phase[_qp]) * _grad_phi[_j][_qp](_component) *  _test[_i][_qp];
+  }
 
   else if (jvar == _phase_var_number)
   {
-    // The off Diag Jac for phase in convection part
-     Real convective =  -0.5 * _xi * _rho * _phi[_j][_qp] * (_u_vel[_qp]*_grad_u[_qp](0) +
-                        _v_vel[_qp]*_grad_u[_qp](1) +
-                        _w_vel[_qp]*_grad_u[_qp](2)) * _test[_i][_qp];
+    RealVectorValue U(_u_vel[_qp], _v_vel[_qp], _w_vel[_qp]);
+    Real convective =  _xi * _rho * 0.5 * (- _phi[_j][_qp]) * U * _grad_u[_qp] * _test[_i][_qp];
+    
+    Real pressure =  0.5 * _xi * ( -_phi[_j][_qp]) * _grad_p[_qp](_component) *  _test[_i][_qp];
 
-    // The off Diag Jac for phase in pressure part
-    Real pressure =  _xi * 0.5 * _phi[_j][_qp] *  _p[_qp] * _grad_test[_i][_qp](_component);
+   // Real pressure = -_xi * 0.5 * (-_phi[_j][_qp]) *  _p[_qp] * _grad_test[_i][_qp](_component);
 
-    // The off Diag Jac for phase in viscous part
-    RealVectorValue tau_row;
-    tau_row(0)= - _grad_phi[_j][_qp](0)* _u[_qp] - _grad_u[_qp](0) * _phi[_j][_qp];
-    tau_row(1)= - _grad_phi[_j][_qp](1)* _u[_qp] - _grad_u[_qp](1) * _phi[_j][_qp];
-    tau_row(2)= - _grad_phi[_j][_qp](2)* _u[_qp] - _grad_u[_qp](2) * _phi[_j][_qp];
-
-    Real viscous = 0.5 * _xi * _mu * (tau_row * _grad_test[_i][_qp]);
+    RealVectorValue tau = -_grad_phi[_j][_qp] * _u[_qp] + ( - _phi[_j][_qp]) * _grad_u[_qp];
+    
+    Real viscous =  0.5 * _xi * _mu * (tau * _grad_test[_i][_qp]);
     return convective + pressure + viscous;
   }
   else

@@ -1,8 +1,8 @@
 [Mesh]
   type = GeneratedMesh
   dim = 2
-  nx = 16
-  ny = 8
+  nx = 15
+  ny = 15
   xmin = -1e-5
   xmax = .02001
   ymin = -1e-5
@@ -71,10 +71,25 @@
     variable = phi
     mob_name = mobility
   [../]
+  [./x_momentum_time]
+    type = PhaseTimeDerivative
+    variable = v_x
+    phase = phi
+  [../]
+  [./y_momentum_time]
+    type = PhaseTimeDerivative
+    variable = v_y
+    phase = phi
+  [../]
+  [./phi_time]
+    type = PikaTimeDerivative
+    variable = phi
+    property = relaxation_time
+  [../]
 []
 
 [BCs]
-  active = 'lid y_no_slip vapor_phase_wall solid_phase_wall'
+  active = 'lid phase_wall_no_slip vapor_phase_wall'
   [./x_no_slip]
     type = DirichletBC
     variable = v_x
@@ -96,32 +111,32 @@
   [./vapor_phase_wall]
     type = DirichletBC
     variable = phi
-    boundary = top
+    boundary = 'top bottom left right'
     value = -1
-  [../]
-  [./phase_wall_no_slip_x]
-    type = DirichletBC
-    variable = v_x
-    boundary = bottom
-    value = 0
   [../]
   [./phase_wall_no_slip_y]
     type = DirichletBC
     variable = v_y
-    boundary = bottom
+    boundary = 'top bottom left right'
     value = 0
   [../]
   [./lid]
     type = DirichletBC
     variable = v_x
     boundary = top
-    value = 149.158
+    value = 0.238478747
   [../]
   [./pressure_pin]
     type = DirichletBC
     variable = p
-    boundary = 99
+    boundary = bottom
     value = 0
+  [../]
+  [./phase_wall_no_slip]
+    type = DirichletBC
+    variable = phi
+    boundary = 'bottom left right'
+    value = 1
   [../]
 []
 
@@ -152,12 +167,16 @@
 []
 
 [Executioner]
-  type = Steady
+  type = Transient
+  num_steps = 5
   l_max_its = 50
-  nl_max_its = 40
   solve_type = PJFNK
-  l_tol = 1e-06
-  nl_rel_tol = 1e-15
+  petsc_options_iname = -ksp_gmres_restart
+  petsc_options_value = 100
+  l_tol = 1e-03
+  nl_rel_tol = 1e-10
+  line_search = none
+  nl_abs_tol = 1e-12
 []
 
 [Outputs]
@@ -165,6 +184,8 @@
     type = Console
     output_linear = true
     output_nonlinear = true
+    nonlinear_residuals = true
+    linear_residuals = true
   [../]
   [./exodus]
     file_base = phase_LDC_out
@@ -191,6 +212,11 @@
     variable = phi
     x1 = 0
     type = BoundingBoxIC
+  [../]
+  [./phi_const]
+    variable = phi
+    type = ConstantIC
+    value = -1
   [../]
 []
 

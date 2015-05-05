@@ -37,6 +37,7 @@ protected:
   unsigned _phase_var_number;
   Real _h;
   MaterialProperty<Real> &  _w_2;
+  Real _xi;
   Real _mu;
   //Real _rho;
 };

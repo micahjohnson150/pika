@@ -42,6 +42,7 @@ PhaseBoussinesq::PhaseBoussinesq(const std::string & name, InputParameters param
   _alpha(_property_uo.getParam<Real>("thermal_expansion")),
   _rho(_property_uo.getParam<Real>("density_air")),
   _gravity(_property_uo.getParam<RealVectorValue>("gravity")),
+  _xi(_property_uo.getParam<Real>("temporal_scaling")),
   _component(getParam<unsigned>("component"))
 
 {
@@ -49,21 +50,22 @@ PhaseBoussinesq::PhaseBoussinesq(const std::string & name, InputParameters param
 
 Real PhaseBoussinesq::computeQpResidual()
 {
-  return -0.5 * (1.0-_phase[_qp])* _rho * (1.0 -  _alpha * (_T[_qp] - _T_ref) * _test[_i][_qp] * _gravity(_component));
+  return -0.5 * _xi * (1.0-_phase[_qp])* _rho * (1.0 -  _alpha * (_T[_qp] - _T_ref) * _test[_i][_qp] * _gravity(_component));
 }
 
 Real PhaseBoussinesq::computeQpJacobian()
 {
-
- return 0.0 ;
+ return 0.0;
 }
 
 Real PhaseBoussinesq::computeQpOffDiagJacobian(unsigned jvar)
 {
   if(jvar == _T_var_number)
-    return -0.5 * (1.0-_phase[_qp])* _rho * (1.0 -  _alpha * _phi[_j][_qp] * _test[_i][_qp] * _gravity(_component));
+    return -0.5 * _xi * (1.0-_phase[_qp])* _rho * (1.0 -  _alpha * _phi[_j][_qp] * _test[_i][_qp] * _gravity(_component));
+
   else if(jvar == _phase_var_number)
-    return -0.5 * _phi[_j][_qp]* _rho * (1.0 -  _alpha * (_T[_qp]-_T_ref) * _test[_i][_qp] * _gravity(_component));
+    return -0.5 * _xi * (-_phi[_j][_qp])* _rho * (1.0 -  _alpha * (_T[_qp] - _T_ref) * _test[_i][_qp] * _gravity(_component));
+
   else 
     return 0.0; 
 }

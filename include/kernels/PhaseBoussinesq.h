@@ -52,6 +52,7 @@ protected:
   Real _alpha;
   Real _rho;
   RealVectorValue _gravity;
+  Real _xi;
   unsigned _component;
 };
 #endif // PHASEBOUSSINESQ_H

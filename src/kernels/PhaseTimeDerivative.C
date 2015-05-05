@@ -43,15 +43,14 @@ PhaseTimeDerivative::computeQpResidual()
 Real
 PhaseTimeDerivative::computeQpJacobian()
 {
-    return 0.0;
+  return 0.5 * _rho * (_phi[_j][_qp] * _du_dot_du[_qp] - _phase_dot[_qp] * _phi[_j][_qp] - _phi[_j][_qp] * _du_dot_du[_qp] * _phase[_qp]);
 }
 Real
 PhaseTimeDerivative::computeQpOffDiagJacobian(unsigned jvar)
 {
-/*  if (jvar==_phase_var_number)
-    return  -0.5 * _phi[_j][_qp]* _rho *  TimeDerivative::computeQpResidual();
+  if (jvar==_phase_var_number)
+    return 0.5 * _rho * (_u_dot[_qp] - _phi[_j][_qp] * _phase_dot_du[_qp] * _u[_qp] - _u_dot[_qp] * _phi[_j][_qp]);
+
   else
-    return   0.5 * (1.0-_phase[_qp]) *  _rho * TimeDerivative::computeQpOffDiagJacobian(jvar);
-    */
     return  0.0;
 }
