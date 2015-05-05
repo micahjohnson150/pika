@@ -231,13 +231,14 @@
   num_steps = 5
   dt = 0.1
   l_max_its = 50
+  nl_max_its = 100
   solve_type = JFNK
   petsc_options_iname = -ksp_gmres_restart
   petsc_options_value = ' 50'
   l_tol = 1e-03
   nl_rel_tol = 1e-10
   line_search = none
-  nl_abs_tol = 1e-12
+  nl_abs_tol = 1e-7
 []
 
 [Outputs]
@@ -257,7 +258,7 @@
 
 [PikaMaterials]
   phase = phi
-  temperature = 263
+  temperature = T
   interface_thickness = 1e-05
   gravity = '0 -9.81 0'
 []
