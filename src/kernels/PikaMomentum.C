@@ -85,7 +85,7 @@ Real PikaMomentum::computeQpJacobian()
 
   //Jacobian of convective part
 
-  convective = _xi * _rho * 0.5 * (1.0 - _phase[_qp]) * (U * _grad_phi[_j][_qp] + + _phi[_j][_qp] * _grad_u[_qp](_component)  )* _test[_i][_qp];
+  convective = _xi * _rho * 0.5 * (1.0 - _phase[_qp]) * (U * _grad_phi[_j][_qp] +  _phi[_j][_qp] * _grad_u[_qp](_component)) *  _test[_i][_qp];
            
   //Jacobian part of pressure = 0
 
@@ -113,8 +113,8 @@ Real PikaMomentum::computeQpOffDiagJacobian(unsigned jvar)
   // The off Diag Jac for pressure
   else if (jvar == _p_var_number)
   {
-    // return -_xi * 0.5 * (1.0-_phase[_qp]) *  _phi[_j][_qp] * _grad_test[_i][_qp](_component);
-    return 0.5 * _xi * (1.0 - _phase[_qp]) * _grad_phi[_j][_qp](_component) *  _test[_i][_qp];
+    return -_xi * 0.5 * (1.0-_phase[_qp]) *  _phi[_j][_qp] * _grad_test[_i][_qp](_component);
+    //return 0.5 * _xi * (1.0 - _phase[_qp]) * _grad_phi[_j][_qp](_component) *  _test[_i][_qp];
   }
 
   else if (jvar == _phase_var_number)
@@ -122,9 +122,9 @@ Real PikaMomentum::computeQpOffDiagJacobian(unsigned jvar)
     RealVectorValue U(_u_vel[_qp], _v_vel[_qp], _w_vel[_qp]);
     Real convective =  _xi * _rho * 0.5 * (- _phi[_j][_qp]) * U * _grad_u[_qp] * _test[_i][_qp];
     
-    Real pressure =  0.5 * _xi * ( -_phi[_j][_qp]) * _grad_p[_qp](_component) *  _test[_i][_qp];
+    //Real pressure =  0.5 * _xi * ( -_phi[_j][_qp]) * _grad_p[_qp](_component) *  _test[_i][_qp];
 
-   // Real pressure = -_xi * 0.5 * (-_phi[_j][_qp]) *  _p[_qp] * _grad_test[_i][_qp](_component);
+    Real pressure = -_xi * 0.5 * (-_phi[_j][_qp]) *  _p[_qp] * _grad_test[_i][_qp](_component);
 
     RealVectorValue tau = -_grad_phi[_j][_qp] * _u[_qp] + ( - _phi[_j][_qp]) * _grad_u[_qp];
     
