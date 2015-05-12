@@ -1,14 +1,7 @@
 [Mesh]
-  type = GeneratedMesh
+  type = FileMesh
+  file = phi_initial_out.e-s002
   dim = 2
-  nx = 15
-  ny = 15
-  xmin = -1e-5
-  xmax = .02001
-  ymin = -1e-5
-  ymax = 0.02
-  uniform_refine = 3
-  elem_type = QUAD9
 []
 
 [Variables]
@@ -24,7 +17,16 @@
   [../]
 []
 
+[Functions]
+  [./phi_func]
+    type = SolutionFunction
+    from_variable = phi
+    solution = intial_uo
+  [../]
+[]
+
 [Kernels]
+  active = 'phi_diffusion y_momentum_time phi_double_well y_no_slip x_no_slip y_momentum mass_conservation x_momentum_time x_momentum'
   [./x_momentum]
     type = PikaMomentum
     variable = v_x
@@ -89,7 +91,7 @@
 []
 
 [BCs]
-  active = 'lid phase_wall_no_slip vapor_phase_wall'
+  active = 'lid y_no_slip solid_phase_wall vapor_phase_wall'
   [./x_no_slip]
     type = DirichletBC
     variable = v_x
@@ -111,7 +113,7 @@
   [./vapor_phase_wall]
     type = DirichletBC
     variable = phi
-    boundary = 'top bottom left right'
+    boundary = top
     value = -1
   [../]
   [./phase_wall_no_slip_y]
@@ -121,10 +123,11 @@
     value = 0
   [../]
   [./lid]
-    type = DirichletBC
+    type = PhaseDirichletBC
     variable = v_x
     boundary = top
-    value = 0.238478747
+    value = .95391499
+    phase_variable = phi
   [../]
   [./pressure_pin]
     type = DirichletBC
@@ -132,54 +135,72 @@
     boundary = bottom
     value = 0
   [../]
-  [./phase_wall_no_slip]
-    type = DirichletBC
-    variable = phi
-    boundary = 'bottom left right'
-    value = 1
-  [../]
 []
 
 [VectorPostprocessors]
-  [./vertical]
-    type = LineValueSampler
-    variable = v_x
-    num_points = 200
-    start_point = '0.01 -1e-5 0'
-    end_point = '0.01 0.02 0'
-    sort_by = y
-  [../]
-  [./horizontal]
+  [./v_func_x]
     type = LineValueSampler
     variable = v_y
-    num_points = 200
-    start_point = '-1e-5 0.01 0'
-    end_point = '0.02001 0.01 0'
+    num_points = 100
+    end_point = '0.00501 0.002505 0'
     sort_by = x
+    execute_on = timestep_end
+    start_point = '-1e-5 0.002505 0'
+    outputs = exodus
+  [../]
+  [./u_func_y]
+    type = LineValueSampler
+    variable = v_x
+    num_points = 100
+    start_point = '0.00251 -1e-5 0'
+    end_point = '0.00251 0.005 0'
+    sort_by = y
+    outputs = exodus
+  [../]
+[]
+
+[UserObjects]
+  [./intial_uo]
+    type = SolutionUserObject
+    execute_on = initial
+    mesh = phi_initial_out.e-s002
+    timestep = 1
   [../]
 []
 
 [Preconditioning]
+  active = 'SMP_PJFNK'
   [./SMP_PJFNK]
     type = SMP
     full = true
+  [../]
+  [./PBP_JFNK]
+    type = PBP
+    solve_order = 'phi v_x v_y p '
+    preconditioner = AMG
+    off_diag_row = p
+    off_diag_column = 'phi '
   [../]
 []
 
 [Executioner]
   type = Transient
-  num_steps = 5
+  num_steps = 1000
   l_max_its = 50
   solve_type = PJFNK
-  petsc_options_iname = -ksp_gmres_restart
-  petsc_options_value = 100
-  l_tol = 1e-03
-  nl_rel_tol = 1e-10
-  line_search = none
-  nl_abs_tol = 1e-12
+  l_tol = 1e-02
+  nl_rel_tol = 1e-3
+  nl_abs_tol = 2e-20
+  end_time = 500
+  nl_rel_step_tol = 1e-3
+  [./TimeStepper]
+    type = IterationAdaptiveDT
+    dt = 0.1
+  [../]
 []
 
 [Outputs]
+  csv = true
   [./console]
     type = Console
     output_linear = true
@@ -198,11 +219,11 @@
   phase = phi
   temperature = 263
   interface_thickness = 1e-05
-  temporal_scaling = 1 # 1e-05
+  temporal_scaling = 1e-5 # 1e-05
 []
 
 [ICs]
-  active = 'phase_ic'
+  active = 'phi_ic_func'
   [./phase_ic]
     y2 = 0.02001
     y1 = 0
@@ -217,6 +238,11 @@
     variable = phi
     type = ConstantIC
     value = -1
+  [../]
+  [./phi_ic_func]
+    function = phi_func
+    variable = phi
+    type = FunctionIC
   [../]
 []
 
