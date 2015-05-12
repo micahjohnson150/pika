@@ -37,13 +37,14 @@ PhaseTimeDerivative::PhaseTimeDerivative(const std::string & name, InputParamete
 Real
 PhaseTimeDerivative::computeQpResidual()
 {
-  return 0.5 * _rho * (_u_dot[_qp] - _phase_dot[_qp] * _u[_qp] - _u_dot[_qp] * _phase[_qp]);
+  return 0.5 * _rho * ((1.0 - _phase[_qp]) * _u_dot[_qp] + ( -_phase_dot[_qp]) * _u[_qp]) * _test[_i][_qp];
 }
 
 Real
 PhaseTimeDerivative::computeQpJacobian()
 {
-  return 0.5 * _rho * (_phi[_j][_qp] * _du_dot_du[_qp] - _phase_dot[_qp] * _phi[_j][_qp] - _phi[_j][_qp] * _du_dot_du[_qp] * _phase[_qp]);
+
+  return 0.5 * _rho * ((1.0 - _phase[_qp]) * _du_dot_du[_qp]  - _phase_dot[_qp]) *  _phi[_j][_qp] *  _test[_i][_qp];
 }
 Real
 PhaseTimeDerivative::computeQpOffDiagJacobian(unsigned jvar)

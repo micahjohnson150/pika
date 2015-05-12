@@ -59,18 +59,14 @@ Real PikaMomentum::Convective()
 Real PikaMomentum::Pressure()
 {
   // The pressure part
-  //return -0.5 * _xi * (1.0 - _phase[_qp]) * _p[_qp] *  _grad_test[_i][_qp](_component);
-  return 0.5 * _xi * (1.0 - _phase[_qp]) * _grad_p[_qp](_component) *  _test[_i][_qp];
+  return -0.5 * _xi * (1.0 - _phase[_qp]) * _p[_qp] *  _grad_test[_i][_qp](_component);
+  //return 0.5 * _xi * (1.0 - _phase[_qp]) * _grad_p[_qp](_component) *  _test[_i][_qp];
 }
 
 Real PikaMomentum::Viscous()
 {
   RealVectorValue tau = -_grad_phase[_qp] * _u[_qp] + (1.0 - _phase[_qp]) * _grad_u[_qp];
-  /*tau_row(0)= _grad_u[_qp](0) -_phase[_qp] * _grad_u[_qp](0) - _u[_qp] * _grad_phase[_qp](0);
-  tau_row(1)= _grad_u[_qp](1) -_phase[_qp] * _grad_u[_qp](1) - _u[_qp] * _grad_phase[_qp](1);
-  tau_row(2)= _grad_u[_qp](2) -_phase[_qp] * _grad_u[_qp](2) - _u[_qp] * _grad_phase[_qp](2);
-*/
-  return 0.5 * _xi * _mu * (tau * _grad_test[_i][_qp]);
+  return 0.5 * _xi * _mu * tau * _grad_test[_i][_qp];
 }
 
 Real PikaMomentum::computeQpResidual()
@@ -90,7 +86,6 @@ Real PikaMomentum::computeQpJacobian()
   //Jacobian part of pressure = 0
 
   //Jacobian of viscous part 
-  //tau= _grad_phi[_j][_qp] -_phase[_qp] * _grad_phi[_j][_qp] - _phi[_j][_qp] * _grad_phase[_qp];
   RealVectorValue tau = -_grad_phase[_qp] * _phi[_j][_qp] + (1.0 - _phase[_qp]) * _grad_phi[_j][_qp];
 
   Real viscous = 0.5 * _xi * _mu * tau *_grad_test[_i][_qp];
@@ -114,7 +109,6 @@ Real PikaMomentum::computeQpOffDiagJacobian(unsigned jvar)
   else if (jvar == _p_var_number)
   {
     return -_xi * 0.5 * (1.0-_phase[_qp]) *  _phi[_j][_qp] * _grad_test[_i][_qp](_component);
-    //return 0.5 * _xi * (1.0 - _phase[_qp]) * _grad_phi[_j][_qp](_component) *  _test[_i][_qp];
   }
 
   else if (jvar == _phase_var_number)
@@ -122,8 +116,6 @@ Real PikaMomentum::computeQpOffDiagJacobian(unsigned jvar)
     RealVectorValue U(_u_vel[_qp], _v_vel[_qp], _w_vel[_qp]);
     Real convective =  _xi * _rho * 0.5 * (- _phi[_j][_qp]) * U * _grad_u[_qp] * _test[_i][_qp];
     
-    //Real pressure =  0.5 * _xi * ( -_phi[_j][_qp]) * _grad_p[_qp](_component) *  _test[_i][_qp];
-
     Real pressure = -_xi * 0.5 * (-_phi[_j][_qp]) *  _p[_qp] * _grad_test[_i][_qp](_component);
 
     RealVectorValue tau = -_grad_phi[_j][_qp] * _u[_qp] + ( - _phi[_j][_qp]) * _grad_u[_qp];

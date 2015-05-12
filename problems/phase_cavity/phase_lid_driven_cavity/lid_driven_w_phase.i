@@ -1,11 +1,7 @@
 [Mesh]
-  type = GeneratedMesh
+  type = FileMesh
+  file = phi_initial_out.e-s002
   dim = 2
-  nx = 100
-  ny = 100
-  xmax = 0.005
-  ymax = 0.005
-  elem_type = QUAD9
 []
 
 [Variables]
@@ -95,7 +91,7 @@
 []
 
 [BCs]
-  active = 'lid y_no_slip vapor_phase_wall phase_wall_no_slip'
+  active = 'lid y_no_slip solid_phase_wall vapor_phase_wall'
   [./x_no_slip]
     type = DirichletBC
     variable = v_x
@@ -117,7 +113,7 @@
   [./vapor_phase_wall]
     type = DirichletBC
     variable = phi
-    boundary = 'top bottom left right'
+    boundary = top
     value = -1
   [../]
   [./phase_wall_no_slip_y]
@@ -127,10 +123,11 @@
     value = 0
   [../]
   [./lid]
-    type = DirichletBC
+    type = PhaseDirichletBC
     variable = v_x
     boundary = top
     value = .95391499
+    phase_variable = phi
   [../]
   [./pressure_pin]
     type = DirichletBC
@@ -138,31 +135,27 @@
     boundary = bottom
     value = 0
   [../]
-  [./phase_wall_no_slip]
-    type = DirichletBC
-    variable = phi
-    boundary = 'bottom left right'
-    value = 1
-  [../]
 []
 
 [VectorPostprocessors]
   [./v_func_x]
     type = LineValueSampler
     variable = v_y
-    num_points = 50
-    end_point = '0.0025 0.005 0'
+    num_points = 100
+    end_point = '0.00501 0.002505 0'
     sort_by = x
-    execute_on = custom
-    start_point = '0 0.0025 0'
+    execute_on = timestep_end
+    start_point = '-1e-5 0.002505 0'
+    outputs = exodus
   [../]
   [./u_func_y]
     type = LineValueSampler
     variable = v_x
     num_points = 100
-    start_point = '0.0025 0 0'
-    end_point = '0.0025 0.005 0'
+    start_point = '0.00251 -1e-5 0'
+    end_point = '0.00251 0.005 0'
     sort_by = y
+    outputs = exodus
   [../]
 []
 
@@ -170,8 +163,8 @@
   [./intial_uo]
     type = SolutionUserObject
     execute_on = initial
-    mesh = ../phase_convection/phi_initial_out.e
-    timestep = 2
+    mesh = phi_initial_out.e-s002
+    timestep = 1
   [../]
 []
 
@@ -179,6 +172,7 @@
   active = 'SMP_PJFNK'
   [./SMP_PJFNK]
     type = SMP
+    full = true
   [../]
   [./PBP_JFNK]
     type = PBP
@@ -192,18 +186,21 @@
 [Executioner]
   type = Transient
   num_steps = 1000
-  dt = 0.01
   l_max_its = 50
-  solve_type = JFNK
-  petsc_options_iname = -pc_type
-  petsc_options_value = bjacobi
-  l_tol = 1e-04
-  nl_rel_tol = 1e-10
-  nl_abs_tol = 2e-6
-  end_time = 0.5
+  solve_type = PJFNK
+  l_tol = 1e-02
+  nl_rel_tol = 1e-3
+  nl_abs_tol = 2e-20
+  end_time = 500
+  nl_rel_step_tol = 1e-3
+  [./TimeStepper]
+    type = IterationAdaptiveDT
+    dt = 0.1
+  [../]
 []
 
 [Outputs]
+  csv = true
   [./console]
     type = Console
     output_linear = true
@@ -222,11 +219,11 @@
   phase = phi
   temperature = 263
   interface_thickness = 1e-05
-  temporal_scaling = 1 # 1e-05
+  temporal_scaling = 1e-5 # 1e-05
 []
 
 [ICs]
-  active = 'phi_const'
+  active = 'phi_ic_func'
   [./phase_ic]
     y2 = 0.02001
     y1 = 0
