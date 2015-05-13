@@ -1,8 +1,8 @@
 [Mesh]
   type = GeneratedMesh
   dim = 2
-  nx = 30
-  ny = 50
+  nx = 50
+  ny = 75
   xmin = -.05
   xmax = 0.1
   ymin = -0.1
@@ -99,7 +99,7 @@
 
 [Adaptivity]
   max_h_level = 9
-  initial_steps = 9
+  initial_steps =9
   initial_marker = phi_marker
   cycles_per_step = 0
   [./Indicators]

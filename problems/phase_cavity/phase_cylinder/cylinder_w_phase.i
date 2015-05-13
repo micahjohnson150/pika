@@ -126,7 +126,7 @@
     type = DirichletBC
     variable = vx
     boundary = left
-    value = .119239
+    value = .047696
   [../]
 []
 
@@ -142,20 +142,19 @@
 [Preconditioning]
   [./SMP_PJFNK]
     type = SMP
+    full = true
   [../]
 []
 
 [Executioner]
   type = Transient
+  dt = .1
+  num_steps = 10
   l_max_its = 50
   nl_max_its = 100
   solve_type = PJFNK
-  l_tol = 1e-06
-  nl_rel_tol = 1e-15
-  [./TimeStepper]
-    type = IterationAdaptiveDT
-    dt = 0.01
-  [../]
+  l_tol = 1e-02
+  nl_rel_tol = 1e-3
 []
 
 [Outputs]
