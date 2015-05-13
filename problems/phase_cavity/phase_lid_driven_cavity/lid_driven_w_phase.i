@@ -2,6 +2,7 @@
   type = FileMesh
   file = phi_initial_out.e-s002
   dim = 2
+  uniform_refine = 1
 []
 
 [Variables]
@@ -174,13 +175,6 @@
     type = SMP
     full = true
   [../]
-  [./PBP_JFNK]
-    type = PBP
-    solve_order = 'phi v_x v_y p '
-    preconditioner = AMG
-    off_diag_row = p
-    off_diag_column = 'phi '
-  [../]
 []
 
 [Executioner]
@@ -192,7 +186,9 @@
   nl_rel_tol = 1e-3
   nl_abs_tol = 2e-20
   end_time = 500
-  nl_rel_step_tol = 1e-3
+  nl_rel_step_tol = 1e-2
+  petsc_iname_options = '-pc_type -ksp_gmres_restart'
+  petsc_value = 'hypre 5'
   [./TimeStepper]
     type = IterationAdaptiveDT
     dt = 0.1
@@ -219,7 +215,7 @@
   phase = phi
   temperature = 263
   interface_thickness = 1e-05
-  temporal_scaling = 1e-5 # 1e-05
+  temporal_scaling = 1 # 1e-05
 []
 
 [ICs]
