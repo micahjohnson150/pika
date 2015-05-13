@@ -17,6 +17,11 @@
   [../]
 []
 
+[AuxVariables]
+  [./phi_aux]
+  [../]
+[]
+
 [Functions]
   [./phi_func]
     type = SolutionFunction
@@ -26,7 +31,6 @@
 []
 
 [Kernels]
-  active = 'phi_diffusion y_momentum_time phi_double_well y_no_slip x_no_slip y_momentum mass_conservation x_momentum_time x_momentum'
   [./x_momentum]
     type = PikaMomentum
     variable = v_x
@@ -34,7 +38,7 @@
     vel_x = v_x
     component = 0
     p = p
-    phase = phi
+    phase = phi_aux
   [../]
   [./x_no_slip]
     type = PhaseNoSlipForcing
@@ -48,7 +52,7 @@
     vel_x = v_x
     component = 1
     p = p
-    phase = phi
+    phase = phi_aux
   [../]
   [./y_no_slip]
     type = PhaseNoSlipForcing
@@ -60,7 +64,7 @@
     variable = p
     vel_y = v_y
     vel_x = v_x
-    phase = phi
+    phase = phi_aux
   [../]
   [./phi_diffusion]
     type = ACInterface
@@ -76,12 +80,12 @@
   [./x_momentum_time]
     type = PhaseTimeDerivative
     variable = v_x
-    phase = phi
+    phase = phi_aux
   [../]
   [./y_momentum_time]
     type = PhaseTimeDerivative
     variable = v_y
-    phase = phi
+    phase = phi_aux
   [../]
   [./phi_time]
     type = PikaTimeDerivative
@@ -90,8 +94,16 @@
   [../]
 []
 
+[AuxKernels]
+  [./phi_intializer]
+    type = PikaPhaseInitializeAux
+    variable = phi_aux
+    phase = phi
+  [../]
+[]
+
 [BCs]
-  active = 'lid y_no_slip solid_phase_wall vapor_phase_wall'
+  active = 'lid y_no_slip solid_phase_wall phi_neuman_top'
   [./x_no_slip]
     type = DirichletBC
     variable = v_x
@@ -109,12 +121,6 @@
     variable = phi
     boundary = 'bottom left right'
     value = 1
-  [../]
-  [./vapor_phase_wall]
-    type = DirichletBC
-    variable = phi
-    boundary = top
-    value = -1
   [../]
   [./phase_wall_no_slip_y]
     type = DirichletBC
@@ -134,6 +140,11 @@
     variable = p
     boundary = bottom
     value = 0
+  [../]
+  [./phi_neuman_top]
+    type = NeumannBC
+    variable = phi
+    boundary = top
   [../]
 []
 
@@ -185,18 +196,18 @@
 
 [Executioner]
   type = Transient
-  num_steps = 1000
+  num_steps = 5
+  dt = 1e-7
   l_max_its = 50
   solve_type = PJFNK
+  petsc_options_iname = -ksp_gmres_restart
+  petsc_options_value = 300
   l_tol = 1e-02
-  nl_rel_tol = 1e-3
+  nl_rel_tol = 1e-4
   nl_abs_tol = 2e-20
   end_time = 500
-  nl_rel_step_tol = 1e-3
-  [./TimeStepper]
-    type = IterationAdaptiveDT
-    dt = 0.1
-  [../]
+  nl_rel_step_tol = 1e-4
+  line_search = none
 []
 
 [Outputs]
@@ -216,7 +227,7 @@
 []
 
 [PikaMaterials]
-  phase = phi
+  phase = phi_aux
   temperature = 263
   interface_thickness = 1e-05
   temporal_scaling = 1e-5 # 1e-05
