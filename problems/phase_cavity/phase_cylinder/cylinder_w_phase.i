@@ -1,14 +1,7 @@
 [Mesh]
-  type = GeneratedMesh
+  type = FileMesh
+  file = phi_initial.e
   dim = 2
-  nx = 64
-  ny = 64
-  xmin = -0.02
-  xmax = .02
-  ymin = -0.02
-  ymax = 0.02
-  uniform_refine = 0
-  elem_type = QUAD9
 []
 
 [Variables]
@@ -21,6 +14,14 @@
   [../]
   [./vy]
     order = SECOND
+  [../]
+[]
+
+[Functions]
+  [./phi_func]
+    type = SolutionFunction
+    from_variable = phi
+    solution = intial_uo
   [../]
 []
 
@@ -71,6 +72,16 @@
     variable = phi
     mob_name = mobility
   [../]
+  [./x_momentum_time]
+    type = PhaseTimeDerivative
+    variable = vx
+    phase = phi
+  [../]
+  [./y_momentum_time]
+    type = PhaseTimeDerivative
+    variable = vy
+    phase = phi
+  [../]
 []
 
 [BCs]
@@ -119,6 +130,15 @@
   [../]
 []
 
+[UserObjects]
+  [./intial_uo]
+    type = SolutionUserObject
+    timestep = 2
+    mesh = phi_initial.e
+    system_variables = phi
+  [../]
+[]
+
 [Preconditioning]
   [./SMP_PJFNK]
     type = SMP
@@ -126,42 +146,15 @@
 []
 
 [Executioner]
-  type = Steady
+  type = Transient
   l_max_its = 50
   nl_max_its = 100
-  solve_type = JFNK
+  solve_type = PJFNK
   l_tol = 1e-06
   nl_rel_tol = 1e-15
-[]
-
-[Adaptivity]
-  max_h_level = 8
-  initial_steps = 5
-  marker = combo
-  initial_marker = combo
-  [./Indicators]
-    [./phi_jump]
-      type = GradientJumpIndicator
-      variable = phi
-    [../]
-  [../]
-  [./Markers]
-    [./phi_marker]
-      type = ErrorFractionMarker
-      indicator = phi_jump
-      refine = 0.8
-    [../]
-    [./box_marker]
-      type = BoxMarker
-      bottom_left = '0 -0.001 0'
-      top_right = '0.01 0.001 0'
-      inside = REFINE
-      outside = DONT_MARK
-    [../]
-    [./combo]
-      type = ComboMarker
-      markers = 'box_marker phi_marker'
-    [../]
+  [./TimeStepper]
+    type = IterationAdaptiveDT
+    dt = 0.01
   [../]
 []
 
@@ -188,14 +181,9 @@
 
 [ICs]
   [./phase_ic]
-    y1 = 0
     variable = phi
-    x1 = 0
-    type = SmoothCircleIC
-    int_width = 1e-5
-    radius = 0.001
-    outvalue = -1
-    invalue = 1
+    type = FunctionIC
+    function = phi_func
   [../]
 []
 
