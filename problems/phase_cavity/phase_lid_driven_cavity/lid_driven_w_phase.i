@@ -2,6 +2,7 @@
   type = FileMesh
   file = phi_initial_out.e-s002
   dim = 2
+  uniform_refine = 1
 []
 
 [Variables]
@@ -208,6 +209,9 @@
   end_time = 500
   nl_rel_step_tol = 1e-4
   line_search = none
+[]
+
+[Adaptivity]
 []
 
 [Outputs]
