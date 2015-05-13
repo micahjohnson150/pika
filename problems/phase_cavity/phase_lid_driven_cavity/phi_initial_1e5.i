@@ -3,10 +3,10 @@
   dim = 2
   nx = 50
   ny = 50
-  xmin = -1e-5
-  ymin = -1e-5
-  xmax = .00501
-  ymax = .00501
+  xmin = -1e-4
+  ymin = -1e-4
+  xmax = .0051
+  ymax = .005
   elem_type = QUAD9
 []
 
@@ -49,10 +49,11 @@
 []
 
 [BCs]
+  active = 'solid phi_neuman_top'
   [./solid]
     type = DirichletBC
     variable = phi
-    boundary = 'left top bottom right'
+    boundary = 'left bottom right'
     value = 1
   [../]
   [./vapor]
@@ -60,6 +61,11 @@
     variable = phi
     boundary = top
     value = -1
+  [../]
+  [./phi_neuman_top]
+    type = NeumannBC
+    variable = phi
+    boundary = top
   [../]
 []
 
@@ -118,7 +124,7 @@
 []
 
 [ICs]
-  active = 'phase_ic'
+  active = 'phi_box_IC'
   [./phase_ic]
     y2 = 0.005011
     y1 = 0
@@ -129,10 +135,15 @@
     x1 = 0
     type = BoundingBoxIC
   [../]
-  [./phi_const_IC]
+  [./phi_box_IC]
+    y2 = 0.006
+    y1 = 0
+    inside = -1
+    x2 = 0.005
+    outside = 1
     variable = phi
-    type = ConstantIC
-    value = -1
+    x1 = 0
+    type = BoundingBoxIC
   [../]
 []
 
