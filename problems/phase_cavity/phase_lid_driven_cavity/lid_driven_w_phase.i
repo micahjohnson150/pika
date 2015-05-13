@@ -204,6 +204,9 @@
   line_search = none
 []
 
+[Adaptivity]
+[]
+
 [Outputs]
   csv = true
   [./console]
