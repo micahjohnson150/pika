@@ -2,6 +2,7 @@
   type = FileMesh
   file = phi_initial_out.e
   dim = 2
+  uniform_refine =1
 []
 
 [MeshModifiers]
