@@ -2,7 +2,6 @@
   type = FileMesh
   file = phi_initial_out.e
   dim = 2
-  uniform_refine =1
 []
 
 [MeshModifiers]
@@ -189,11 +188,17 @@
 [Executioner]
   type = Transient
   dt = 0.1
+  l_max_its = 100
   end_time = 2
   solve_type = PJFNK
   petsc_options_iname = ' -ksp_gmres_restart'
   petsc_options_value = ' 300'
   line_search = none
+  nl_abs_tol = 1e-40
+  nl_rel_step_tol = 1e-40
+  nl_rel_tol = 1e-3
+  l_tol = 1e-04
+  nl_abs_step_tol = 1e-40
 []
 
 [Outputs]
@@ -216,7 +221,7 @@
 [PikaMaterials]
   phase = phi
   temperature = 263
-  interface_thickness = 1e-05
+  interface_thickness = 1e-04
   temporal_scaling = 1 # 1e-05
 []
 
