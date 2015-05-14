@@ -7,6 +7,7 @@
   ymin = -1e-4
   xmax = .0051
   ymax = .005
+  uniform_refine = 2
   elem_type = QUAD9
 []
 
@@ -88,28 +89,6 @@
   [../]
 []
 
-[Adaptivity]
-  max_h_level = 3
-  initial_steps = 3
-  marker = phi_marker
-  initial_marker = phi_marker
-  steps = 4
-  [./Indicators]
-    [./phi_grad_indicator]
-      type = GradientJumpIndicator
-      variable = phi
-    [../]
-  [../]
-  [./Markers]
-    [./phi_marker]
-      type = ErrorToleranceMarker
-      coarsen = 0.5
-      indicator = phi_grad_indicator
-      refine = 0.5
-    [../]
-  [../]
-[]
-
 [Outputs]
   output_initial = true
   print_linear_residuals = true
@@ -149,7 +128,7 @@
 
 [PikaMaterials]
   temperature = 263.15
-  interface_thickness = 1e-5
+  interface_thickness = 1e-4
   phase = phi
   temporal_scaling = 1
 []

@@ -1,8 +1,16 @@
 [Mesh]
   type = FileMesh
-  file = phi_initial_out.e-s002
+  file = phi_initial_out.e
   dim = 2
-  uniform_refine = 1
+[]
+
+[MeshModifiers]
+  [./pin]
+    type = AddExtraNodeset
+    new_boundary = 99
+    coord = '0 0'
+    tolerance = 1e-04
+  [../]
 []
 
 [Variables]
@@ -18,20 +26,17 @@
   [../]
 []
 
-[AuxVariables]
-  [./phi_aux]
-  [../]
-[]
-
 [Functions]
   [./phi_func]
     type = SolutionFunction
     from_variable = phi
-    solution = intial_uo
+    solution = initial_uo
   [../]
 []
 
 [Kernels]
+  # active = ' x_no_slip y_no_slip phi_diffusion phi_double_well y_momentum mass_conservation x_momentum'
+  # active = 'phi_diffusion phi_double_well y_momentum mass_conservation x_momentum'
   [./x_momentum]
     type = PikaMomentum
     variable = v_x
@@ -39,7 +44,7 @@
     vel_x = v_x
     component = 0
     p = p
-    phase = phi_aux
+    phase = phi
   [../]
   [./x_no_slip]
     type = PhaseNoSlipForcing
@@ -53,7 +58,7 @@
     vel_x = v_x
     component = 1
     p = p
-    phase = phi_aux
+    phase = phi
   [../]
   [./y_no_slip]
     type = PhaseNoSlipForcing
@@ -65,7 +70,7 @@
     variable = p
     vel_y = v_y
     vel_x = v_x
-    phase = phi_aux
+    phase = phi
   [../]
   [./phi_diffusion]
     type = ACInterface
@@ -81,12 +86,12 @@
   [./x_momentum_time]
     type = PhaseTimeDerivative
     variable = v_x
-    phase = phi_aux
+    phase = phi
   [../]
   [./y_momentum_time]
     type = PhaseTimeDerivative
     variable = v_y
-    phase = phi_aux
+    phase = phi
   [../]
   [./phi_time]
     type = PikaTimeDerivative
@@ -95,35 +100,14 @@
   [../]
 []
 
-[AuxKernels]
-  [./phi_intializer]
-    type = PikaPhaseInitializeAux
-    variable = phi_aux
-    phase = phi
-  [../]
-[]
-
 [BCs]
-  active = 'lid y_no_slip solid_phase_wall phi_neuman_top'
   [./x_no_slip]
     type = DirichletBC
     variable = v_x
-    boundary = top
+    boundary = 'left right bottom'
     value = 0
   [../]
   [./y_no_slip]
-    type = DirichletBC
-    variable = v_y
-    boundary = top
-    value = 0
-  [../]
-  [./solid_phase_wall]
-    type = DirichletBC
-    variable = phi
-    boundary = 'bottom left right'
-    value = 1
-  [../]
-  [./phase_wall_no_slip_y]
     type = DirichletBC
     variable = v_y
     boundary = 'top bottom left right'
@@ -133,13 +117,13 @@
     type = PhaseDirichletBC
     variable = v_x
     boundary = top
-    value = .95391499
+    value = 0.95391499
     phase_variable = phi
   [../]
   [./pressure_pin]
     type = DirichletBC
     variable = p
-    boundary = bottom
+    boundary = 99
     value = 0
   [../]
   [./phi_neuman_top]
@@ -147,36 +131,42 @@
     variable = phi
     boundary = top
   [../]
+  [./solid_phase]
+    type = DirichletBC
+    variable = phi
+    boundary = 'left right bottom'
+    value = 1
+  [../]
 []
 
 [VectorPostprocessors]
   [./v_func_x]
+    # outputs = exodus
     type = LineValueSampler
     variable = v_y
     num_points = 100
-    end_point = '0.00501 0.002505 0'
+    end_point = '0.005 0.0025 0'
     sort_by = x
     execute_on = timestep_end
-    start_point = '-1e-5 0.002505 0'
-    outputs = exodus
+    start_point = '0 0.0025 0'
   [../]
   [./u_func_y]
+    # outputs = exodus
     type = LineValueSampler
     variable = v_x
     num_points = 100
-    start_point = '0.00251 -1e-5 0'
-    end_point = '0.00251 0.005 0'
+    start_point = '0.0025 0 0'
+    end_point = '0.0025 0.005 0'
     sort_by = y
-    outputs = exodus
   [../]
 []
 
 [UserObjects]
-  [./intial_uo]
+  [./initial_uo]
     type = SolutionUserObject
-    execute_on = initial
-    mesh = phi_initial_out.e-s002
-    timestep = 1
+    timestep = 2
+    mesh = phi_initial_out.e
+    system_variables = phi
   [../]
 []
 
@@ -186,29 +176,28 @@
     type = SMP
     full = true
   [../]
+  [./PBP_JFNK]
+    type = PBP
+    solve_order = 'phi v_x v_y p '
+    preconditioner = AMG
+    off_diag_row = p
+    off_diag_column = 'phi '
+  [../]
 []
 
 [Executioner]
   type = Transient
-  num_steps = 5
-  dt = 1e-7
-  l_max_its = 50
+  dt = 0.1
+  end_time = 2
   solve_type = PJFNK
-  petsc_options_iname = -ksp_gmres_restart
-  petsc_options_value = 300
-  l_tol = 1e-02
-  nl_rel_tol = 1e-4
-  nl_abs_tol = 2e-20
-  end_time = 500
-  nl_rel_step_tol = 1e-4
+  petsc_options_iname = ' -ksp_gmres_restart'
+  petsc_options_value = ' 300'
   line_search = none
-[]
-
-[Adaptivity]
 []
 
 [Outputs]
   csv = true
+  output_final = true
   [./console]
     type = Console
     output_linear = true
@@ -219,35 +208,19 @@
   [./exodus]
     file_base = phase_LDC_out
     type = Exodus
-    output_on = 'initial failed timestep_end'
+    output_on = 'initial timestep_end'
   [../]
 []
 
 [PikaMaterials]
-  phase = phi_aux
+  phase = phi
   temperature = 263
   interface_thickness = 1e-05
   temporal_scaling = 1 # 1e-05
 []
 
 [ICs]
-  active = 'phi_ic_func'
-  [./phase_ic]
-    y2 = 0.02001
-    y1 = 0
-    inside = -1
-    x2 = 0.02
-    outside = 1
-    variable = phi
-    x1 = 0
-    type = BoundingBoxIC
-  [../]
-  [./phi_const]
-    variable = phi
-    type = ConstantIC
-    value = -1
-  [../]
-  [./phi_ic_func]
+  [./phi_IC]
     function = phi_func
     variable = phi
     type = FunctionIC
