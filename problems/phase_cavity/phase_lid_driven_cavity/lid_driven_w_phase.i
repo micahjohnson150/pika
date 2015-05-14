@@ -2,6 +2,7 @@
   type = FileMesh
   file = phi_initial_out.e
   dim = 2
+  uniform_refine = 1
 []
 
 [MeshModifiers]
@@ -114,11 +115,10 @@
     value = 0
   [../]
   [./lid]
-    type = PhaseDirichletBC
+    type = DirichletBC
     variable = v_x
     boundary = top
     value = 0.95391499
-    phase_variable = phi
   [../]
   [./pressure_pin]
     type = DirichletBC

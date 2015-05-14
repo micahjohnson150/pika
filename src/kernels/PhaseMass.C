@@ -51,10 +51,16 @@ PhaseMass::PhaseMass(const std::string & name, InputParameters parameters) :
 Real
 PhaseMass::computeQpResidual()
 {
-  return 0.5 * ( 
+/*  return 0.5 * ( 
                 -_grad_phase[_qp](0) * _u_vel[_qp] + (1.0 - _phase[_qp]) * _grad_u_vel[_qp](0) 
                 -_grad_phase[_qp](1) * _v_vel[_qp] + (1.0 - _phase[_qp]) * _grad_v_vel[_qp](1) 
                 -_grad_phase[_qp](2) * _w_vel[_qp] + (1.0 - _phase[_qp]) * _grad_w_vel[_qp](2)) * _test[_i][_qp];
+  */              
+  return 0.5 * (1.0 - _phase[_qp]) * ( 
+                 _grad_u_vel[_qp](0) 
+               + _grad_v_vel[_qp](1) 
+               + _grad_w_vel[_qp](2)) * _test[_i][_qp];
+
 }
 
 Real
@@ -68,25 +74,34 @@ PhaseMass::computeQpOffDiagJacobian(unsigned jvar)
 {
   if (jvar==_phase_var_number)
   {
-      return 0.5 * ( 
+      /*return 0.5 * ( 
                     -_grad_phi[_j][_qp](0) * _u_vel[_qp] + ( - _phi[_j][_qp]) * _grad_u_vel[_qp](0) 
                     -_grad_phi[_j][_qp](1) * _v_vel[_qp] + ( - _phi[_j][_qp]) * _grad_v_vel[_qp](1) 
                     -_grad_phi[_j][_qp](2) * _w_vel[_qp] + ( - _phi[_j][_qp]) * _grad_w_vel[_qp](2)) * _test[_i][_qp];
-
+                    */
+  return 0.5 * (- _phi[_j][_qp]) * ( 
+                 _grad_u_vel[_qp](0)  
+               + _grad_v_vel[_qp](1) 
+               + _grad_w_vel[_qp](2)) * _test[_i][_qp];
+ 
   }
   else if (jvar==_u_vel_var_number)
   {
-       return 0.5 * (-_grad_phase[_qp](0) * _phi[_j][_qp] + (1.0 - _phase[_qp]) * _grad_phi[_j][_qp](0)) * _test[_i][_qp];
+      // return 0.5 * (-_grad_phase[_qp](0) * _phi[_j][_qp] + (1.0 - _phase[_qp]) * _grad_phi[_j][_qp](0)) * _test[_i][_qp];
+      return   0.5 * (1.0 - _phase[_qp]) * (_grad_phi[_j][_qp](0)) * _test[_i][_qp];
+ 
   }
 
   else if (jvar==_v_vel_var_number)
   {
-       return 0.5 * (-_grad_phase[_qp](1) * _phi[_j][_qp] + (1.0 - _phase[_qp]) * _grad_phi[_j][_qp](1)) * _test[_i][_qp];
+       //return 0.5 * (-_grad_phase[_qp](1) * _phi[_j][_qp] + (1.0 - _phase[_qp]) * _grad_phi[_j][_qp](1)) * _test[_i][_qp];
+       return   0.5 * (1.0 - _phase[_qp]) * (_grad_phi[_j][_qp](1)) * _test[_i][_qp];
   }
 
   else if (jvar==_w_vel_var_number)
   {
-       return 0.5 * (-_grad_phase[_qp](2) * _phi[_j][_qp] + (1.0 - _phase[_qp]) * _grad_phi[_j][_qp](2)) * _test[_i][_qp];
+      // return 0.5 * (-_grad_phase[_qp](2) * _phi[_j][_qp] + (1.0 - _phase[_qp]) * _grad_phi[_j][_qp](2)) * _test[_i][_qp];
+       return   0.5 * (1.0 - _phase[_qp]) * (_grad_phi[_j][_qp](2)) * _test[_i][_qp];
   }
 
   else

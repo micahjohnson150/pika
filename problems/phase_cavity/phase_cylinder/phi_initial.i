@@ -146,7 +146,7 @@
 [PikaMaterials]
   phase = phi
   temperature = 263.15
-  interface_thickness = 1e-05
+  interface_thickness = 1e-04
   temporal_scaling = 1 # 1e-05
   gravity = '0 -9.81 0'
 []
