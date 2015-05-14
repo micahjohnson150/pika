@@ -31,7 +31,9 @@
 []
 
 [Kernels]
-  active = 'phi_diffusion phi_double_well y_momentum mass_conservation x_momentum'
+ # active = ' x_no_slip y_no_slip phi_diffusion phi_double_well y_momentum mass_conservation x_momentum'
+ # active = 'phi_diffusion phi_double_well y_momentum mass_conservation x_momentum'
+  active = 'phi_time x_momentum_time y_momentum_time phi_diffusion phi_double_well y_momentum mass_conservation x_momentum'
   [./x_momentum]
     type = PikaMomentum
     variable = v_x
@@ -109,7 +111,7 @@
     value = 0
   [../]
   [./lid]
-    type = PhaseDirichletBC
+    type = DirichletBC
     variable = v_x
     boundary = top
     value = 0.95391499
@@ -167,7 +169,9 @@
 []
 
 [Executioner]
-  type = Steady
+  type = Transient
+  dt = 0.1
+  end_time = 2
   solve_type = PJFNK
   petsc_options_iname = ' -ksp_gmres_restart'
   petsc_options_value = ' 300'

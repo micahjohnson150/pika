@@ -39,23 +39,20 @@ PhaseNoSlipForcing::PhaseNoSlipForcing(const std::string & name, InputParameters
 
 Real PhaseNoSlipForcing::computeQpResidual()
 {
-    //return _mu * _xi * 0.25 *_h * (1.0 - _phase[_qp] * _phase[_qp] ) * _u[_qp] * _test[_i][_qp] / _w_2[_qp];
-    return _mu * _xi * 0.125 *_h * std::pow(1.0 + _phase[_qp] * _phase[_qp], 2.0 ) * (1.0 - _phase[_qp]) * _u[_qp] * _test[_i][_qp] / _w_2[_qp];
+    return _mu * _xi * 0.25 *_h * (1.0 - _phase[_qp] * _phase[_qp] ) * _u[_qp] * _test[_i][_qp] / _w_2[_qp];
 }
 
 Real PhaseNoSlipForcing::computeQpJacobian()
 {
 
-    //return _mu * _xi* 0.25 *_h * (1.0 - _phase[_qp] * _phase[_qp] ) * _phi[_j][_qp] * _test[_i][_qp] / _w_2[_qp];
-    return _mu * _xi * 0.125 *_h * std::pow(1.0 + _phase[_qp] * _phase[_qp], 2.0 ) * (1.0 - _phase[_qp]) * _phi[_j][_qp] * _test[_i][_qp] / _w_2[_qp];
+    return _mu * _xi* 0.25 *_h * (1.0 - _phase[_qp] * _phase[_qp] ) * _phi[_j][_qp] * _test[_i][_qp] / _w_2[_qp];
 }
 
 Real PhaseNoSlipForcing::computeQpOffDiagJacobian(unsigned jvar)
 {
   if(jvar == _phase_var_number)
   {
-    //return _mu * _xi* 0.25 *_h * _phi[_j][_qp] *  ( -2.0*_phase[_qp] ) * _u[_qp] * _test[_i][_qp] / _w_2[_qp];
-    return _mu * _xi * 0.125 *_h * (3.0 * _phase[_qp] * _phase[_qp] - 2.0 * _phase[_qp] - 1)* _phi[_j][_qp] * _u[_qp] * _test[_i][_qp] / _w_2[_qp];
+    return _mu * _xi* 0.25 *_h * _phi[_j][_qp] *  ( -2.0*_phase[_qp] ) * _u[_qp] * _test[_i][_qp] / _w_2[_qp];
   }
 
   else
