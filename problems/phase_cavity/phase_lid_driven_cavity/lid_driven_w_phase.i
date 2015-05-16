@@ -2,7 +2,6 @@
   type = FileMesh
   file = phi_initial_out.e
   dim = 2
-  uniform_refine = 1
 []
 
 [MeshModifiers]
@@ -36,16 +35,16 @@
 []
 
 [Kernels]
-  # active = ' x_no_slip y_no_slip phi_diffusion phi_double_well y_momentum mass_conservation x_momentum'
-  # active = 'phi_diffusion phi_double_well y_momentum mass_conservation x_momentum'
   [./x_momentum]
-    type = PikaMomentum
+    type = INSMomentum
     variable = v_x
-    vel_y = v_y
-    vel_x = v_x
     component = 0
     p = p
-    phase = phi
+    gravity = '0 -9.81 0'
+    mu = 1.599e-5
+    u = v_x
+    rho = 1.341
+    v = v_y
   [../]
   [./x_no_slip]
     type = PhaseNoSlipForcing
@@ -53,13 +52,15 @@
     phase = phi
   [../]
   [./y_momentum]
-    type = PikaMomentum
+    type = INSMomentum
     variable = v_y
-    vel_y = v_y
-    vel_x = v_x
     component = 1
     p = p
-    phase = phi
+    gravity = '0 -9.81 0'
+    mu = 1.599e-5
+    u = v_x
+    rho = 1.341
+    v = v_y
   [../]
   [./y_no_slip]
     type = PhaseNoSlipForcing
@@ -67,11 +68,11 @@
     phase = phi
   [../]
   [./mass_conservation]
-    type = PhaseMass
+    type = INSMass
     variable = p
-    vel_y = v_y
-    vel_x = v_x
-    phase = phi
+    p = p
+    u = v_x
+    v = v_y
   [../]
   [./phi_diffusion]
     type = ACInterface
@@ -84,15 +85,15 @@
     variable = phi
     mob_name = mobility
   [../]
-  [./x_momentum_time]
-    type = PhaseTimeDerivative
-    variable = v_x
-    phase = phi
-  [../]
   [./y_momentum_time]
-    type = PhaseTimeDerivative
+    type = PikaTimeDerivative
     variable = v_y
-    phase = phi
+    coefficient = 1.341
+  [../]
+  [./x_momentum_time]
+    type = PikaTimeDerivative
+    variable = v_x
+    coefficient = 1.341
   [../]
   [./phi_time]
     type = PikaTimeDerivative
@@ -187,7 +188,7 @@
 
 [Executioner]
   type = Transient
-  dt = 0.1
+  dt = 0.001
   l_max_its = 100
   end_time = 2
   solve_type = PJFNK
@@ -196,7 +197,7 @@
   line_search = none
   nl_abs_tol = 1e-40
   nl_rel_step_tol = 1e-40
-  nl_rel_tol = 1e-3
+  nl_rel_tol = 1e-1
   l_tol = 1e-04
   nl_abs_step_tol = 1e-40
 []

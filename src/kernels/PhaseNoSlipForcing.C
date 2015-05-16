@@ -42,7 +42,7 @@ Real PhaseNoSlipForcing::computeQpResidual()
 {
     //return _mu * _xi * 0.25 *_h * (1.0 - _phase[_qp] * _phase[_qp] ) * _u[_qp] * _test[_i][_qp] / _w_2[_qp];
     //return _mu * _xi * 0.25 *_h * (1.0 - _phase[_qp] * _phase[_qp] ) * _u[_qp] * _test[_i][_qp] / _w_2;
-    return _mu * _xi * 0.125 *_h * (1.0 +  _phase[_qp]) * (1.0 + _phase[_qp]) * (1.0 - _phase[_qp]) * _u[_qp] * _test[_i][_qp] / _w_2[_qp];
+    return _mu * _xi * 0.5 *_h * (1.0 +  _phase[_qp]) * _u[_qp] * _test[_i][_qp] / _w_2[_qp];
 }
 
 Real PhaseNoSlipForcing::computeQpJacobian()
@@ -50,7 +50,7 @@ Real PhaseNoSlipForcing::computeQpJacobian()
 
     //return _mu * _xi* 0.25 *_h * (1.0 - _phase[_qp] * _phase[_qp] ) * _phi[_j][_qp] * _test[_i][_qp] / _w_2[_qp];
     // return _mu * _xi* 0.25 *_h * (1.0 - _phase[_qp] * _phase[_qp] ) * _phi[_j][_qp] * _test[_i][_qp] / _w_2;
-    return _mu * _xi * 0.125 *_h * (1.0 +  _phase[_qp]) * (1.0 + _phase[_qp]) * (1.0 - _phase[_qp]) * _phi[_j][_qp] * _test[_i][_qp] / _w_2[_qp];
+    return _mu * _xi * 0.5 *_h * (1.0 +  _phase[_qp]) * _phi[_j][_qp] * _test[_i][_qp] / _w_2[_qp];
 }
 
 Real PhaseNoSlipForcing::computeQpOffDiagJacobian(unsigned jvar)
@@ -59,7 +59,7 @@ Real PhaseNoSlipForcing::computeQpOffDiagJacobian(unsigned jvar)
   {
     //return _mu * _xi* 0.25 *_h * _phi[_j][_qp] *  ( -2.0*_phase[_qp] ) * _u[_qp] * _test[_i][_qp] / _w_2[_qp];
     //return _mu * _xi* 0.25 *_h * _phi[_j][_qp] *  ( -2.0*_phase[_qp] ) * _u[_qp] * _test[_i][_qp] / _w_2;
-    return _mu * _xi * 0.125 *_h * ( _phi[_j][_qp]) * (_phi[_j][_qp]) * (- _phi[_j][_qp]) * _u[_qp] * _test[_i][_qp] / _w_2[_qp];
+    return _mu * _xi * 0.5 *_h * (1.0 +  _phi[_j][_qp]) * _u[_qp] * _test[_i][_qp] / _w_2[_qp];
   }
 
   else

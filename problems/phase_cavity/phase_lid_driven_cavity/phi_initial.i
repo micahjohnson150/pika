@@ -7,7 +7,7 @@
   ymin = -1e-4
   xmax = .0051
   ymax = .005
-  uniform_refine = 2
+  uniform_refine = 3
   elem_type = QUAD9
 []
 
@@ -128,7 +128,7 @@
 
 [PikaMaterials]
   temperature = 263.15
-  interface_thickness = 1e-4
+  interface_thickness = 1e-5
   phase = phi
   temporal_scaling = 1
 []
