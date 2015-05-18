@@ -50,6 +50,7 @@
     type = PhaseNoSlipForcing
     variable = v_x
     phase = phi
+    h = 100
   [../]
   [./y_momentum]
     type = INSMomentum
@@ -66,6 +67,7 @@
     type = PhaseNoSlipForcing
     variable = v_y
     phase = phi
+    h = 100
   [../]
   [./mass_conservation]
     type = INSMass
@@ -103,18 +105,6 @@
 []
 
 [BCs]
-  [./x_no_slip]
-    type = DirichletBC
-    variable = v_x
-    boundary = 'left right bottom'
-    value = 0
-  [../]
-  [./y_no_slip]
-    type = DirichletBC
-    variable = v_y
-    boundary = 'top bottom left right'
-    value = 0
-  [../]
   [./lid]
     type = DirichletBC
     variable = v_x
