@@ -8,7 +8,7 @@
   [./pin]
     type = AddExtraNodeset
     new_boundary = 99
-    coord = '0 0 '
+    coord = '0.005 0 '
   [../]
 []
 
@@ -24,7 +24,6 @@
   [./phi]
   [../]
   [./T]
-    order = SECOND
   [../]
   [./x]
   [../]
@@ -52,6 +51,7 @@
     type = PhaseNoSlipForcing
     variable = v_x
     phase = phi
+    h = 100
   [../]
   [./y_momentum]
     type = PikaMomentum
@@ -66,6 +66,7 @@
     type = PhaseNoSlipForcing
     variable = v_y
     phase = phi
+    h = 100
   [../]
   [./mass_conservation]
     type = PhaseMass
@@ -80,10 +81,10 @@
     property = relaxation_time
   [../]
   [./phi_diffusion]
-    type = ACInterface
+    type = PikaDiffusion
     variable = phi
-    mob_name = mobility
-    kappa_name = interface_thickness_squared
+    property = interface_thickness_squared
+    temporal_scaling = false
   [../]
   [./phi_double_well]
     type = DoubleWellPotential
@@ -228,17 +229,24 @@
 
 [Executioner]
   type = Transient
-  num_steps = 5
-  dt = 0.1
-  l_max_its = 50
-  nl_max_its = 100
-  solve_type = JFNK
-  petsc_options_iname = -ksp_gmres_restart
-  petsc_options_value = ' 50'
-  l_tol = 1e-03
-  nl_rel_tol = 1e-10
+  dt = 1
+  l_max_its = 100
+  end_time = 3600
+  solve_type = PJFNK
+  petsc_options = '-snes_ksp_ew'
+  petsc_options_iname = ' -ksp_gmres_restart'
+  petsc_options_value = ' 300'
   line_search = none
-  nl_abs_tol = 1e-7
+  nl_abs_tol = 1e-40
+  nl_rel_step_tol = 1e-40
+  nl_rel_tol = 1e-3
+  l_tol = 1e-04
+  nl_abs_step_tol = 1e-40
+  [./TimeStepper]
+    type = IterationAdaptiveDT
+    dt = 1
+    growth_factor = 1.5
+  [../]
 []
 
 [Outputs]
@@ -246,21 +254,20 @@
     type = Console
     output_linear = true
     output_nonlinear = true
-    nonlinear_residuals = true
-    linear_residuals = true
   [../]
   [./exodus]
-    file_base = phase_LDC_out
+    file_base = phase_cavity_out
     type = Exodus
-    output_on = 'initial failed timestep_end'
+    output_on = 'initial timestep_end'
   [../]
 []
 
 [PikaMaterials]
   phase = phi
   temperature = T
-  interface_thickness = 1e-05
+  interface_thickness = 1e-04
   gravity = '0 -9.81 0'
+  temporal_scale = 1e-5
 []
 
 [ICs]

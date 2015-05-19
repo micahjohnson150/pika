@@ -39,6 +39,7 @@
     type = PhaseNoSlipForcing
     variable = vx
     phase = phi
+    h = 100
   [../]
   [./y_momentum]
     type = PikaMomentum
@@ -53,6 +54,7 @@
     type = PhaseNoSlipForcing
     variable = vy
     phase = phi
+    h = 100
   [../]
   [./mass_conservation]
     type = PhaseMass
@@ -62,15 +64,21 @@
     phase = phi
   [../]
   [./phi_diffusion]
-    type = ACInterface
+    type = PikaDiffusion
     variable = phi
-    mob_name = mobility
-    kappa_name = interface_thickness_squared
+    property = interface_thickness_squared
+    temporal_scaling = false
   [../]
   [./phi_double_well]
     type = DoubleWellPotential
     variable = phi
     mob_name = mobility
+  [../]
+  [./phi_time]
+    type = PikaTimeDerivative
+    variable = phi
+    property = relaxation_time
+    temporal_scaling = false
   [../]
   [./x_momentum_time]
     type = PhaseTimeDerivative
@@ -133,7 +141,7 @@
 [UserObjects]
   [./intial_uo]
     type = SolutionUserObject
-    timestep = 2
+    timestep = 1
     mesh = phi_initial.e
     system_variables = phi
   [../]
@@ -148,13 +156,18 @@
 
 [Executioner]
   type = Transient
-  dt = .1
-  num_steps = 10
-  l_max_its = 50
-  nl_max_its = 100
+  dt = 0.001
+  l_max_its = 100
+  end_time = 2
   solve_type = PJFNK
-  l_tol = 1e-02
-  nl_rel_tol = 1e-3
+  petsc_options_iname = ' -ksp_gmres_restart'
+  petsc_options_value = ' 300'
+  line_search = none
+  nl_abs_tol = 1e-40
+  nl_rel_step_tol = 1e-40
+  nl_rel_tol = 1e-1
+  l_tol = 1e-04
+  nl_abs_step_tol = 1e-40
 []
 
 [Outputs]
@@ -173,7 +186,7 @@
 [PikaMaterials]
   phase = phi
   temperature = 263
-  interface_thickness = 1e-05
+  interface_thickness = 1e-04
   temporal_scaling = 1 # 1e-05
   gravity = '0 -9.81 0'
 []

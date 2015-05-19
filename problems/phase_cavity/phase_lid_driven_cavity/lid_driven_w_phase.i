@@ -76,11 +76,16 @@
     u = v_x
     v = v_y
   [../]
-  [./phi_diffusion]
-    type = ACInterface
+  [./phi_time]
+    type = PikaTimeDerivative
     variable = phi
-    mob_name = mobility
-    kappa_name = interface_thickness_squared
+    property = relaxation_time
+  [../]
+  [./phi_diffusion]
+    type = PikaDiffusion
+    variable = phi
+    property= interface_thickness_squared
+    temporal_scaling = false
   [../]
   [./phi_double_well]
     type = DoubleWellPotential
@@ -96,11 +101,6 @@
     type = PikaTimeDerivative
     variable = v_x
     coefficient = 1.341
-  [../]
-  [./phi_time]
-    type = PikaTimeDerivative
-    variable = phi
-    property = relaxation_time
   [../]
 []
 
@@ -162,17 +162,9 @@
 []
 
 [Preconditioning]
-  active = 'SMP_PJFNK'
   [./SMP_PJFNK]
     type = SMP
     full = true
-  [../]
-  [./PBP_JFNK]
-    type = PBP
-    solve_order = 'phi v_x v_y p '
-    preconditioner = AMG
-    off_diag_row = p
-    off_diag_column = 'phi '
   [../]
 []
 
@@ -180,7 +172,7 @@
   type = Transient
   dt = 0.001
   l_max_its = 100
-  end_time = 2
+  end_time = 0.3
   solve_type = PJFNK
   petsc_options_iname = ' -ksp_gmres_restart'
   petsc_options_value = ' 300'

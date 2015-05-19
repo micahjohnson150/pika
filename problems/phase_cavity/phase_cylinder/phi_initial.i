@@ -1,12 +1,12 @@
 [Mesh]
   type = GeneratedMesh
   dim = 2
-  nx = 50
-  ny = 75
+  nx = 300  
+  ny = 200
   xmin = -.05
   xmax = 0.1
-  ymin = -0.1
-  ymax = 0.1
+  ymin = 0
+  ymax = 0.05
   elem_type = QUAD9
 []
 
@@ -17,10 +17,10 @@
 
 [Kernels]
   [./phi_diffusion]
-    type = ACInterface
+    type = PikaDiffusion
     variable = phi
-    mob_name = mobility
-    kappa_name = interface_thickness_squared
+    property = interface_thickness_squared
+    temporal_scaling = false
   [../]
   [./phi_double_well]
     type = DoubleWellPotential
@@ -35,42 +35,11 @@
 []
 
 [BCs]
-  active = 'vapor_phase_wall'
-  [./x_no_slip]
-    type = DirichletBC
-    variable = v_x
-    boundary = top
-    value = 0
-  [../]
-  [./y_no_slip]
-    type = DirichletBC
-    variable = v_y
-    boundary = top
-    value = 0
-  [../]
-  [./vapor_phase_wall]
+  [./vapor_phase_walls]
     type = DirichletBC
     variable = phi
-    boundary = 'top bottom left right'
+    boundary =' top left right'
     value = -1
-  [../]
-  [./phase_wall_no_slip_x]
-    type = DirichletBC
-    variable = v_x
-    boundary = bottom
-    value = 0
-  [../]
-  [./phase_wall_no_slip_y]
-    type = DirichletBC
-    variable = v_y
-    boundary = bottom
-    value = 0
-  [../]
-  [./pressure_pin]
-    type = DirichletBC
-    variable = p
-    boundary = right
-    value = 0
   [../]
 []
 
@@ -96,40 +65,26 @@
     dt = 1
   [../]
 []
-
 [Adaptivity]
-  max_h_level = 9
-  initial_steps =9
+  max_h_level = 5
+  initial_steps = 5
+  marker = phi_marker
   initial_marker = phi_marker
-  cycles_per_step = 0
   [./Indicators]
-    [./phi_jump]
+    [./phi_grad_indicator]
       type = GradientJumpIndicator
       variable = phi
     [../]
   [../]
   [./Markers]
-    active = 'phi_marker'
     [./phi_marker]
-      type = ErrorFractionMarker
-      indicator = phi_jump
-      refine = 0.8
-      coarsen = 0.2
-    [../]
-    [./box_marker]
-      type = BoxMarker
-      bottom_left = '0 -0.001 0'
-      top_right = '0.01 0.001 0'
-      inside = REFINE
-      outside = DONT_MARK
-    [../]
-    [./combo]
-      type = ComboMarker
-      markers = 'box_marker phi_marker'
+      type = ErrorToleranceMarker
+      coarsen = 1e-7
+      indicator = phi_grad_indicator
+      refine = 1e-5
     [../]
   [../]
 []
-
 [Outputs]
   [./console]
     type = Console
@@ -139,7 +94,7 @@
   [./exodus]
     file_base = phi_initial
     type = Exodus
-    output_on = 'initial failed timestep_end'
+    output_on = 'final'
   [../]
 []
 
