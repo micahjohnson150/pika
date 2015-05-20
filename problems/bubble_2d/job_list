@@ -2,18 +2,17 @@
   [./PBSJob]
     notify_address                 = micahjohnson1@u.boisestate.edu        # The email address to use for PBS notifications
     template_script                = /home/mjohnson/projects/pika/problems/pbs_submit.sh  # The template job script to use.
-    input_file                     = lid_driven_wo_phase.i                     # The input file name.
+    input_file                     = full_543_w_conv.i                     # The input file name.
     moose_application              = /home/mjohnson/projects/pika/pika-opt  # The full path to the application to run.
-    test_name                      = LDC_WO_PHASE                            # The name of the test
+    test_name                      = Bubble_conv                            # The name of the test
     chunks                         = 3                                     # The number of PBS chunks.
     copy_files                     = *.e                                    # A list of files specifically to copy
     total_mpi_procs                = 24                                     # The total number of MPI processes to use divided evenly among chunks.
-    walltime                       = 10:00:00                                # The requested walltime for this job.
-    job_name                       = LDC_time                               # The name of the job
+    walltime                       = 40:00:00                                # The requested walltime for this job.
+    job_name                       = bubble_conv                              # The name of the job
     type                           = PBSJob
     queue                          = MRI
     no_copy                        = *.sh , *.i
-    cli_args                       = -r 1 
   [../]
 
 []
