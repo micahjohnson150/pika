@@ -1,11 +1,12 @@
 [Mesh]
   type = GeneratedMesh
   dim = 2
-  nx = 5
-  ny = 10
+  nx = 50
+  ny = 50
   xmax = 0.0025
   ymax = 0.005
-[]
+  elem_type = QUAD9
+  []
 
 [Variables]
   [./phi]
@@ -64,8 +65,8 @@
 []
 
 [Adaptivity]
-  max_h_level = 9
-  initial_steps = 9
+  max_h_level = 4
+  initial_steps = 4
   marker = phi_marker
   initial_marker = phi_marker
   [./Indicators]
@@ -110,7 +111,7 @@
 
 [PikaMaterials]
   temperature = 258.2
-  interface_thickness = 1e-6
+  interface_thickness = 1e-5
   phase = phi
   temporal_scaling = 1e-04
 []
