@@ -50,7 +50,7 @@
     type = PhaseNoSlipForcing
     variable = v_x
     phase = phi
-    h = 100
+    h = 400
   [../]
   [./y_momentum]
     type = INSMomentum
@@ -67,7 +67,7 @@
     type = PhaseNoSlipForcing
     variable = v_y
     phase = phi
-    h = 100
+    h = 400
   [../]
   [./mass_conservation]
     type = INSMass
@@ -136,18 +136,17 @@
     type = LineValueSampler
     variable = v_y
     num_points = 100
-    end_point = '0.005 0.0025 0'
+    end_point = '0.005 0.00255 0'
     sort_by = x
-    execute_on = timestep_end
-    start_point = '0 0.0025 0'
+    start_point = '0 0.00255 0'
   [../]
   [./u_func_y]
     # outputs = exodus
     type = LineValueSampler
     variable = v_x
     num_points = 100
-    start_point = '0.0025 0 0'
-    end_point = '0.0025 0.005 0'
+    start_point = '0.0026 0 0'
+    end_point = '0.0026 0.005 0'
     sort_by = y
   [../]
 []
@@ -172,7 +171,7 @@
   type = Transient
   dt = 0.001
   l_max_its = 100
-  end_time = 0.3
+  end_time = 1
   solve_type = PJFNK
   petsc_options_iname = ' -ksp_gmres_restart'
   petsc_options_value = ' 300'
@@ -182,6 +181,12 @@
   nl_rel_tol = 1e-1
   l_tol = 1e-04
   nl_abs_step_tol = 1e-40
+  [./TimeStepper]
+    type = IterationAdaptiveDT
+    dt = 0.001
+    growth_factor = 1.1
+  [../]
+
 []
 
 [Outputs]
@@ -197,7 +202,7 @@
   [./exodus]
     file_base = phase_LDC_out
     type = Exodus
-    output_on = 'initial timestep_end'
+    output_on = 'initial final'
   [../]
 []
 
