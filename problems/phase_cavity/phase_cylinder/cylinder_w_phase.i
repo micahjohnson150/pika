@@ -2,6 +2,7 @@
   type = FileMesh
   file = phi_initial.e
   dim = 2
+  uniform_refine = 0
 []
 
 [Variables]
@@ -67,7 +68,7 @@
     type = PikaDiffusion
     variable = phi
     property = interface_thickness_squared
-    temporal_scaling = false
+    use_temporal_scaling = false
   [../]
   [./phi_double_well]
     type = DoubleWellPotential
@@ -78,7 +79,7 @@
     type = PikaTimeDerivative
     variable = phi
     property = relaxation_time
-    temporal_scaling = false
+    use_temporal_scaling = false
   [../]
   [./x_momentum_time]
     type = PhaseTimeDerivative
@@ -93,17 +94,10 @@
 []
 
 [BCs]
-  active = 'vapor_phase_wall inlet'
-  [./x_no_slip]
-    type = DirichletBC
-    variable = v_x
-    boundary = top
-    value = 0
-  [../]
   [./y_no_slip]
     type = DirichletBC
-    variable = v_y
-    boundary = top
+    variable = vy
+    boundary = 'top'
     value = 0
   [../]
   [./vapor_phase_wall]
@@ -111,18 +105,6 @@
     variable = phi
     boundary = 'top bottom left right'
     value = -1
-  [../]
-  [./phase_wall_no_slip_x]
-    type = DirichletBC
-    variable = v_x
-    boundary = bottom
-    value = 0
-  [../]
-  [./phase_wall_no_slip_y]
-    type = DirichletBC
-    variable = v_y
-    boundary = bottom
-    value = 0
   [../]
   [./pressure_pin]
     type = DirichletBC
@@ -158,16 +140,17 @@
   type = Transient
   dt = 0.001
   l_max_its = 100
-  end_time = 2
+  end_time = 1
   solve_type = PJFNK
-  petsc_options_iname = ' -ksp_gmres_restart'
-  petsc_options_value = ' 300'
+  petsc_options_iname = '-pc_type -sub_pc_type -ksp_gmres_restart'
+  petsc_options_value = ' hypre boomeramg 300'
   line_search = none
   nl_abs_tol = 1e-40
   nl_rel_step_tol = 1e-40
   nl_rel_tol = 1e-1
   l_tol = 1e-04
   nl_abs_step_tol = 1e-40
+
 []
 
 [Outputs]
@@ -179,7 +162,7 @@
   [./exodus]
     file_base = phase_cyl_out
     type = Exodus
-    output_on = 'initial failed timestep_end'
+    output_on = 'initial timestep_end'
   [../]
 []
 
