@@ -6,6 +6,7 @@
   xmax = 0.0025
   ymax = 0.005
   elem_type = QUAD9
+  uniform_refine = 2
 []
 
 [MeshModifiers]
@@ -236,25 +237,27 @@
   # Preconditioned JFNK (default)
   type = Transient
   solve_type = PJFNK
+  l_max_its = 100
   petsc_options_iname = '-pc_type -pc_hypre_type -ksp_gmres_restart'
   petsc_options_value = 'hypre boomeramg 300 '
   end_time = 20000
   reset_dt = true
+  line_search = none
   dtmax = 10
   nl_abs_tol = 1e-12
   nl_rel_tol = 1e-01
-  dtmin = 0.1
+  dtmin = 0.001
   [./TimeStepper]
     type = SolutionTimeAdaptiveDT
-    dt = 0.1
+    dt = 0.01
     percent_change = 1
   [../]
 []
 
 [Adaptivity]
-  max_h_level = 4
+  max_h_level = 5
   marker = combo_marker
-  initial_steps = 3
+  initial_steps = 4
   initial_marker = combo_marker
   [./Indicators]
     [./phi_grad_indicator]
@@ -269,7 +272,7 @@
   [./Markers]
     [./combo_marker]
       type = ComboMarker
-      markers = 'phi_grad_marker x_grad_marker'
+      markers = 'phi_grad_marker x_grad_marker vapor_marker'
     [../]
     [./x_grad_marker]
       type = ErrorToleranceMarker
@@ -282,6 +285,14 @@
       coarsen = 1e-7
       indicator = phi_grad_indicator
       refine = 1e-5
+    [../]
+
+    [./vapor_marker]
+      type = ValueRangeMarker
+      lower_bound = -1.1
+      upper_bound = 0.5
+      variable = phi
+      third_state = DO_NOTHING
     [../]
   [../]
 []
@@ -317,7 +328,7 @@
 [PikaMaterials]
   temperature = T
   interface_thickness = 1e-5
-  temporal_scaling = 1e-4
+  temporal_scaling = 1e-5
   condensation_coefficient = .01
   phase = phi
   gravity = '0 -9.81 0'

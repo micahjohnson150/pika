@@ -42,6 +42,7 @@
 []
 
 [Kernels]
+
   [./x_momentum_time]
     type = PhaseTimeDerivative
     variable = v_x
@@ -105,7 +106,6 @@
     variable = phi
     mob_name = mobility
   [../]
-
   [./phi_transition]
     type = PhaseTransition
     variable = phi
@@ -114,7 +114,6 @@
     coefficient = 1.0
     lambda = phase_field_coupling_constant
   [../]
-
   [./Heat_time]
     type = PikaTimeDerivative
     variable = T
@@ -245,15 +244,16 @@
   type = Transient
   dt = 1
   l_max_its = 100
+  nl_max_its = 100
   end_time = 1
   solve_type = PJFNK
-  petsc_options = '-snes_ksp_ew'
-  petsc_options_iname = '-pc_type -pc_hypre_type  -ksp_gmres_restart'
+  petsc_options = '-snes_ksp_ew_'
+  petsc_options_iname = '-pc_type -pc_hypre_type -ksp_gmres_restart'
   petsc_options_value = ' hypre boomeramg 300'
   line_search = none
   nl_abs_tol = 1e-40
   nl_rel_step_tol = 1e-40
-  nl_rel_tol = 1e-1
+  nl_rel_tol = 1e-3
   l_tol = 1e-04
   nl_abs_step_tol = 1e-40
   [./TimeStepper]
@@ -263,37 +263,48 @@
   [../]
 []
 [Adaptivity]
-  max_h_level = 5
-  initial_steps = 4
+  max_h_level = 4
   marker = combo_marker
-  initial_marker = phi_marker
+  initial_steps = 3
+  initial_marker = combo_marker
   [./Indicators]
     [./phi_grad_indicator]
       type = GradientJumpIndicator
       variable = phi
     [../]
+    [./x_grad_indicator]
+      type = GradientJumpIndicator
+      variable = x
+    [../]
   [../]
   [./Markers]
-    [./phi_marker]
+    [./combo_marker]
+      type = ComboMarker
+      markers = 'phi_grad_marker x_grad_marker vapor_marker'
+    [../]
+    [./x_grad_marker]
+      type = ErrorToleranceMarker
+      coarsen = 1e-10
+      indicator = x_grad_indicator
+      refine = 1e-8
+    [../]
+    [./phi_grad_marker]
       type = ErrorToleranceMarker
       coarsen = 1e-7
       indicator = phi_grad_indicator
       refine = 1e-5
     [../]
+
     [./vapor_marker]
       type = ValueRangeMarker
-      lower_bound = -1
-      upper_bound = 0
+      lower_bound = -1.1
+      upper_bound = 0.5
       variable = phi
+      third_state = DO_NOTHING
     [../]
-    [./combo_marker]
-      type = ComboMarker
-      markers = 'phi_marker vapor_marker'
-    [../]
-
-
   [../]
 []
+
 [Outputs]
   [./console]
     type = Console
@@ -312,7 +323,7 @@
   temperature = T
   interface_thickness = 1e-04
   gravity = '0 -9.81 0'
-  temporal_scaling = 1e-4
+  temporal_scaling = 1e-5
   #ice 
   conductivity_ice = 0.02
   density_ice = 1.341
