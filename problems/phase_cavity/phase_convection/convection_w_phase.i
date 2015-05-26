@@ -8,7 +8,6 @@
   xmax = .0051
   ymax = .0051
   elem_type = QUAD9
-  uniform_refine = 3
 []
 
 [MeshModifiers]
@@ -103,7 +102,6 @@
     variable = T
     vel_x = v_x
     use_temporal_scaling = true
-    phase = phi
     property = heat_capacity
     vel_y = v_y
   [../]
@@ -146,7 +144,7 @@
   [./uo_initial]
     type = SolutionUserObject
     execute_on = initial
-    mesh = phi_initial_out.e-s004
+    mesh = phi_initial_out.e-s005
     timestep = 1
   [../]
 []
@@ -165,9 +163,55 @@
   petsc_options_value = '100 '
   nl_max_its = 50
   l_max_its = 100
-  nl_rel_tol = 1e-07
-  l_tol = 1e-07
+  nl_rel_tol = 1e-03
+  l_tol = 1e-03
   line_search = none
+[]
+[Adaptivity]
+  max_h_level = 3
+  marker = combo_marker
+  initial_steps = 3
+  steps = 1
+  initial_marker = phi_grad_marker
+  [./Indicators]
+    [./phi_grad_indicator]
+      type = GradientJumpIndicator
+      variable = phi
+    [../]
+    [./v_x_grad_indicator]
+      type = GradientJumpIndicator
+      variable = v_x
+    [../]
+    [./v_y_grad_indicator]
+      type = GradientJumpIndicator
+      variable = v_y
+    [../]
+
+  [../]
+  [./Markers]
+    [./combo_marker]
+      type = ComboMarker
+      markers = 'phi_grad_marker v_x_marker v_y_marker'
+    [../]
+    [./phi_grad_marker]
+      type = ErrorToleranceMarker
+      coarsen = 1e-7
+      indicator = phi_grad_indicator
+      refine = 1e-5
+    [../]
+    [./v_x_marker]
+      type = ErrorToleranceMarker
+      coarsen =1e-7
+      indicator = v_x_grad_indicator
+      refine = 1e-5
+    [../]
+    [./v_y_marker]
+      type = ErrorToleranceMarker
+      coarsen =1e-7
+      indicator = v_y_grad_indicator
+      refine = 1e-5
+    [../]
+  [../]
 []
 
 [Outputs]

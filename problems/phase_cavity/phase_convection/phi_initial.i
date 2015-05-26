@@ -23,12 +23,6 @@
 []
 
 [Kernels]
-active = 'phase_diffusion phase_double_well'
-  [./phase_time]
-    type = PikaTimeDerivative
-    variable = phi
-    property = relaxation_time
-  [../]
   [./phase_diffusion]
     type = PikaDiffusion
     variable = phi
@@ -57,23 +51,21 @@ active = 'phase_diffusion phase_double_well'
     value = 1
   [../]
 []
-
 [Executioner]
-  # Preconditioned JFNK (default)
   type = Steady
   nl_max_its = 20
   solve_type = PJFNK
-  petsc_options_iname = '-ksp_gmres_restart '
-  petsc_options_value = '50 '
+  petsc_options_iname = '-ksp_gmres_restart -pc_type -pc_hypre_type'
+  petsc_options_value = '50 hypre boomeramg'
   nl_rel_tol = 1e-07
   nl_abs_tol = 1e-12
   l_tol = 1e-4
   l_abs_step_tol = 1e-13
 []
 [Adaptivity]
-  max_h_level = 4
-  initial_steps = 4
-  steps = 3
+  max_h_level = 3
+  initial_steps = 3
+  steps = 4
   marker = phi_marker
   initial_marker = phi_marker
   [./Indicators]
