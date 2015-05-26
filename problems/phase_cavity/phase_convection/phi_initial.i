@@ -5,9 +5,8 @@
   ny = 50
   xmin = -1e-4
   ymin = -1e-4
-  xmax = .0051
-  ymax = .0051
-  uniform_refine = 3
+  xmax = .0101
+  ymax = .0101
   elem_type = QUAD9
 []
 
@@ -24,6 +23,7 @@
 []
 
 [Kernels]
+active = 'phase_diffusion phase_double_well'
   [./phase_time]
     type = PikaTimeDerivative
     variable = phi
@@ -60,7 +60,7 @@
 
 [Executioner]
   # Preconditioned JFNK (default)
-  type = Transient
+  type = Steady
   nl_max_its = 20
   solve_type = PJFNK
   petsc_options_iname = '-ksp_gmres_restart -pc_type -pc_hypre_type'
@@ -76,26 +76,46 @@
     growth_factor = 3
   [../]
 []
+[Adaptivity]
+  max_h_level = 4
+  initial_steps = 4
+  steps = 3
+  marker = phi_marker
+  initial_marker = phi_marker
+  [./Indicators]
+    [./phi_grad_indicator]
+      type = GradientJumpIndicator
+      variable = phi
+    [../]
+  [../]
+  [./Markers]
+    [./phi_marker]
+      type = ErrorToleranceMarker
+      coarsen = 1e-7
+      indicator = phi_grad_indicator
+      refine = 1e-5
+    [../]
+  [../]
+[]
 
 [Outputs]
-  output_initial = true
   print_linear_residuals = true
   print_perf_log = true
-  output_final = true
   [./out]
     output_final = true
     type = Exodus
     file_base = phi_initial_out
-    output_on = 'final initial'
+    output_final = true
+    output_initial = true
   [../]
 []
 
 [ICs]
   [./phi_box_IC]
-    y2 = 0.005
+    y2 = 0.01
     y1 = 0
     inside = -1
-    x2 = 0.005
+    x2 = 0.01
     outside = 1
     variable = phi
     x1 = 0
@@ -105,7 +125,7 @@
 
 [PikaMaterials]
   temperature = 263.15
-  interface_thickness = 1e-4
+  interface_thickness = 1e-5
   phase = phi
   temporal_scaling = 1
 []

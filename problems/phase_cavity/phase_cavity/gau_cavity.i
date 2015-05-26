@@ -1,11 +1,12 @@
 [Mesh]
   type = GeneratedMesh
   dim = 2
-  nx = 100
-  ny = 100
+  nx = 500
+  ny = 500
   xmax = 0.05
   ymax = 0.05
   elem_type = QUAD9
+  unform_refine = 0
 []
 
 [MeshModifiers]
@@ -44,9 +45,9 @@
 [Kernels]
 
   [./x_momentum_time]
-    type = PhaseTimeDerivative
+    type = PikaTimeDerivative
     variable = v_x
-    phase = phi
+    coefficient = 1.341
   [../]
   [./x_momentum]
     type = PikaMomentum
@@ -63,10 +64,17 @@
     phase = phi
     h = 100
   [../]
-  [./y_momentum_time]
-    type = PhaseTimeDerivative
-    variable = v_y
+  [./x_momentum_boussinesq]
+    type = PhaseBoussinesq
+    variable = v_x
+    component = 0
+    T = T
     phase = phi
+  [../]
+  [./y_momentum_time]
+    type = PikaTimeDerivative
+    variable = v_y
+    coefficient = 1.341
   [../]
   [./y_momentum]
     type = PikaMomentum
@@ -83,12 +91,19 @@
     phase = phi
     h = 100
   [../]
-  [./mass_conservation]
-    type = PhaseMass
-    variable = p
-    vel_y = v_y
-    vel_x = v_x
+  [./y_momentum_boussinesq]
+    type = PhaseBoussinesq
+    variable = v_y
+    component = 1
+    T = T
     phase = phi
+  [../]
+  [./mass_conservation]
+    type = INSMass
+    variable = p
+    u = v_y
+    v = v_x
+    p = p
   [../]
   [./phi_time]
     type = PikaTimeDerivative
@@ -169,13 +184,6 @@
     coupled_variable = phi
     coefficient = 1
     scale = 0.5
-  [../]
-  [./y_momentum_boussinesq]
-    type = PhaseBoussinesq
-    variable = v_y
-    component = 1
-    T = T
-    phase = phi
   [../]
 []
 
@@ -276,11 +284,20 @@
       type = GradientJumpIndicator
       variable = x
     [../]
+    [./v_x_grad_indicator]
+      type = GradientJumpIndicator
+      variable = v_x
+    [../]
+    [./v_y_grad_indicator]
+      type = GradientJumpIndicator
+      variable = v_y
+    [../]
+
   [../]
   [./Markers]
     [./combo_marker]
       type = ComboMarker
-      markers = 'phi_grad_marker x_grad_marker vapor_marker'
+      markers = 'phi_grad_marker x_grad_marker v_x_marker v_y_marker'
     [../]
     [./x_grad_marker]
       type = ErrorToleranceMarker
@@ -294,13 +311,17 @@
       indicator = phi_grad_indicator
       refine = 1e-5
     [../]
-
-    [./vapor_marker]
-      type = ValueRangeMarker
-      lower_bound = -1.1
-      upper_bound = 0.5
-      variable = phi
-      third_state = DO_NOTHING
+    [./v_x_marker]
+      type = ErrorToleranceMarker
+      coarsen =1e-7
+      indicator = v_x_grad_indicator
+      refine = 1e-5
+    [../]
+    [./v_y_marker]
+      type = ErrorToleranceMarker
+      coarsen =1e-7
+      indicator = v_y_grad_indicator
+      refine = 1e-5
     [../]
   [../]
 []
@@ -323,7 +344,7 @@
   temperature = T
   interface_thickness = 1e-04
   gravity = '0 -9.81 0'
-  temporal_scaling = 1e-5
+  temporal_scaling = 1
   #ice 
   conductivity_ice = 0.02
   density_ice = 1.341

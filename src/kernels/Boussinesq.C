@@ -9,10 +9,10 @@
 /*                      With the U. S. Department of Energy                       */
 /**********************************************************************************/
 
-#include "PhaseBoussinesq.h"
+#include "Boussinesq.h"
 
 template<>
-InputParameters validParams<PhaseBoussinesq>()
+InputParameters validParams<Boussinesq>()
 {
   InputParameters params = validParams<Kernel>();
   params += validParams<PropertyUserObjectInterface>();
@@ -26,7 +26,7 @@ InputParameters validParams<PhaseBoussinesq>()
   return params;
 }
 
-PhaseBoussinesq::PhaseBoussinesq(const std::string & name, InputParameters parameters) :
+Boussinesq::Boussinesq(const std::string & name, InputParameters parameters) :
   Kernel(name, parameters),
   PropertyUserObjectInterface(name, parameters),
 
@@ -48,17 +48,17 @@ PhaseBoussinesq::PhaseBoussinesq(const std::string & name, InputParameters param
 {
 }
 
-Real PhaseBoussinesq::computeQpResidual()
+Real Boussinesq::computeQpResidual()
 {
   return  -_xi * _rho * (1.0 -  _alpha * (_T[_qp] - _T_ref)) * _test[_i][_qp] * _gravity(_component);
 }
 
-Real PhaseBoussinesq::computeQpJacobian()
+Real Boussinesq::computeQpJacobian()
 {
  return 0.0;
 }
 
-Real PhaseBoussinesq::computeQpOffDiagJacobian(unsigned jvar)
+Real Boussinesq::computeQpOffDiagJacobian(unsigned jvar)
 {
   if(jvar == _T_var_number)
     return  -_xi * _rho * ( -  _alpha * _phi[_j][_qp] * _test[_i][_qp]) * _gravity(_component);

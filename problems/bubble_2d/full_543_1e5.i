@@ -129,7 +129,7 @@
 [UserObjects]
   [./phi_initial]
     type = SolutionUserObject
-    mesh = phi_initial_1e5_out.e-s006
+    mesh = phi_initial_1e5_out.e-s010
     system_variables = phi
   [../]
 []

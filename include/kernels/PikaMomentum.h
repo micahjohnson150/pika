@@ -29,25 +29,23 @@ public:
 protected:
   /**
    * Calculates the Convective acceleration portion of the equation
-   * \rho * 0.5 * (1-\phi) * (\vec{v} \cdot \nabla u) \psi
+   * \rho * 0.5 * (\vec{v} \cdot \nabla u) \psi
    * where u is the velocity component selected
    */
   virtual Real Convective();
 
   /**
    * Calculates the pressure term
-   * 0.5 *(1- \phi) *  p * \nabla \psi 
+   * - \xi p * \nabla \psi 
    * where \psi is the test function
    */
   virtual Real Pressure();
 
   /**
    * Calculates the viscous term of the momentum equation.
-   * -\mu * \nabla^{2}(0.5*( 1-\phi) * u) \psi
+   *  -\xi \mu * \nabla^{2} u \psi
    *  Using the divergence theorem becomes:
-   *  -\mu * \nabla (0.5*( 1-\phi) * u) \nabla \psi
-   *  Using the product rule becomes:
-   *  \mu * 0.5 ( - \nabla \phi * u + \nabla u * (1- \phi)) \cdot \nabla \psi
+   *  \xi \mu * \nabla u \nabla \psi
    */
   virtual Real Viscous();
   /**
@@ -65,13 +63,11 @@ protected:
   VariableValue& _v_vel;
   VariableValue& _w_vel;
   VariableValue& _p;
-  VariableValue& _phase;
 
   /** 
    * Gradients
    */
   VariableGradient& _grad_p;
-  VariableGradient& _grad_phase;
 
   /**
    * Variable numberings for identifying which part of the jacobian to compute
@@ -80,7 +76,6 @@ protected:
   unsigned _v_vel_var_number;
   unsigned _w_vel_var_number;
   unsigned _p_var_number;
-  unsigned _phase_var_number;
 
 /** 
  * Constant Values required for computations.

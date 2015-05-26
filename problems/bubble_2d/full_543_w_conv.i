@@ -51,11 +51,6 @@
 []
 
 [Kernels]
-  [./x_momentum_time]
-    type = PhaseTimeDerivative
-    variable = v_x
-    phase = phi
-  [../]
   [./x_momentum]
     type = PikaMomentum
     variable = v_x
@@ -63,7 +58,6 @@
     vel_x = v_x
     component = 0
     p = p
-    phase = phi
   [../]
   [./x_no_slip]
     type = PhaseNoSlipForcing
@@ -71,11 +65,14 @@
     phase = phi
     h = 100
   [../]
-  [./y_momentum_time]
-    type = PhaseTimeDerivative
-    variable = v_y
+  [./x_momentum_boussinesq]
+    type = PhaseBoussinesq
+    variable = v_x
+    component = 0
+    T = T
     phase = phi
   [../]
+
   [./y_momentum]
     type = PikaMomentum
     variable = v_y
@@ -99,11 +96,11 @@
     phase = phi
   [../]
   [./mass_conservation]
-    type = PhaseMass
+    type = INSMass
     variable = p
-    vel_y = v_y
-    vel_x = v_x
-    phase = phi
+    u = v_y
+    v = v_x
+    p = p
   [../]
   [./phi_time]
     type = PikaTimeDerivative
@@ -228,7 +225,7 @@
 [UserObjects]
   [./phi_initial]
     type = SolutionUserObject
-    mesh = phi_initial_1e5_out.e-s006
+    mesh = phi_initial_1e5_out.e-s010
     system_variables = phi
   [../]
 []
@@ -249,7 +246,7 @@
   dtmin = 0.001
   [./TimeStepper]
     type = SolutionTimeAdaptiveDT
-    dt = 0.01
+    dt = 0.001
     percent_change = 1
   [../]
 []
@@ -328,7 +325,7 @@
 [PikaMaterials]
   temperature = T
   interface_thickness = 1e-5
-  temporal_scaling = 1e-5
+  temporal_scaling = 1
   condensation_coefficient = .01
   phase = phi
   gravity = '0 -9.81 0'

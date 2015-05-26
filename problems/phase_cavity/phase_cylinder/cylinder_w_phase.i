@@ -1,8 +1,13 @@
 [Mesh]
-  type = FileMesh
-  file = phi_initial.e
+  type = GeneratedMesh
+  xmin = -0.01
+  xmax = 0.05
+  ymin = 0
+  ymax =0.01
   dim = 2
-  uniform_refine = 0
+  nx = 200
+  ny = 500
+  elem_type = QUAD9
 []
 
 [Variables]
@@ -10,10 +15,10 @@
   [../]
   [./phi]
   [../]
-  [./vx]
+  [./v_x]
     order = SECOND
   [../]
-  [./vy]
+  [./v_y]
     order = SECOND
   [../]
 []
@@ -29,39 +34,39 @@
 [Kernels]
   [./x_momentum]
     type = PikaMomentum
-    variable = vx
-    vel_y = vy
-    vel_x = vx
+    variable = v_x
+    vel_y = v_y
+    vel_x = v_x
     component = 0
     p = p
     phase = phi
   [../]
   [./x_no_slip]
     type = PhaseNoSlipForcing
-    variable = vx
+    variable = v_x
     phase = phi
     h = 100
   [../]
   [./y_momentum]
     type = PikaMomentum
-    variable = vy
-    vel_y = vy
-    vel_x = vx
+    variable = v_y
+    vel_y = v_y
+    vel_x = v_x
     component = 1
     p = p
     phase = phi
   [../]
   [./y_no_slip]
     type = PhaseNoSlipForcing
-    variable = vy
+    variable = v_y
     phase = phi
     h = 100
   [../]
   [./mass_conservation]
     type = PhaseMass
     variable = p
-    vel_y = vy
-    vel_x = vx
+    vel_y = v_y
+    vel_x = v_x
     phase = phi
   [../]
   [./phi_diffusion]
@@ -82,28 +87,28 @@
     use_temporal_scaling = false
   [../]
   [./x_momentum_time]
-    type = PhaseTimeDerivative
-    variable = vx
-    phase = phi
+    type = PikaTimeDerivative
+    variable = v_x
+    coefficient = 1.341
   [../]
   [./y_momentum_time]
-    type = PhaseTimeDerivative
-    variable = vy
-    phase = phi
+    type = PikaTimeDerivative
+    variable = v_y
+    coefficient = 1.341
   [../]
 []
 
 [BCs]
   [./y_no_slip]
     type = DirichletBC
-    variable = vy
+    variable = v_y
     boundary = 'top'
     value = 0
   [../]
   [./vapor_phase_wall]
     type = DirichletBC
     variable = phi
-    boundary = 'top bottom left right'
+    boundary = 'top left right'
     value = -1
   [../]
   [./pressure_pin]
@@ -114,7 +119,7 @@
   [../]
   [./inlet]
     type = DirichletBC
-    variable = vx
+    variable = v_x
     boundary = left
     value = .047696
   [../]
@@ -135,24 +140,64 @@
     full = true
   [../]
 []
-
 [Executioner]
   type = Transient
   dt = 0.001
-  l_max_its = 100
-  end_time = 1
+  timesteps = 2
   solve_type = PJFNK
-  petsc_options_iname = '-pc_type -sub_pc_type -ksp_gmres_restart'
-  petsc_options_value = ' hypre boomeramg 300'
-  line_search = none
+  petsc_options_iname = ' -ksp_gmres_restart'
+  petsc_options_value = ' 300'
+  l_max_its = 100
   nl_abs_tol = 1e-40
   nl_rel_step_tol = 1e-40
-  nl_rel_tol = 1e-1
-  l_tol = 1e-04
+  nl_rel_tol = 1e-5
+  l_tol = 1e-5
   nl_abs_step_tol = 1e-40
-
 []
-
+[Adaptivity]
+  max_h_level = 5
+  initial_steps =5
+  marker = combo_marker
+  initial_marker = phi_marker
+  [./Indicators]
+    [./phi_grad_indicator]
+      type = GradientJumpIndicator
+      variable = phi
+    [../]
+    [./v_x_grad_indicator]
+      type = GradientJumpIndicator
+      variable = v_x
+    [../]
+    [./v_y_grad_indicator]
+      type = GradientJumpIndicator
+      variable = v_y
+    [../]
+  [../]
+  [./Markers]
+    [./phi_marker]
+      type = ErrorToleranceMarker
+      coarsen =1e-7
+      indicator = phi_grad_indicator
+      refine = 1e-5
+    [../]
+    [./v_x_marker]
+      type = ErrorToleranceMarker
+      coarsen =0.5
+      indicator = v_x_grad_indicator
+      refine = 0.5
+    [../]
+    [./v_y_marker]
+      type = ErrorToleranceMarker
+      coarsen =0.5
+      indicator = v_y_grad_indicator
+      refine = 0.5
+    [../]
+    [./combo_marker]
+      type = ComboMarker
+      markers = ' v_x_marker v_y_marker phi_marker'
+    [../]
+  [../]
+[]
 [Outputs]
   [./console]
     type = Console

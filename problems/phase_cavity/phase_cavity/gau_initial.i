@@ -119,7 +119,7 @@
     x2 = 0.05
     outside = -1
     variable = phi
-    x1 = 0.025
+    x1 = 0.001
     type = BoundingBoxIC
   [../]
 []

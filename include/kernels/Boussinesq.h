@@ -19,23 +19,23 @@
 #include "PropertyUserObjectInterface.h"
 
 // Forward Declarations
-class PhaseBoussinesq;
+class Boussinesq;
 
 template<>
-InputParameters validParams<PhaseBoussinesq>();
+InputParameters validParams<Boussinesq>();
 
 /**
  * Computes a one sided, phase dependent buoyancy based
  * forcing term for the Navier Stokes Equations in PikaMomentum
  */
-class PhaseBoussinesq : 
+class Boussinesq : 
     public Kernel,
     public PropertyUserObjectInterface
 {
 public:
-  PhaseBoussinesq(const std::string & name, InputParameters parameters);
+  Boussinesq(const std::string & name, InputParameters parameters);
 
-  virtual ~PhaseBoussinesq(){}
+  virtual ~Boussinesq(){}
 
 protected:
   virtual Real computeQpResidual();

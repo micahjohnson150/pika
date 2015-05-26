@@ -71,6 +71,7 @@ traceout*.txt
 .depend
 *.tar
 *Revision.h
+*.json
 .ipynb_checkpoints/
 doc/doxygen/html/
 *.#*
