@@ -49,7 +49,7 @@
 #include "IbexShortwaveForcingFunction.h"
 #include "PikaHomogenizedKernel.h"
 #include "PikaMomentum.h"
-#include "PhaseBoussinesq.h"
+#include "Boussinesq.h"
 #include "PhaseMass.h"
 #include "PikaConvection.h"
 #include "PhaseTimeDerivative.h"
@@ -143,7 +143,7 @@ PikaApp::registerObjects(Factory & factory)
   registerKernel(IbexShortwaveForcingFunction);
   registerKernel(PikaHomogenizedKernel);
   registerKernel(PikaMomentum);
-  registerKernel(PhaseBoussinesq);
+  registerKernel(Boussinesq);
   registerKernel(PhaseMass);
   registerKernel(PikaConvection);
   registerKernel(PhaseTimeDerivative);

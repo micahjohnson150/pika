@@ -59,6 +59,9 @@ private:
   /// Density of ice
   const Real & _density_ice;
 
+  /// Density of air
+  const Real & _density_air;
+
   /// Latent heat of sublimation
   const Real &  _l_sg;
 

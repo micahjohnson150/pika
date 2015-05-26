@@ -33,6 +33,7 @@ PikaMaterial::PikaMaterial(const std::string & name, InputParameters parameters)
     _interface_thickness(_property_uo.getParam<Real>("interface_thickness")),
     _a_1((5./8.)*std::sqrt(2)),
     _density_ice(_property_uo.getParam<Real>("density_ice")),
+    _density_air(_property_uo.getParam<Real>("density_air")),
     _l_sg(_property_uo.getParam<Real>("latent_heat")),
     _ki(_property_uo.getParam<Real>("conductivity_ice")),
     _ka(_property_uo.getParam<Real>("conductivity_air")),

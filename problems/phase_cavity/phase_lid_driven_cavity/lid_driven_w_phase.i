@@ -115,7 +115,7 @@
   [./uo_initial]
     type = SolutionUserObject
     execute_on = initial
-    mesh = phi_initial_out.e-s004
+    mesh = phi_initial_out.e-s005
     timestep = 1
   [../]
 []
@@ -150,13 +150,13 @@
 [Executioner]
   type = Steady
   solve_type = PJFNK
-  petsc_options_iname = '-ksp_gmres_restart -pc_type -pc_hypre_type'
-  petsc_options_value = '50 hypre boomeramg'
+  petsc_options_iname = '-ksp_gmres_restart '
+  petsc_options_value = '50 '
   l_max_its = 100
   nl_max_its = 50
-  nl_rel_tol = 1e-08
-  l_tol = 1e-08
-  line_search = bt
+  nl_rel_tol = 1e-07
+  l_tol = 1e-07
+  line_search = none
 
 []
 [Adaptivity]
