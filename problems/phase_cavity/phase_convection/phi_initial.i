@@ -5,8 +5,8 @@
   ny = 50
   xmin = -1e-4
   ymin = -1e-4
-  xmax = .0101
-  ymax = .0101
+  xmax = .0051
+  ymax = .0051
   elem_type = QUAD9
 []
 
@@ -63,18 +63,12 @@ active = 'phase_diffusion phase_double_well'
   type = Steady
   nl_max_its = 20
   solve_type = PJFNK
-  petsc_options_iname = '-ksp_gmres_restart -pc_type -pc_hypre_type'
-  petsc_options_value = '50 hypre boomeramg'
+  petsc_options_iname = '-ksp_gmres_restart '
+  petsc_options_value = '50 '
   nl_rel_tol = 1e-07
   nl_abs_tol = 1e-12
   l_tol = 1e-4
   l_abs_step_tol = 1e-13
-  end_time = 7200
-  [./TimeStepper]
-    type = IterationAdaptiveDT
-    dt = 1
-    growth_factor = 3
-  [../]
 []
 [Adaptivity]
   max_h_level = 4
@@ -112,10 +106,10 @@ active = 'phase_diffusion phase_double_well'
 
 [ICs]
   [./phi_box_IC]
-    y2 = 0.01
+    y2 = 0.005
     y1 = 0
     inside = -1
-    x2 = 0.01
+    x2 = 0.005
     outside = 1
     variable = phi
     x1 = 0

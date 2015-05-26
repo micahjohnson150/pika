@@ -1,13 +1,14 @@
 [Mesh]
   type = GeneratedMesh
   dim = 2
-  nx = 500
-  ny = 500
+  nx = 50
+  ny = 50
   xmin = -1e-4
   ymin = -1e-4
   xmax = .0051
   ymax = .0051
   elem_type = QUAD9
+  uniform_refine = 3
 []
 
 [MeshModifiers]
@@ -43,13 +44,6 @@
 []
 
 [Kernels]
-#active = 'x_momentum_time x_momentum x_no_slip x_momentum_boussinesq y_momentum_time y_momentum y_no_slip y_momentum_boussinesq mass_conservation Heat_convection Heat_diffusion phase_time phase_diffusion phase_double_well'
-  [./x_momentum_time]
-    type = PikaTimeDerivative
-    variable = v_x
-    phase = phi
-    coefficient = 1.341
-  [../]
   [./x_momentum]
     type = PikaMomentum
     variable = v_x
@@ -63,19 +57,6 @@
     variable = v_x
     phase = phi
     h = 100
-  [../]
-  [./x_momentum_boussinesq]
-    type = PhaseBoussinesq
-    variable = v_x
-    component = 0
-    T = T
-    phase = phi
-  [../]
-  [./y_momentum_time]
-    type = PikaTimeDerivative
-    variable = v_y
-    phase = phi
-    coefficient = 1.341
   [../]
   [./y_momentum]
     type = PikaMomentum
@@ -92,11 +73,11 @@
     h = 100
   [../]
   [./y_momentum_boussinesq]
-    type = PhaseBoussinesq
+    type = Boussinesq
+    phase = phi
+    T = T
     variable = v_y
     component = 1
-    T = T
-    phase = phi
   [../]
   [./mass_conservation]
     type = INSMass
@@ -104,11 +85,6 @@
     v = v_y
     u = v_x
     p = p
-  [../]
-  [./phase_time]
-    type = PikaTimeDerivative
-    variable = phi
-    property = relaxation_time
   [../]
   [./phase_diffusion]
     type = PikaDiffusion
@@ -121,11 +97,7 @@
     variable = phi
     mob_name = mobility
   [../]
-  [./Heat_time]
-    type = PikaTimeDerivative
-    variable = T
-    property = heat_capacity
-  [../]
+
   [./Heat_convection]
     type = PikaConvection
     variable = T
@@ -174,7 +146,7 @@
   [./uo_initial]
     type = SolutionUserObject
     execute_on = initial
-    mesh = phi_initial_out.e
+    mesh = phi_initial_out.e-s004
     timestep = 1
   [../]
 []
@@ -182,67 +154,20 @@
 [Preconditioning]
   [./SMP_PJFNK]
     type = SMP
+    full = true
   [../]
 []
 
 [Executioner]
-  type = Transient
-  dt = 0.001
-  end_time = 0.05
+  type = Steady
   solve_type = PJFNK
-  petsc_options_iname = ' -pc_type -ksp_gmres_restart'
-  petsc_options_value = 'hypre 300'
+  petsc_options_iname = ' -ksp_gmres_restart '
+  petsc_options_value = '100 '
+  nl_max_its = 50
   l_max_its = 100
-  nl_abs_tol = 1e-40
-  nl_rel_step_tol = 1e-40
-  nl_rel_tol = 1e-5
-  l_tol = 1e-5
-  nl_abs_step_tol = 1e-40
-[]
-
-[Adaptivity]
-  max_h_level = 4
-  initial_steps = 4
-  marker = combo_marker
-  initial_marker = phi_marker
-  [./Indicators]
-    [./phi_grad_indicator]
-      type = GradientJumpIndicator
-      variable = phi
-    [../]
-    [./v_x_grad_indicator]
-      type = GradientJumpIndicator
-      variable = v_x
-    [../]
-    [./v_y_grad_indicator]
-      type = GradientJumpIndicator
-      variable = v_y
-    [../]
-  [../]
-  [./Markers]
-    [./phi_marker]
-      type = ErrorToleranceMarker
-      coarsen =1e-7
-      indicator = phi_grad_indicator
-      refine = 1e-5
-    [../]
-    [./v_x_marker]
-      type = ErrorToleranceMarker
-      coarsen =1e-7
-      indicator = v_x_grad_indicator
-      refine = 1e-5
-    [../]
-    [./v_y_marker]
-      type = ErrorToleranceMarker
-      coarsen =1e-7
-      indicator = v_y_grad_indicator
-      refine = 1e-5
-    [../]
-    [./combo_marker]
-      type = ComboMarker
-      markers = ' v_x_marker v_y_marker phi_marker'
-    [../]
-  [../]
+  nl_rel_tol = 1e-07
+  l_tol = 1e-07
+  line_search = none
 []
 
 [Outputs]
@@ -254,20 +179,17 @@
   [./exodus]
     file_base = phase_conv_out
     type = Exodus
-    output_on = 'initial timestep_end'
+    output_final = true
+    output_initial = true
   [../]
 []
 
 [PikaMaterials]
   phase = phi
-  temperature = T
+  temperature = 263.15
   interface_thickness = 1e-05
   gravity = '0 -9.81 0'
   temporal_scaling = 1
-  #ice
-  conductivity_ice = 0.02
-  density_ice = 1.341
-  heat_capacity_ice = 1400
 []
 
 [ICs]
