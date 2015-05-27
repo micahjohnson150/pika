@@ -29,7 +29,7 @@ InputParameters validParams<PikaConvection>();
  * A  phase dependent convection Kernel
  * Defined as: 
  *
- * 0.5 * (1 - phi) * grad_u * test
+ *  V \cdot grad_u * test
  *
  */
 class PikaConvection :
@@ -59,23 +59,17 @@ protected:
  /**
    * Compute off diagonal jacobian
    */
-
-
   virtual Real computeQpOffDiagJacobian(unsigned jvar);
 
-  // Coupled variables
+  /// Coupled variables
   VariableValue& _u_vel;
   VariableValue& _v_vel;
   VariableValue& _w_vel;
   
-  // Variable numberings
+  /// Variable numberings
   unsigned _u_vel_var_number;
   unsigned _v_vel_var_number;
   unsigned _w_vel_var_number;
-
-  VariableValue& _phase;
-  unsigned _phase_var_number;
-
 };
 
 #endif //PIKACONVECTION_H

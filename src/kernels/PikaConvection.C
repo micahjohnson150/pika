@@ -19,7 +19,6 @@ InputParameters validParams<PikaConvection>()
   params += validParams<CoefficientKernelInterface>();
 
 
-  params.addRequiredCoupledVar("phase","variable containing the phase");
   params.addRequiredCoupledVar("vel_x", "x-velocity");
   params.addCoupledVar("vel_y", "y-velocity"); // only required in 2D and 3D
   params.addCoupledVar("vel_w", "z-velocity"); // only required in 3D
@@ -39,9 +38,7 @@ PikaConvection::PikaConvection(const std::string & name, InputParameters paramet
     // Variable numberings
     _u_vel_var_number(coupled("vel_x")),
     _v_vel_var_number(_mesh.dimension() >= 2 ? coupled("vel_y") : libMesh::invalid_uint),
-    _w_vel_var_number(_mesh.dimension() == 3 ? coupled("vel_z") : libMesh::invalid_uint),
-
-    _phase(coupledValue("phase"))
+    _w_vel_var_number(_mesh.dimension() == 3 ? coupled("vel_z") : libMesh::invalid_uint)
 {
  // The getMaterialProperty method cannot be replicated in interface
   if (useMaterial())
@@ -51,15 +48,13 @@ PikaConvection::PikaConvection(const std::string & name, InputParameters paramet
 Real
 PikaConvection::computeQpResidual()
 {
-  RealVectorValue U(_u_vel[_qp], _v_vel[_qp], _w_vel[_qp]);
-  return  coefficient(_qp) * U * _grad_u[_qp] * _test[_i][_qp];
+  return  coefficient(_qp) * ( _u_vel[_qp] * _grad_u[_qp](0) +  _v_vel[_qp] * _grad_u[_qp](1) +  _w_vel[_qp] * _grad_u[_qp](2)) * _test[_i][_qp];
 }
 
 Real
 PikaConvection::computeQpJacobian()
 {
-  RealVectorValue U(_u_vel[_qp], _v_vel[_qp], _w_vel[_qp]);
-  return   coefficient(_qp) * U *_grad_phi[_j][_qp] * _test[_i][_qp];
+  return  coefficient(_qp) * ( _u_vel[_qp] * _grad_phi[_j][_qp](0) +  _v_vel[_qp] * _grad_phi[_j][_qp](1) +  _w_vel[_qp] * _grad_phi[_j][_qp](2)) * _test[_i][_qp];
 }
 Real
 PikaConvection::computeQpOffDiagJacobian(unsigned jvar)
