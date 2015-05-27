@@ -8,7 +8,6 @@
   xmax = .0051
   ymax = .0051
   elem_type = QUAD9
-  uniform_refine = 1
 []
 
 [MeshModifiers]
@@ -86,6 +85,11 @@
     u = v_x
     p = p
   [../]
+  [./phase_time]
+    type = PikaTimeDerivative
+    property = relaxation_time
+    variable = phi
+  [../]
   [./phase_diffusion]
     type = PikaDiffusion
     variable = phi
@@ -158,14 +162,17 @@
 []
 
 [Executioner]
-  type = Steady
+  type = Transient
+  dt = 1
+  time_steps = 1
   solve_type = PJFNK
-  petsc_options_iname = '-pc_type -sub_pc_type -ksp_gmres_restart '
-  petsc_options_value = 'bjacobi ilu 100 '
+  petsc_options_iname = ' -ksp_gmres_restart '
+  petsc_options_value = ' 100 '
   l_max_its = 100
+  nl_max_its = 150
   nl_rel_tol = 1e-05
   l_tol = 1e-05
-  line_search = bt
+  line_search = none
 []
 [Adaptivity]
   max_h_level = 3
