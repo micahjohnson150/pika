@@ -169,7 +169,7 @@
   petsc_options_iname = ' -ksp_gmres_restart '
   petsc_options_value = ' 100 '
   l_max_its = 100
-  nl_max_its = 150
+  nl_max_its = 50
   nl_rel_tol = 1e-05
   l_tol = 1e-05
   line_search = none
