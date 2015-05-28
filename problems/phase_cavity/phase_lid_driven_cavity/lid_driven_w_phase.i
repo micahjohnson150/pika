@@ -6,7 +6,7 @@
   xmin = -1e-4
   ymin = -1e-4
   xmax = .0051
-  ymax = .0051
+  ymax = .0050
   elem_type = QUAD9
 []
 [MeshModifiers]
@@ -125,17 +125,17 @@
     type = LineValueSampler
     variable = v_y
     num_points = 100
-    end_point = '0.005 0.00255 0'
+    end_point = '0.0051 0.0025 0'
     sort_by = x
     execute_on = timestep_end
-    start_point = '0 0.00255 0'
+    start_point = '-1e-4 0.0025 0'
   [../]
   [./vertical]
     type = LineValueSampler
     variable = v_x
     num_points = 100
-    start_point = '0.00256 0 0'
-    end_point = '0.00256 0.005 0'
+    start_point = '0.0025 -1e-4 0'
+    end_point = '0.0025 0.005 0'
     sort_by = y
   [../]
 []
@@ -151,11 +151,11 @@
   type = Steady
   solve_type = PJFNK
   petsc_options_iname = '-ksp_gmres_restart '
-  petsc_options_value = '50 '
+  petsc_options_value = '100 '
   l_max_its = 100
-  nl_max_its = 50
-  nl_rel_tol = 1e-07
-  l_tol = 1e-07
+  nl_max_its = 150
+  nl_rel_tol = 1e-08
+  l_tol = 1e-08
   line_search = none
 
 []

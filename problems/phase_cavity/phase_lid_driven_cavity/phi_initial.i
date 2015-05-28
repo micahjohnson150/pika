@@ -6,7 +6,7 @@
   xmin = -1e-4
   ymin = -1e-4
   xmax = .0051
-  ymax = .0051
+  ymax = .0050
   elem_type = QUAD9
 []
 
