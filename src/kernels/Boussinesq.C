@@ -22,7 +22,6 @@ InputParameters validParams<Boussinesq>()
 
   // Coupled variables
   params.addRequiredCoupledVar("T", "Temperature");
-  params.addRequiredCoupledVar("phase","variable containing the phase");
   return params;
 }
 
@@ -32,11 +31,9 @@ Boussinesq::Boussinesq(const std::string & name, InputParameters parameters) :
 
   // Coupled variables
   _T(coupledValue("T")),
-  _phase(coupledValue("phase")),
 
   // Variable numberings
   _T_var_number(coupled("T")),
-  _phase_var_number(coupled("phase")),
 
   // Parameters
   _alpha(_property_uo.getParam<Real>("thermal_expansion")),
@@ -63,7 +60,7 @@ Real Boussinesq::computeQpOffDiagJacobian(unsigned jvar)
 {
   if(jvar == _T_var_number)
   { //return  -_xi * _rho * 0.5 * (1.0 - _phase[_qp]) * ( -  _alpha * _phi[_j][_qp]) * _test[_i][_qp] * _gravity(_component);
-    return  -_xi * _rho * 0.5 * (1.0 - _phase[_qp]) * ( -  _alpha * _phi[_j][_qp]) * _test[_i][_qp] * _gravity(_component);
+    return  -_xi * _rho * ( -  _alpha * _phi[_j][_qp]) * _test[_i][_qp] * _gravity(_component);
   }
 /*
   else if(jvar == _phase_var_number)

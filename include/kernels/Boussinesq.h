@@ -25,7 +25,7 @@ template<>
 InputParameters validParams<Boussinesq>();
 
 /**
- * Computes a one sided, phase dependent buoyancy based
+ * Computes a buoyancy based
  * forcing term for the Navier Stokes Equations in PikaMomentum
  */
 class Boussinesq : 
@@ -44,9 +44,7 @@ protected:
 
   // Coupled variables
   VariableValue& _T;
-  VariableValue& _phase;
   unsigned _T_var_number;
-  unsigned _phase_var_number;
 
   Real _T_ref;
   Real _alpha;
