@@ -38,6 +38,7 @@
   [../]
 []
 [BCs]
+active = ' ' 
   [./vapor_walls]
     type = DirichletBC
     value = -1
