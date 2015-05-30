@@ -40,6 +40,7 @@ Boussinesq::Boussinesq(const std::string & name, InputParameters parameters) :
   _rho(_property_uo.getParam<Real>("density_air")),
   _gravity(_property_uo.getParam<RealVectorValue>("gravity")),
   _xi(_property_uo.getParam<Real>("temporal_scaling")),
+ // _xi(1.0),
   _component(getParam<unsigned>("component"))
 
 {

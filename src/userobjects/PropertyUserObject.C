@@ -67,6 +67,7 @@ PropertyUserObject::objectParams()
   params.addParam<Real>("conductivity_air", 0.02, "Thermal conductivity or air, kappa_a [ W/(m K)]");
   params.addParam<Real>("heat_capacity_air", 1.4e3, "Heat capacity of air, C_a [J/(m^3 K)]");
   params.addParam<Real>("water_vapor_diffusion_coefficient", 2.178e-5, "Diffusion coefficient water vapor in air, D_v [m^2/s]");
+  params.addParam<Real>("water_vapor_diffusion_coefficient_ice", 1e-10, "Diffusion coefficient water vapor in ice, D_v [m^2/s]");
   params.addParam<Real>("density_air", 1.341, "Density of air, \rho_a [kg/m^3]");
   params.addParam<Real>("dry_air_viscosity", 1.599e-5, "viscosity of air, \\mu [kg s/m^2 ]");
   params.addParam<Real>("thermal_expansion", 3.6e-3, "coefficient of thermal expansion, \\alpha [1/k ]");

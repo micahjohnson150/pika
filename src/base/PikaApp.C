@@ -54,6 +54,8 @@
 #include "PikaConvection.h"
 #include "PhaseTimeDerivative.h"
 #include "PhaseNoSlipForcing.h"
+#include "PhaseForcing.h"
+#include "PikaPhaseConvection.h"
 
 // AuxKernels
 #include "ErrorFunctionAux.h"
@@ -148,6 +150,8 @@ PikaApp::registerObjects(Factory & factory)
   registerKernel(PikaConvection);
   registerKernel(PhaseTimeDerivative);
   registerKernel(PhaseNoSlipForcing);
+  registerKernel(PhaseForcing);
+  registerKernel(PikaPhaseConvection);
 
   // InitialConditions
   registerInitialCondition(KaempferAnalyticPhaseIC);

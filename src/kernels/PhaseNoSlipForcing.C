@@ -22,9 +22,6 @@ PhaseNoSlipForcing::PhaseNoSlipForcing(const std::string & name, InputParameters
   // Coupled variables
   _phase(coupledValue("phase")),
 
-  //Coupled Gradients
-  _grad_phase(coupledGradient("phase")),
-
   // Variable numberings
   _phase_var_number(coupled("phase")),
 
@@ -33,6 +30,7 @@ PhaseNoSlipForcing::PhaseNoSlipForcing(const std::string & name, InputParameters
   _w_2(getMaterialProperty<Real>("interface_thickness_squared")),
   //_w_2(_property_uo.getParam<Real>("interface_thickness")),
   _xi(_property_uo.getParam<Real>("temporal_scaling")),
+  //_xi(1.0),
   _mu(_property_uo.getParam<Real>("dry_air_viscosity"))
 
 {
@@ -59,7 +57,7 @@ Real PhaseNoSlipForcing::computeQpOffDiagJacobian(unsigned jvar)
   {
     //return _mu * _xi* 0.25 *_h * _phi[_j][_qp] *  ( -2.0*_phase[_qp] ) * _u[_qp] * _test[_i][_qp] / _w_2[_qp];
     //return _mu * _xi* 0.25 *_h * _phi[_j][_qp] *  ( -2.0*_phase[_qp] ) * _u[_qp] * _test[_i][_qp] / _w_2;
-    return _mu * _xi * 0.5 *_h * (1.0 +  _phi[_j][_qp]) * _u[_qp] * _test[_i][_qp] / _w_2[_qp];
+    return _mu * _xi * 0.5 *_h *  _phi[_j][_qp] * _u[_qp] * _test[_i][_qp] / _w_2[_qp];
   }
 
   else

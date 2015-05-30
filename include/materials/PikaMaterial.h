@@ -80,6 +80,9 @@ private:
   /// Diffusion coefficient of water vapor
   const Real & _dv;
 
+  /// Diffusion coefficient of water vapor in ice
+  const Real & _dvi;
+
   /// Viscosity of dry air at a const. temperature
   const Real & _mu;
 
