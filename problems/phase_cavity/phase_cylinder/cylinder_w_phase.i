@@ -1,36 +1,41 @@
 [Mesh]
   type = GeneratedMesh
-  xmin = -0.01
-  xmax = 0.05
-  ymin = 0
-  ymax =0.01
   dim = 2
-  nx = 200
-  ny = 500
+  nx = 50
+  ny = 50
+  xmin = 0
+  ymin = 0
+  xmax = .005
+  ymax = .0050
   elem_type = QUAD9
 []
-
+[MeshModifiers]
+  [./pin]
+    type = AddExtraNodeset
+    new_boundary = 99
+    coord = '0 0'
+    tolerance = 1e-04
+  [../]
+[]
 [Variables]
-  [./p]
-  [../]
-  [./phi]
-  [../]
   [./v_x]
     order = SECOND
   [../]
   [./v_y]
     order = SECOND
   [../]
+  [./p]
+  [../]
+  [./phi]
+  [../]
 []
-
 [Functions]
   [./phi_func]
     type = SolutionFunction
     from_variable = phi
-    solution = intial_uo
+    solution = uo_initial
   [../]
 []
-
 [Kernels]
   [./x_momentum]
     type = PikaMomentum
@@ -39,7 +44,6 @@
     vel_x = v_x
     component = 0
     p = p
-    phase = phi
   [../]
   [./x_no_slip]
     type = PhaseNoSlipForcing
@@ -54,7 +58,6 @@
     vel_x = v_x
     component = 1
     p = p
-    phase = phi
   [../]
   [./y_no_slip]
     type = PhaseNoSlipForcing
@@ -63,74 +66,72 @@
     h = 100
   [../]
   [./mass_conservation]
-    type = PhaseMass
+    type = INSMass
     variable = p
-    vel_y = v_y
-    vel_x = v_x
-    phase = phi
+    v = v_y
+    u = v_x
+    p = p
   [../]
-  [./phi_diffusion]
-    type = PikaDiffusion
-    variable = phi
-    property = interface_thickness_squared
-    use_temporal_scaling = false
-  [../]
-  [./phi_double_well]
-    type = DoubleWellPotential
-    variable = phi
-    mob_name = mobility
-  [../]
-  [./phi_time]
+  [./phase_time]
     type = PikaTimeDerivative
     variable = phi
     property = relaxation_time
     use_temporal_scaling = false
   [../]
-  [./x_momentum_time]
-    type = PikaTimeDerivative
-    variable = v_x
-    coefficient = 1.341
+
+  [./phase_diffusion]
+    type = PikaDiffusion
+    variable = phi
+    property = interface_thickness_squared
+    use_temporal_scaling = false
   [../]
-  [./y_momentum_time]
-    type = PikaTimeDerivative
-    variable = v_y
-    coefficient = 1.341
+  [./phase_double_well]
+    type = DoubleWellPotential
+    variable = phi
+    mob_name = mobility
   [../]
 []
-
 [BCs]
-  [./y_no_slip]
-    type = DirichletBC
-    variable = v_y
-    boundary = 'top'
-    value = 0
-  [../]
-  [./vapor_phase_wall]
-    type = DirichletBC
-    variable = phi
-    boundary = 'top left right'
-    value = -1
-  [../]
-  [./pressure_pin]
-    type = DirichletBC
-    variable = p
-    boundary = right
-    value = 0
-  [../]
   [./inlet]
-    type = DirichletBC
+    type = PhaseDirichletBC
     variable = v_x
-    boundary = left
-    value = .047696
+    boundary = right
+    phase_variable = phi
+    value = -0.009539149888
   [../]
+#  [./y_no_slip_top]
+#    type = DirichletBC
+#    variable = v_y
+#    boundary = 'right top bottom'
+#    value = 0.0
+#  [../]
+#  [./x_no_slip_top]
+#    type = DirichletBC
+#    variable = v_x
+#    boundary = 'top bottom'
+#    value = 0.0
+#  [../]
+
+#  [./solid_phase_wall]
+#    type = DirichletBC
+#    variable = phi
+#    boundary = 'top bottom'
+#    value = 1
+#  [../]
+# [./pressure_pin]
+#   type = DirichletBC
+#   variable = p
+#   boundary = 99
+#   value = 0
+# [../]
 []
 
 [UserObjects]
-  [./intial_uo]
+  [./uo_initial]
     type = SolutionUserObject
+    execute_on = initial
+    mesh = phi_initial_out.e-s004
     timestep = 1
-    mesh = phi_initial.e
-    system_variables = phi
   [../]
 []
 
@@ -140,61 +141,39 @@
     full = true
   [../]
 []
+
 [Executioner]
   type = Transient
   dt = 0.001
-  timesteps = 2
+  end_time = 0.001
   solve_type = PJFNK
-  petsc_options_iname = ' -ksp_gmres_restart'
-  petsc_options_value = ' 300'
+  petsc_options_iname = '-ksp_gmres_restart '
+  petsc_options_value = '100 '
   l_max_its = 100
-  nl_abs_tol = 1e-40
-  nl_rel_step_tol = 1e-40
-  nl_rel_tol = 1e-5
-  l_tol = 1e-5
-  nl_abs_step_tol = 1e-40
+  nl_max_its = 150
+  nl_rel_tol = 1e-08
+  l_tol = 1e-08
+  line_search = none
+
 []
 [Adaptivity]
   max_h_level = 5
-  initial_steps =5
-  marker = combo_marker
+  initial_steps = 5
+  steps = 0
+  marker = phi_marker
   initial_marker = phi_marker
   [./Indicators]
     [./phi_grad_indicator]
       type = GradientJumpIndicator
       variable = phi
     [../]
-    [./v_x_grad_indicator]
-      type = GradientJumpIndicator
-      variable = v_x
-    [../]
-    [./v_y_grad_indicator]
-      type = GradientJumpIndicator
-      variable = v_y
-    [../]
   [../]
   [./Markers]
     [./phi_marker]
       type = ErrorToleranceMarker
-      coarsen =1e-7
+      coarsen = 1e-7
       indicator = phi_grad_indicator
       refine = 1e-5
-    [../]
-    [./v_x_marker]
-      type = ErrorToleranceMarker
-      coarsen =0.5
-      indicator = v_x_grad_indicator
-      refine = 0.5
-    [../]
-    [./v_y_marker]
-      type = ErrorToleranceMarker
-      coarsen =0.5
-      indicator = v_y_grad_indicator
-      refine = 0.5
-    [../]
-    [./combo_marker]
-      type = ComboMarker
-      markers = ' v_x_marker v_y_marker phi_marker'
     [../]
   [../]
 []
@@ -205,18 +184,23 @@
     output_nonlinear = true
   [../]
   [./exodus]
-    file_base = phase_cyl_out
+    file_base = phase_LDC_h_100
     type = Exodus
-    output_on = 'initial timestep_end'
+    output_final = true
+    output_initial = true
+  [../]
+  [./csv]
+    file_base = phase_LDC_h_100
+    type = CSV
   [../]
 []
 
+
 [PikaMaterials]
   phase = phi
-  temperature = 263
-  interface_thickness = 1e-04
-  temporal_scaling = 1 # 1e-05
-  gravity = '0 -9.81 0'
+  temperature = 263.15
+  interface_thickness = 1e-05
+  temporal_scaling = 1
 []
 
 [ICs]
@@ -226,4 +210,5 @@
     function = phi_func
   [../]
 []
+
 

@@ -1,13 +1,22 @@
 [Mesh]
   type = GeneratedMesh
   dim = 2
-  nx = 300  
-  ny = 200
-  xmin = -.05
-  xmax = 0.1
+  nx = 50  
+  ny = 50
+  xmin = 0
+  xmax = 0.005
   ymin = 0
-  ymax = 0.05
+  ymax = 0.005
   elem_type = QUAD9
+[]
+
+[MeshModifiers]
+  [./pin]
+    type = AddExtraNodeset
+    coord = '0.0025 0.0025'
+    tolerance = 1e-4
+    new_boundary = 99
+  [../]
 []
 
 [Variables]
@@ -27,21 +36,21 @@
     variable = phi
     mob_name = mobility
   [../]
-  [./phi_time]
-    type = PikaTimeDerivative
-    variable = phi
-    property = relaxation_time
-  [../]
 []
-
 [BCs]
-  [./vapor_phase_walls]
+  [./vapor_walls]
     type = DirichletBC
-    variable = phi
-    boundary =' top left right'
     value = -1
+    variable = phi
+    boundary = 'top left right bottom'
   [../]
-[]
+
+  [./solid_pin]
+    type = DirichletBC
+    value = 1
+    variable = phi
+    boundary = 99
+  [../]
 
 [Preconditioning]
   [./SMP_PJFNK]
@@ -50,24 +59,21 @@
 []
 
 [Executioner]
-  type = Transient
-  l_max_its = 50
-  nl_max_its = 100
+  # Preconditioned JFNK (default)
+  type = Steady
+  nl_max_its = 20
   solve_type = PJFNK
-  petsc_options_iname = -pc_type
-  petsc_options_value = hypre
-  l_tol = 1e-03
-  nl_rel_tol = 1e-15
-  nl_abs_tol = 1e-9
-  end_time = 3600
-  [./TimeStepper]
-    type = IterationAdaptiveDT
-    dt = 1
-  [../]
+  petsc_options_iname = '-ksp_gmres_restart -pc_type -pc_hypre_type'
+  petsc_options_value = '50 hypre boomeramg'
+  nl_rel_tol = 1e-07
+  nl_abs_tol = 1e-12
+  l_tol = 1e-4
+  l_abs_step_tol = 1e-13
 []
 [Adaptivity]
-  max_h_level = 5
-  initial_steps = 5
+  max_h_level = 3
+  initial_steps = 3
+  steps = 4
   marker = phi_marker
   initial_marker = phi_marker
   [./Indicators]
@@ -85,38 +91,50 @@
     [../]
   [../]
 []
+
 [Outputs]
-  [./console]
-    type = Console
-    output_linear = true
-    output_nonlinear = true
-  [../]
-  [./exodus]
-    file_base = phi_initial
+  print_linear_residuals = true
+  print_perf_log = true
+  [./out]
     type = Exodus
-    output_on = 'final'
+    file_base = phi_initial_out
+    output_final = true
+    output_initial = true
   [../]
 []
-
 [PikaMaterials]
   phase = phi
   temperature = 263.15
-  interface_thickness = 1e-04
+  interface_thickness = 2e-05
   temporal_scaling = 1 # 1e-05
   gravity = '0 -9.81 0'
 []
 
 [ICs]
+active = 'phase_ic_tri'
   [./phase_ic]
-    y1 = 0
+    y1 = 0.0025
     variable = phi
-    x1 = 0
+    x1 = 0.0025
     type = SmoothCircleIC
     int_width = 1e-5
-    radius = 0.0025
+    radius = 0.0005
     outvalue = -1
     invalue = 1
     3D_spheres = false
   [../]
+  [./phase_ic_tri]
+    z_positions = '0 0 0'
+    y_positions = '0 0.005 0'
+    x_positions = '0 0.0025 0.005'
+    variable = phi
+    type = SpecifiedSmoothCircleIC
+    int_width = 2e-5
+    radii = '0.001 0.001 0.001'
+    outvalue = -1
+    invalue = 1
+    3D_spheres = false
+  [../]
+
 []
 
