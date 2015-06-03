@@ -97,40 +97,27 @@
     variable = v_x
     boundary = right
     phase_variable = phi
-    value = -0.009539149888
+    value = -1.1923937360179E-005
   [../]
-#  [./y_no_slip_top]
-#    type = DirichletBC
-#    variable = v_y
-#    boundary = 'right top bottom'
-#    value = 0.0
-#  [../]
-#  [./x_no_slip_top]
-#    type = DirichletBC
-#    variable = v_x
-#    boundary = 'top bottom'
-#    value = 0.0
-#  [../]
-
-#  [./solid_phase_wall]
-#    type = DirichletBC
-#    variable = phi
-#    boundary = 'top bottom'
-#    value = 1
-#  [../]
-# [./pressure_pin]
-#   type = DirichletBC
-#   variable = p
-#   boundary = 99
-#   value = 0
-# [../]
+  [./y_no_slip_top]
+    type = DirichletBC
+    variable = v_y
+    boundary = 'top bottom'
+    value = 0.0
+  [../]
+ [./pressure_pin]
+   type = DirichletBC
+   variable = p
+   boundary = 99
+   value = 0
+ [../]
 []
 
 [UserObjects]
   [./uo_initial]
     type = SolutionUserObject
     execute_on = initial
-    mesh = phi_initial_out.e-s004
+    mesh = phi_initial_out.e-s005
     timestep = 1
   [../]
 []
@@ -190,7 +177,7 @@
     output_initial = true
   [../]
   [./csv]
-    file_base = phase_LDC_h_100
+    file_base = phase_cylinder_h_100
     type = CSV
   [../]
 []
@@ -210,5 +197,3 @@
     function = phi_func
   [../]
 []
-
-
