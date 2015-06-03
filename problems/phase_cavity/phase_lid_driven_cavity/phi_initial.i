@@ -1,8 +1,8 @@
 [Mesh]
   type = GeneratedMesh
   dim = 2
-  nx = 50
-  ny = 50
+  nx = 10
+  ny = 10
   xmin = -1e-4
   ymin = -1e-4
   xmax = .0051
@@ -23,7 +23,7 @@
 []
 
 [Kernels]
-active = 'phase_diffusion phase_double_well'
+active = ' phase_diffusion phase_double_well'
   [./phase_time]
     type = PikaTimeDerivative
     variable = phi
@@ -61,6 +61,8 @@ active = 'phase_diffusion phase_double_well'
 [Executioner]
   # Preconditioned JFNK (default)
   type = Steady
+  dt = 1
+  end_time = 1000
   nl_max_its = 20
   solve_type = PJFNK
   petsc_options_iname = '-ksp_gmres_restart -pc_type -pc_hypre_type'
@@ -69,11 +71,15 @@ active = 'phase_diffusion phase_double_well'
   nl_abs_tol = 1e-12
   l_tol = 1e-4
   l_abs_step_tol = 1e-13
+  [./TimeStepper]
+    type = SolutionTimeAdaptiveDT
+    dt = 1
+    percent_change = 10
+ [../]
 []
 [Adaptivity]
-  max_h_level = 3
-  initial_steps = 3
-  steps = 4
+  max_h_level = 8
+  initial_steps = 8
   marker = phi_marker
   initial_marker = phi_marker
   [./Indicators]

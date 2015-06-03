@@ -50,6 +50,7 @@
     variable = v_x
     phase = phi
     h = 100
+  
   [../]
   [./y_momentum]
     type = PikaMomentum
@@ -64,6 +65,7 @@
     variable = v_y
     phase = phi
     h = 100
+
   [../]
   [./mass_conservation]
     type = INSMass
@@ -72,6 +74,13 @@
     u = v_x
     p = p
   [../]
+  [./phase_time]
+    type = PikaTimeDerivative
+    variable = phi
+    property = relaxation_time
+    use_temporal_scaling = false
+  [../]
+
   [./phase_diffusion]
     type = PikaDiffusion
     variable = phi
@@ -103,19 +112,19 @@
     boundary = 'left right bottom'
     value = 1
   [../]
-  [./pressure_pin]
-    type = DirichletBC
-    variable = p
-    boundary = 99
-    value = 0
-  [../]
+#  [./pressure_pin]
+#    type = DirichletBC
+#    variable = p
+#    boundary = 99
+#    value = 0
+#  [../]
 []
 
 [UserObjects]
   [./uo_initial]
     type = SolutionUserObject
     execute_on = initial
-    mesh = phi_initial_out.e-s005
+    mesh = phi_initial_out.e-s004
     timestep = 1
   [../]
 []
@@ -148,7 +157,9 @@
 []
 
 [Executioner]
-  type = Steady
+  type = Transient
+  dt = 0.001
+  end_time = 0.001
   solve_type = PJFNK
   petsc_options_iname = '-ksp_gmres_restart '
   petsc_options_value = '100 '
@@ -160,8 +171,8 @@
 
 []
 [Adaptivity]
-  max_h_level = 3
-  initial_steps = 3
+  max_h_level = 5
+  initial_steps = 5
   steps = 0
   marker = phi_marker
   initial_marker = phi_marker
