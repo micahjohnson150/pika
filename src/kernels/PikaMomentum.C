@@ -40,8 +40,8 @@ PikaMomentum::PikaMomentum(const std::string & name, InputParameters parameters)
   _mu(_property_uo.getParam<Real>("dry_air_viscosity")),
   _rho(_property_uo.getParam<Real>("density_air")),
   _component(getParam<unsigned>("component")),
-  _xi(_property_uo.getParam<Real>("temporal_scaling"))
- // _xi(1.0)
+//  _xi(_property_uo.getParam<Real>("temporal_scaling"))
+  _xi(1.0)
 
 {
 }

@@ -100,7 +100,7 @@ PikaMaterial::computeQpProperties()
   _heat_capacity[_qp] =(1.0/(_spatial_scale)) * _ci * (1. + _phase[_qp]) / 2. + _ca * (1. - _phase[_qp]) / 2.;
 
   // Diffusion coefficient
-  _diffusion_coefficient[_qp] = (_spatial_scale) * (_spatial_scale) * _dvi * ( (1. + _phase[_qp])/ 2.  + _dv * (1. - _phase[_qp]) / 2. ) ;
+  _diffusion_coefficient[_qp] = (_spatial_scale) * (_spatial_scale) * ( _dvi * (1. + _phase[_qp])/ 2.  + _dv * (1. - _phase[_qp]) / 2. ) ;
 
   // Viscosity
   //_viscosity[_qp] = (_spatial_scale) * (_spatial_scale) * _mu * (1. - _phase[_qp]) / 2. ;
