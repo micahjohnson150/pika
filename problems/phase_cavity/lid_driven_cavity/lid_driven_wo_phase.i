@@ -31,9 +31,7 @@
 []
 
 [Kernels]
- # active = ' x_no_slip y_no_slip phi_diffusion phi_double_well y_momentum mass_conservation x_momentum'
- # active = 'phi_diffusion phi_double_well y_momentum mass_conservation x_momentum'
-  active = 'phi_time x_momentum_time y_momentum_time phi_diffusion phi_double_well y_momentum mass_conservation x_momentum'
+  active = ' phi_diffusion phi_double_well y_momentum mass_conservation x_momentum'
   [./x_momentum]
     type = PikaMomentum
     variable = v_x
@@ -41,7 +39,6 @@
     vel_x = v_x
     component = 0
     p = p
-    phase = phi
   [../]
   [./x_no_slip]
     type = PhaseNoSlipForcing
@@ -55,7 +52,6 @@
     vel_x = v_x
     component = 1
     p = p
-    phase = phi
   [../]
   [./y_no_slip]
     type = PhaseNoSlipForcing
@@ -115,14 +111,13 @@
     variable = v_x
     boundary = top
     value = 0.95391499
-    phase_variable = phi
   [../]
-  [./pressure_pin]
-    type = DirichletBC
-    variable = p
-    boundary = 99
-    value = 0
-  [../]
+#  [./pressure_pin]
+#    type = DirichletBC
+#    variable = p
+#    boundary = 99
+#    value = 0
+#  [../]
   [./vapor_phase_wall]
     type = DirichletBC
     variable = phi
@@ -169,13 +164,13 @@
 []
 
 [Executioner]
-  type = Transient
-  dt = 0.1
-  end_time = 2
+  type = Steady
+  l_max_its = 100
   solve_type = PJFNK
   petsc_options_iname = ' -ksp_gmres_restart'
   petsc_options_value = ' 300'
   line_search = none
+  nl_rel_tol = 1e-10
 []
 
 [Outputs]
@@ -185,8 +180,6 @@
     type = Console
     output_linear = true
     output_nonlinear = true
-    nonlinear_residuals = true
-    linear_residuals = true
   [../]
   [./exodus]
     file_base = phase_LDC_out
