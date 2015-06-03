@@ -88,7 +88,6 @@
   print_linear_residuals = true
   print_perf_log = true
   [./out]
-    output_final = true
     type = Exodus
     file_base = phi_initial_out
     output_final = true
@@ -97,7 +96,8 @@
 []
 
 [ICs]
-  [./phi_box_IC]
+active = 'phi_full_box_IC'
+  [./phi_full_box_IC]
     y2 = 0.005
     y1 = 0
     inside = -1
@@ -107,6 +107,17 @@
     x1 = 0
     type = BoundingBoxIC
   [../]
+  [./phi_small_box_IC]
+    y2 = 0.005
+    y1 = 0
+    inside = -1
+    x2 = 0.0001
+    outside = 1
+    variable = phi
+    x1 = 0
+    type = BoundingBoxIC
+  [../]
+
 []
 
 [PikaMaterials]
