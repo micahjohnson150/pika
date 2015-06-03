@@ -64,19 +64,16 @@
 []
 
 [Executioner]
-  # Preconditioned JFNK (default)
   type = Steady
+  nl_max_its = 20
   solve_type = PJFNK
   petsc_options_iname = '-ksp_gmres_restart -pc_type -pc_hypre_type'
   petsc_options_value = '50 hypre boomeramg'
   nl_rel_tol = 1e-07
   nl_abs_tol = 1e-12
   l_tol = 1e-4
-  [./TimeStepper]
-    type = IterationAdaptiveDT
-    dt = 1
-    growth_factor = 3
-  [../]
+  l_abs_step_tol = 1e-13
+
 []
 
 [Outputs]

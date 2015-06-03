@@ -1,12 +1,11 @@
 [Mesh]
   type = GeneratedMesh
   dim = 2
-  nx = 50
-  ny = 50
+  nx = 100
+  ny = 100
   xmax = 0.005
   ymax = 0.005
   elem_type = QUAD9
-  unform_refine = 3
 []
 
 [MeshModifiers]
@@ -19,6 +18,12 @@
 []
 
 [Variables]
+  [./phi]
+  [../]
+  [./T]
+  [../]
+  [./X]
+  [../]
   [./v_x]
     order = SECOND
   [../]
@@ -26,12 +31,6 @@
     order = SECOND
   [../]
   [./p]
-  [../]
-  [./phi]
-  [../]
-  [./T]
-  [../]
-  [./x]
   [../]
 []
 
@@ -44,51 +43,7 @@
 []
 
 [Kernels]
-
-  [./x_momentum]
-    type = PikaMomentum
-    variable = v_x
-    vel_y = v_y
-    vel_x = v_x
-    component = 0
-    p = p
-    phase = phi
-  [../]
-  [./x_no_slip]
-    type = PhaseNoSlipForcing
-    variable = v_x
-    phase = phi
-    h = 100
-  [../]
-  [./y_momentum]
-    type = PikaMomentum
-    variable = v_y
-    vel_y = v_y
-    vel_x = v_x
-    component = 1
-    p = p
-    phase = phi
-  [../]
-  [./y_no_slip]
-    type = PhaseNoSlipForcing
-    variable = v_y
-    phase = phi
-    h = 100
-  [../]
-  [./y_momentum_boussinesq]
-    type = Boussinesq
-    variable = v_y
-    component = 1
-    T = T
-    phase = phi
-  [../]
-  [./mass_conservation]
-    type = INSMass
-    variable = p
-    u = v_y
-    v = v_x
-    p = p
-  [../]
+#Phase Kernels
   [./phi_time]
     type = PikaTimeDerivative
     variable = phi
@@ -106,29 +61,33 @@
     mob_name = mobility
   [../]
   [./phi_transition]
-    type = PhaseTransition
+    type = PhaseForcing
     variable = phi
-    mob_name = mobility
-    chemical_potential = x
-    coefficient = 1.0
-    lambda = phase_field_coupling_constant
+    chemical_potential = X
+    property= phase_field_coupling_constant
+    use_temporal_scaling = false
   [../]
-  [./Heat_convection]
-    type = PikaConvection
+#Temperature Kernels
+  [./heat_time]
+    type = PikaTimeDerivative
     variable = T
-    vel_x = v_x
-    use_temporal_scaling = true
-    phase = phi
     property = heat_capacity
-    vel_y = v_y
   [../]
-  [./Heat_diffusion]
+  [./heat_convection]
+    type = PikaConvection
+    vel_x = v_x
+    vel_y = v_y
+    variable = T
+    property = heat_capacity
+    use_temporal_scaling = true
+  [../]
+  [./heat_diffusion]
     type = PikaDiffusion
     variable = T
     use_temporal_scaling = true
     property = conductivity
   [../]
-  [./Heat_phi_time]
+  [./heat_phi_time]
     type = PikaCoupledTimeDerivative
     variable = T
     use_temporal_scaling = true
@@ -136,81 +95,141 @@
     coupled_variable = phi
     scale = -0.5
   [../]
-  [./Vapor_convection]
-    type = PikaConvection
-    variable = x
-    vel_x = v_x
-    use_temporal_scaling = true
-    phase = phi
-    coefficient = 1.0
-    vel_y = v_y
+#Chemical Potential Kernels
+  [./vapor_time]
+    type = PikaTimeDerivative
+    variable = X
+    coefficient =1.0
   [../]
-  [./Vapor_diffusion]
+ [./vapor_convection]
+   type = PikaConvection
+   vel_x = v_x
+   vel_y = v_y
+   variable = X
+   coefficient = 1.0
+   use_temporal_scaling = true
+ [../]
+  [./vapor_diffusion]
     type = PikaDiffusion
-    variable = x
+    variable = X
     use_temporal_scaling = true
     property = diffusion_coefficient
   [../]
-  [./Vapor_phi_time]
+  [./vapor_phi_time]
     type = PikaCoupledTimeDerivative
-    variable = x
+    variable = X
     use_temporal_scaling = true
     coupled_variable = phi
     coefficient = 1
     scale = 0.5
   [../]
+#Momentum Kernels
+  [./x_momentum_time]
+    type = PikaTimeDerivative
+    variable = v_x
+    coefficient = 1.341
+  [../]
+
+  [./x_momentum]
+    type = PikaMomentum
+    variable = v_x
+    vel_y = v_y
+    vel_x = v_x
+    component = 0
+    p = p
+  [../]
+  [./x_no_slip]
+    type = PhaseNoSlipForcing
+    variable = v_x
+    phase = phi
+    h = 100
+  [../]
+  [./y_momentum_time]
+    type = PikaTimeDerivative
+    variable = v_y
+    coefficient = 1.341
+  [../]
+  [./y_momentum]
+    type = PikaMomentum
+    variable = v_y
+    vel_y = v_y
+    vel_x = v_x
+    component = 1
+    p = p
+  [../]
+  [./y_no_slip]
+    type = PhaseNoSlipForcing
+    variable = v_y
+    phase = phi
+    h = 100
+  [../]
+  [./y_momentum_boussinesq]
+    type = Boussinesq
+    variable = v_y
+    component = 1
+    T = T
+  [../]
+  [./mass_conservation]
+    type = INSMass
+    variable = p
+    u = v_y
+    v = v_x
+    p = p
+  [../]
+
 []
 
 [BCs]
+  [./pressure_pin]
+    type = DirichletBC
+    boundary = 99
+    variable = p
+    value = 0
+  [../]
   [./x_no_slip]
     type = DirichletBC
     variable = v_x
-    boundary = 'top left right bottom'
+    boundary = 'left '
     value = 0
   [../]
   [./y_no_slip]
     type = DirichletBC
     variable = v_y
-    boundary = 'top bottom left right'
-    value = 0
-  [../]
-  [./solid_phase_wall]
-    type = DirichletBC
-    variable = phi
-    boundary = right
-    value = 1
-  [../]
-  [./vapor_phase_wall]
-    type = DirichletBC
-    variable = phi
-    boundary = left
-    value = -1
-  [../]
-  [./pressure_pin]
-    type = DirichletBC
-    variable = p
-    boundary = 99
+    boundary = 'left '
     value = 0
   [../]
   [./T_hot]
     type = DirichletBC
     variable = T
-    boundary = left
-    value = 474.6977519584
+    boundary = right
+    value = 264.65
   [../]
   [./T_cold]
     type = DirichletBC
     variable = T
-    boundary = right
-    value = 263.15
+    boundary = left
+    value = 264.15
   [../]
+  [./phi_vapor]
+    type = DirichletBC
+    variable = phi
+    boundary = left
+    value = -1
+  [../]
+  [./phi_ice]
+    type = DirichletBC
+    variable = phi
+    boundary = right
+    value = 1
+  [../]
+
 []
 
 [UserObjects]
   [./uo_initial]
     type = SolutionUserObject
     execute_on = initial
-    mesh = gau_initial_out.e-s003
+    mesh = gau_initial_out.e-s004
     timestep = 1
   [../]
 []
@@ -218,57 +237,55 @@
 [Preconditioning]
   [./SMP_PJFNK]
     type = SMP
-    full = true
+    full = false
   [../]
 []
 
 [Executioner]
   type = Transient
   dt = 1
-  time_steps = 1
+  dtmax = 100
+  dtmin = 0.001
+  end_time = 10000
   solve_type = PJFNK
   petsc_options_iname = ' -ksp_gmres_restart '
   petsc_options_value = ' 100 '
   l_max_its = 100
-  nl_max_its = 100
+  nl_max_its = 1000
   nl_rel_tol = 1e-05
   l_tol = 1e-05
   line_search = none
+  [./TimeStepper]
+    type = SolutionTimeAdaptiveDT
+    dt = 1
+    percent_change = 0.1
+  [../]
 []
 
 [Adaptivity]
-  max_h_level = 4
+  max_h_level = 3
   marker = combo_marker
-  initial_steps = 4
+  initial_steps = 3
   [./Indicators]
     [./phi_grad_indicator]
       type = GradientJumpIndicator
       variable = phi
     [../]
-    [./x_grad_indicator]
+    [./X_grad_indicator]
       type = GradientJumpIndicator
-      variable = x
+      variable = X
     [../]
-    [./v_x_grad_indicator]
-      type = GradientJumpIndicator
-      variable = v_x
-    [../]
-    [./v_y_grad_indicator]
-      type = GradientJumpIndicator
-      variable = v_y
-    [../]
-
   [../]
   [./Markers]
     [./combo_marker]
       type = ComboMarker
-      markers = 'phi_grad_marker x_grad_marker v_x_marker v_y_marker'
+      markers = 'phi_grad_marker X_grad_marker '
     [../]
-    [./x_grad_marker]
+    [./X_grad_marker]
       type = ErrorToleranceMarker
-      coarsen = 1e-10
-      indicator = x_grad_indicator
-      refine = 1e-8
+      coarsen = 1e-7
+      indicator = X_grad_indicator
+      refine = 1e-5
     [../]
     [./phi_grad_marker]
       type = ErrorToleranceMarker
@@ -276,19 +293,6 @@
       indicator = phi_grad_indicator
       refine = 1e-5
     [../]
-    [./v_x_marker]
-      type = ErrorToleranceMarker
-      coarsen =1e-7
-      indicator = v_x_grad_indicator
-      refine = 1e-5
-    [../]
-    [./v_y_marker]
-      type = ErrorToleranceMarker
-      coarsen =1e-7
-      indicator = v_y_grad_indicator
-      refine = 1e-5
-    [../]
-  [../]
 []
 
 [Outputs]
@@ -309,38 +313,24 @@
   temperature = T
   interface_thickness = 1e-05
   gravity = '0 -9.81 0'
-  temporal_scaling = 1
-  #ice 
-  conductivity_ice = 0.02
-  density_ice = 1.341
-  heat_capacity_ice = 1400
-  #vapor 
-  dry_air_viscosity = 3.98e-7
-  thermal_expansion = 0.0036
-  #misc
-  latent_heat = 6.57e2
+  temporal_scaling = 1e-4
+  condensation_coefficient = 0.01
 []
 
 [ICs]
-active = 'phase_ic x_ic T_const'
+active = 'phase_ic T_ic'
   [./phase_ic]
     variable = phi
     type = FunctionIC
     function = phi_func
   [../]
   [./T_ic]
-    function = -42309.5503916823*x+474.6977519584
+    function = 100*x+264.15
     variable = T
     type = FunctionIC
   [../]
-  [./T_const]
-    variable = T
-    type = ConstantIC
-    value = 263.15
-  [../]
-
-  [./x_ic]
-    variable = x
+  [./X_ic]
+    variable = X
     type = PikaChemicalPotentialIC
     phase_variable = phi
     temperature = T
