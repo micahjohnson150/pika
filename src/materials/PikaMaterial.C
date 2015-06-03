@@ -33,12 +33,15 @@ PikaMaterial::PikaMaterial(const std::string & name, InputParameters parameters)
     _interface_thickness(_property_uo.getParam<Real>("interface_thickness")),
     _a_1((5./8.)*std::sqrt(2)),
     _density_ice(_property_uo.getParam<Real>("density_ice")),
+    _density_air(_property_uo.getParam<Real>("density_air")),
     _l_sg(_property_uo.getParam<Real>("latent_heat")),
     _ki(_property_uo.getParam<Real>("conductivity_ice")),
     _ka(_property_uo.getParam<Real>("conductivity_air")),
     _ci(_property_uo.getParam<Real>("heat_capacity_ice")),
     _ca(_property_uo.getParam<Real>("heat_capacity_air")),
     _dv(_property_uo.getParam<Real>("water_vapor_diffusion_coefficient")),
+    _dvi(_property_uo.getParam<Real>("water_vapor_diffusion_coefficient_ice")),
+    _mu(_property_uo.getParam<Real>("dry_air_viscosity")),
     _spatial_scale(_property_uo.getParam<Real>("spatial_scaling")),
     _input_mobility(_property_uo.getParam<Real>("mobility")),
     _reference_temperature(_property_uo.getParam<Real>("reference_temperature")),
@@ -97,7 +100,12 @@ PikaMaterial::computeQpProperties()
   _heat_capacity[_qp] =(1.0/(_spatial_scale)) * _ci * (1. + _phase[_qp]) / 2. + _ca * (1. - _phase[_qp]) / 2.;
 
   // Diffusion coefficient
-  _diffusion_coefficient[_qp] = (_spatial_scale) * (_spatial_scale) * _dv * (1. - _phase[_qp]) / 2. ;
+  _diffusion_coefficient[_qp] = (_spatial_scale) * (_spatial_scale) * ( _dvi * (1. + _phase[_qp])/ 2.  + _dv * (1. - _phase[_qp]) / 2. ) ;
+
+  // Viscosity
+  //_viscosity[_qp] = (_spatial_scale) * (_spatial_scale) * _mu * (1. - _phase[_qp]) / 2. ;
+
+
 
   // W^2
   _interface_thickness_squared[_qp] = std::pow(_interface_thickness, 2);

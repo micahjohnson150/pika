@@ -1,0 +1,18 @@
+[Jobs]
+  [./PBSJob]
+    notify_address                 = micahjohnson1@u.boisestate.edu        # The email address to use for PBS notifications
+    template_script                = /home/mjohnson/projects/pika/problems/pbs_submit.sh  # The template job script to use.
+    input_file                     = cylinder_w_phase.i                     # The input file name.
+    moose_application              = /home/mjohnson/projects/pika/pika-opt  # The full path to the application to run.
+    test_name                      = cylinder                           # The name of the test
+    chunks                         = 4                                     # The number of PBS chunks.
+    copy_files                     = *.e                                    # A list of files specifically to copy
+    total_mpi_procs                = 32                                     # The total number of MPI processes to use divided evenly among chunks.
+    walltime                       = 2:00:00                                # The requested walltime for this job.
+    job_name                       = sqre_array                              # The name of the job
+    type                           = PBSJob
+    queue                          = MRI
+    no_copy                        = *.sh , *.i
+  [../]
+
+[]

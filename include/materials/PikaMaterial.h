@@ -59,6 +59,9 @@ private:
   /// Density of ice
   const Real & _density_ice;
 
+  /// Density of air
+  const Real & _density_air;
+
   /// Latent heat of sublimation
   const Real &  _l_sg;
 
@@ -76,6 +79,12 @@ private:
 
   /// Diffusion coefficient of water vapor
   const Real & _dv;
+
+  /// Diffusion coefficient of water vapor in ice
+  const Real & _dvi;
+
+  /// Viscosity of dry air at a const. temperature
+  const Real & _mu;
 
   /// Spatial scaling
   const Real & _spatial_scale;
@@ -106,6 +115,9 @@ private:
 
   /// Phase-adjust mass diffusion coefficient
   MaterialProperty<Real> & _diffusion_coefficient;
+
+  /// Phase-adjust Viscosity
+//  MaterialProperty<Real> & _viscosity;
 
   /// Latent heat of sublimation
   MaterialProperty<Real> & _latent_heat;

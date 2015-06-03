@@ -19,6 +19,8 @@
 #include "PhaseFieldApp.h"
 #include "HeatConductionApp.h"
 #include "SolidMechanicsApp.h"
+#include "NavierStokesApp.h"
+
 
 // UserObjects
 #include "PropertyUserObject.h"
@@ -46,6 +48,14 @@
 #include "AntiTrapping.h"
 #include "IbexShortwaveForcingFunction.h"
 #include "PikaHomogenizedKernel.h"
+#include "PikaMomentum.h"
+#include "Boussinesq.h"
+#include "PhaseMass.h"
+#include "PikaConvection.h"
+#include "PhaseTimeDerivative.h"
+#include "PhaseNoSlipForcing.h"
+#include "PhaseForcing.h"
+#include "PikaPhaseConvection.h"
 
 // AuxKernels
 #include "ErrorFunctionAux.h"
@@ -61,13 +71,12 @@
 
 // BoundaryConditions
 #include "IbexSurfaceFluxBC.h"
+#include "PikaChemicalPotentialBC.h"
+#include "PhaseDirichletBC.h"
 
 // Actions
 #include "PikaMaterialAction.h"
 #include "PikaCriteriaAction.h"
-
-//BCS
-#include "PikaChemicalPotentialBC.h"
 
 template<>
 InputParameters validParams<PikaApp>()
@@ -85,12 +94,14 @@ PikaApp::PikaApp(const std::string & name, InputParameters parameters) :
   PhaseFieldApp::registerObjects(_factory);
   HeatConductionApp::registerObjects(_factory);
   SolidMechanicsApp::registerObjects(_factory);
+  NavierStokesApp::registerObjects(_factory);
   PikaApp::registerObjects(_factory);
 
   Moose::associateSyntax(_syntax, _action_factory);
   PhaseFieldApp::associateSyntax(_syntax, _action_factory);
   HeatConductionApp::associateSyntax(_syntax, _action_factory);
   SolidMechanicsApp::associateSyntax(_syntax, _action_factory);
+  NavierStokesApp::associateSyntax(_syntax, _action_factory);
   PikaApp::associateSyntax(_syntax, _action_factory);
 }
 
@@ -133,6 +144,14 @@ PikaApp::registerObjects(Factory & factory)
   registerKernel(AntiTrapping);
   registerKernel(IbexShortwaveForcingFunction);
   registerKernel(PikaHomogenizedKernel);
+  registerKernel(PikaMomentum);
+  registerKernel(Boussinesq);
+  registerKernel(PhaseMass);
+  registerKernel(PikaConvection);
+  registerKernel(PhaseTimeDerivative);
+  registerKernel(PhaseNoSlipForcing);
+  registerKernel(PhaseForcing);
+  registerKernel(PikaPhaseConvection);
 
   // InitialConditions
   registerInitialCondition(KaempferAnalyticPhaseIC);
@@ -149,6 +168,7 @@ PikaApp::registerObjects(Factory & factory)
   // BoundaryConditions
   registerBoundaryCondition(IbexSurfaceFluxBC);
   registerBoundaryCondition(PikaChemicalPotentialBC);
+  registerBoundaryCondition(PhaseDirichletBC);
 }
 
 void

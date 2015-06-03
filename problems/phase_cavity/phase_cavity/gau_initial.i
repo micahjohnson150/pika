@@ -3,10 +3,11 @@
   dim = 2
   nx = 50
   ny = 50
-  xmax = 0.0025
-  ymax = 0.005
+  xmax = .005
+  ymax = .005
   elem_type = QUAD9
-  []
+  uniform_refine = 0
+[]
 
 [Variables]
   [./phi]
@@ -21,11 +22,6 @@
 []
 
 [Kernels]
-  [./phase_time]
-    type = PikaTimeDerivative
-    variable = phi
-    property = relaxation_time
-  [../]
   [./phase_diffusion]
     type = PikaDiffusion
     variable = phi
@@ -46,27 +42,37 @@
   [../]
 []
 
+[BCs]
+  [./vapor]
+    type = DirichletBC
+    variable = phi
+    boundary = left
+    value = -1
+  [../]
+  [./solid]
+    type = DirichletBC
+    variable = phi
+    boundary = right
+    value = 1
+  [../]
+[]
+
 [Executioner]
-  # Preconditioned JFNK (default)
-  type = Transient
-  dt = 10
+  type = Steady
+  nl_max_its = 20
   solve_type = PJFNK
   petsc_options_iname = '-ksp_gmres_restart -pc_type -pc_hypre_type'
   petsc_options_value = '50 hypre boomeramg'
   nl_rel_tol = 1e-07
   nl_abs_tol = 1e-12
-  l_tol = 1e-4
-  [./TimeStepper]
-    type = IterationAdaptiveDT
-    dt = 1
-    growth_factor = 3
-  [../]
-  num_steps = 10
+  l_tol = 1e-7
+  l_abs_step_tol = 1e-20
 []
 
 [Adaptivity]
   max_h_level = 4
   initial_steps = 4
+  steps = 5
   marker = phi_marker
   initial_marker = phi_marker
   [./Indicators]
@@ -87,31 +93,39 @@
 
 [Outputs]
   output_initial = true
-  print_linear_residuals = true
-  print_perf_log = true
   [./out]
     output_final = true
     type = Exodus
-    interval = 1
+    file_base = gau_initial_out
   [../]
 []
 
 [ICs]
   [./phase_ic]
-    int_width = 1e-5
-    x1 = 0.0025
-    y1 = 0.0025
-    radius = 0.0005
-    outvalue = 1
+    y2 = 0.005
+    y1 = 0
+    inside = 1
+    x2 = 0.005
+    outside = -1
     variable = phi
-    invalue = -1
-    type = SmoothCircleIC
+    x1 = 1e-5
+    type = BoundingBoxIC
   [../]
 []
 
 [PikaMaterials]
-  temperature = 258.2
-  interface_thickness = 1e-5
   phase = phi
-  temporal_scaling = 1e-04
+  temperature = 263.15
+  interface_thickness = 1e-05
+  gravity = '0 -9.81 0'
+  temporal_scaling = 1
+  #ice
+  conductivity_ice = 0.02
+  density_ice = 1.341
+  heat_capacity_ice = 1400
+  #vapor
+  dry_air_viscosity = 3.98e-7
+  thermal_expansion = 0.0036
+  #misc
+  latent_heat = 6.57e2
 []

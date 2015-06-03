@@ -1,12 +1,14 @@
 [Mesh]
   type = GeneratedMesh
   dim = 2
-  nx = 50
-  ny = 50
-  xmax = 0.0025
-  ymax = 0.005
+  nx = 10
+  ny = 10
+  xmin = -1e-4
+  ymin = -1e-4
+  xmax = .0051
+  ymax = .0050
   elem_type = QUAD9
-  []
+[]
 
 [Variables]
   [./phi]
@@ -21,6 +23,7 @@
 []
 
 [Kernels]
+active = ' phase_diffusion phase_double_well'
   [./phase_time]
     type = PikaTimeDerivative
     variable = phi
@@ -46,27 +49,37 @@
   [../]
 []
 
+[BCs]
+  [./solid]
+    type = DirichletBC
+    variable = phi
+    boundary = 'left bottom right'
+    value = 1
+  [../]
+[]
+
 [Executioner]
   # Preconditioned JFNK (default)
-  type = Transient
-  dt = 10
+  type = Steady
+  dt = 1
+  end_time = 1000
+  nl_max_its = 20
   solve_type = PJFNK
   petsc_options_iname = '-ksp_gmres_restart -pc_type -pc_hypre_type'
   petsc_options_value = '50 hypre boomeramg'
   nl_rel_tol = 1e-07
   nl_abs_tol = 1e-12
   l_tol = 1e-4
+  l_abs_step_tol = 1e-13
   [./TimeStepper]
-    type = IterationAdaptiveDT
+    type = SolutionTimeAdaptiveDT
     dt = 1
-    growth_factor = 3
-  [../]
-  num_steps = 10
+    percent_change = 10
+ [../]
 []
-
 [Adaptivity]
-  max_h_level = 4
-  initial_steps = 4
+  max_h_level = 8
+  initial_steps = 8
   marker = phi_marker
   initial_marker = phi_marker
   [./Indicators]
@@ -86,32 +99,34 @@
 []
 
 [Outputs]
-  output_initial = true
   print_linear_residuals = true
   print_perf_log = true
   [./out]
     output_final = true
     type = Exodus
-    interval = 1
+    file_base = phi_initial_out
+    output_final = true
+    output_initial = true
   [../]
 []
 
 [ICs]
-  [./phase_ic]
-    int_width = 1e-5
-    x1 = 0.0025
-    y1 = 0.0025
-    radius = 0.0005
-    outvalue = 1
+  [./phi_box_IC]
+    y2 = 0.0051
+    y1 = 0
+    inside = -1
+    x2 = 0.005
+    outside = 1
     variable = phi
-    invalue = -1
-    type = SmoothCircleIC
+    x1 = 0
+    type = BoundingBoxIC
   [../]
 []
 
 [PikaMaterials]
-  temperature = 258.2
+  temperature = 263.15
   interface_thickness = 1e-5
   phase = phi
-  temporal_scaling = 1e-04
+  temporal_scaling = 1
 []
+
