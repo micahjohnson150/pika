@@ -3,14 +3,13 @@
   dim = 3
   nx = 5
   ny = 5
-  nz = 6
-  xmin= 0.001
-  ymin = 0.001
-  zmin = 0.001
-  xmax = 0.002
-  ymax = 0.002
-  zmax = 0.002
-  uniform_refine = 5
+  nz = 2
+  xmin= 0.003
+  ymin = 0.003
+  zmin = 0.003
+  xmax = 0.004
+  ymax = 0.004
+  zmax = 0.0031
 []
 
 [Variables]
@@ -28,12 +27,14 @@
 [Functions]
   [./image]
     type = ImageFunction
-    file_base = /home/slauae/Documents/data/msu/0930/0930_rr_rec_tra_bin__Tra
-    file_type = png
+    file_base = /home/johnmica/data/snow_3d/0930/0930_rr_rec_tra_bin__Tra
+    file_suffix = png
     threshold = 180
-    lower_value = -1
-    upper_value = 1
+    lower_value = 1
+    upper_value = -1
     dimensions = '0.005 0.005 0.006'
+    file_range = '1303 1659'
+     
   [../]
 [Kernels]
   [./phase_time]
@@ -65,17 +66,41 @@
   # Preconditioned JFNK (default)
   type = Transient
   dt = 10
+  end_time = 1000
   solve_type = PJFNK
   petsc_options_iname = '-ksp_gmres_restart -pc_type -pc_hypre_type'
-  petsc_options_value = '500 hypre boomeramg'
+  petsc_options_value = '300 hypre boomeramg'
   nl_rel_tol = 1e-07
   nl_abs_tol = 5e-14
   [./TimeStepper]
     type = IterationAdaptiveDT
     dt = 1
-    growth_factor = 3
+    growth_factor = 1.5
   [../]
 []
+
+[Adaptivity]
+  max_h_level = 6
+  marker = phi_grad_marker
+  initial_steps = 6
+  initial_marker = phi_grad_marker
+  [./Indicators]
+    [./phi_grad_indicator]
+      type = GradientJumpIndicator
+      variable = phi
+    [../]
+  [../]
+  [./Markers]
+    [./phi_grad_marker]
+      type = ErrorToleranceMarker
+      coarsen = 1e-7
+      indicator = phi_grad_indicator
+      refine = 1e-5
+    [../]
+  [../]
+[]
+
+
 
 [Postprocessors]
   [./num_elems]
@@ -85,7 +110,7 @@
 
 [Outputs]
   output_initial = true
-  console = false
+  console = true
   print_linear_residuals = true
   print_perf_log = true
   [./exodus]
@@ -104,7 +129,7 @@
 []
 
 [PikaMaterials]
-  temperature = 268.15
+  temperature = 263.15
   interface_thickness = 1e-5
   phase = phi
   temporal_scaling = 1e-04
