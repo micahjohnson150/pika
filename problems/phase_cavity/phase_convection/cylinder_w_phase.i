@@ -1,7 +1,7 @@
 [Mesh]
   type = GeneratedMesh
   dim = 2
-  nx =50
+  nx = 50
   ny = 50
   xmin = 0
   ymin = 0
@@ -28,9 +28,8 @@
   [../]
   [./phi]
   [../]
-#  [./X]
-#    order = SECOND
-#  [../]
+  [./X]
+  [../]
   [./T]
   [../]
 
@@ -112,21 +111,45 @@
     variable = phi
     mob_name = mobility
   [../]
-#  [./vapor_convection] 
-#    type = PikaPhaseConvection 
-#    coefficient = 1.0 
-#    use_temporal_scaling = true 
-#    variable = X 
-#    vel_x = v_x 
-#    vel_y = v_y 
-#    phase = phi
-#  [../] 
-#  [./vapor_diffusion] 
-#    type = PikaDiffusion 
-#    property = diffusion_coefficient 
-#    use_temporal_scaling = true 
-#    variable = X 
-#  [../]
+  [./phase_transition]
+    type = PhaseForcing
+    variable = phi
+    chemical_potential = X
+    property = phase_field_coupling_constant
+    use_temporal_scaling = false
+  [../]
+
+  [./vapor_time]
+    type = PikaTimeDerivative
+    variable = X
+    coefficient = 1.0
+    use_temporal_scaling = false
+  [../]
+
+  [./vapor_convection] 
+    type = PikaPhaseConvection 
+    coefficient = 1.0 
+    use_temporal_scaling = false 
+    variable = X 
+    vel_x = v_x 
+    vel_y = v_y 
+    phase = phi
+  [../] 
+  [./vapor_diffusion] 
+    type = PikaDiffusion 
+    property = diffusion_coefficient 
+    use_temporal_scaling = true 
+    variable = X 
+  [../]
+  [./Vapor_phi_time]
+    type = PikaCoupledTimeDerivative
+    variable = X
+    use_temporal_scaling = true
+    coupled_variable = phi
+    coefficient = 1
+    scale = 0.5
+  [../]
+
   [./heat_time]
     type = PikaTimeDerivative
     variable = T
@@ -150,7 +173,14 @@
     use_temporal_scaling = true
     variable = T
   [../]
-
+  [./Heat_phi_time]
+    type = PikaCoupledTimeDerivative
+    variable = T
+    use_temporal_scaling = true
+    property = latent_heat
+    coupled_variable = phi
+    scale = -0.5
+  [../]
 
 []
 [BCs]
@@ -159,7 +189,7 @@
     variable = v_x
     boundary = right
     phase_variable = phi
-    value = -1.1923937360179E-005
+    value = -1.1923937360179E-004
   [../]
   [./y_no_slip_top]
     type = DirichletBC
@@ -173,27 +203,25 @@
    boundary = left
    value = 0
  [../]
-# [./X_bc]
-#   type = PikaChemicalPotentialBC
-#   variable = X
-#   boundary = 'bottom top'
-#   phase_variable = phi
-#   temperature = T
-# [../]
+ [./X_bc]
+   type = PikaChemicalPotentialBC
+   variable = X
+   boundary = 'bottom top'
+   phase_variable = phi
+   temperature = T
+ [../]
  [./T_hot]
     type = DirichletBC
     variable = T
     boundary = 'right'
     value = 263.65
  [../]
-# [./T_cold]
-#    type = DirichletBC
-#    variable = T
-#    boundary = 'left'
-#    value = 263.15
-# [../]
-
-
+ [./T_cold]
+    type = DirichletBC
+    variable = T
+    boundary = 'left'
+    value = 263.15
+ [../]
 
 []
 
@@ -216,21 +244,29 @@
 [Executioner]
   type = Transient
   dt = 0.001
-  end_time = 0.005
+  end_time = 1000
   solve_type = PJFNK
   petsc_options_iname = '-ksp_gmres_restart '
   petsc_options_value = '100 '
-  l_max_its = 100
+  l_max_its = 50
   nl_max_its = 150
   nl_rel_tol = 1e-06
   l_tol = 1e-08
   line_search = none
   scheme = 'crank-nicolson'
+  [./TimeStepper]
+    type = SolutionTimeAdaptiveDT
+    dt = 0.001
+    dt_max = 5
+    dt_min = 1e-4
+    percent_change = 1
+ [../]
+
 
 []
 [Adaptivity]
-  max_h_level = 5
-  initial_steps = 5
+  max_h_level = 4
+  initial_steps = 4
   steps = 0
   marker = phi_marker
   initial_marker = phi_marker
@@ -256,14 +292,10 @@
     output_nonlinear = true
   [../]
   [./exodus]
-    file_base = phase_LDC_h_100
+    file_base = phase_cyl
     type = Exodus
     output_final = true
     output_initial = true
-  [../]
-  [./csv]
-    file_base = phase_cylinder_h_100
-    type = CSV
   [../]
 []
 
@@ -272,11 +304,11 @@
   phase = phi
   temperature = T
   interface_thickness = 1e-5
-  temporal_scaling = 1e-4
+  temporal_scaling = 1
 []
 
 [ICs]
-active = 'phase_ic T_ic'
+active = 'phase_ic T_ic X_ic'
   [./phase_ic]
     variable = phi
     type = FunctionIC
