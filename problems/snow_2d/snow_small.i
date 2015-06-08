@@ -1,8 +1,8 @@
 [Mesh]
   type = GeneratedMesh
   dim = 2
-  nx = 6
-  ny = 6
+  nx = 50
+  ny = 50
   xmax = .005
   ymax = .005
 []
@@ -126,7 +126,7 @@
 [UserObjects]
   [./phi_initial]
     type = SolutionUserObject
-    mesh = phi_initial_small_out.e-s010
+    mesh = phi_initial_small_out.e-s009
     system_variables = phi
   [../]
 []
@@ -151,9 +151,9 @@
 []
 
 [Adaptivity]
-  max_h_level = 7
+  max_h_level = 4
   marker = combo_marker
-  initial_steps = 12
+  initial_steps = 3
   initial_marker = combo_marker
   [./Indicators]
     [./phi_grad_indicator]
@@ -187,10 +187,9 @@
 
 [Outputs]
   output_initial = true
+  output_final = true
   exodus = true
-  csv = true
-  print_linear_residuals = true
-  print_perf_log = true
+  interval = 1000
 []
 
 [ICs]
@@ -216,22 +215,9 @@
 [PikaMaterials]
   temperature = T
   interface_thickness = 1e-5
-  temporal_scaling = 1e-4
+  temporal_scaling = 1
   condensation_coefficient = .01
   phase = phi
 []
 
-[PikaCriteriaOutput]
-  air_criteria = false
-  velocity_criteria = false
-  time_criteria = false
-  vapor_criteria = false
-  chemical_potential = u
-  phase = phi
-  use_temporal_scaling = true
-  ice_criteria = false
-  super_saturation = false
-  interface_velocity_postprocessors = max
-  temperature = T
-[]
 

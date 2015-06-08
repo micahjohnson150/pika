@@ -2,8 +2,8 @@
   # uniform_refine = 6
   type = GeneratedMesh
   dim = 2
-  nx = 6
-  ny = 6
+  nx = 50
+  ny = 50
   xmax = .005
   ymax = .005
 []
@@ -26,8 +26,8 @@
 [Functions]
   [./snow_ct]
     type = ImageFunction
-    upper_value = -1
-    lower_value = 1
+    upper_value = 1
+    lower_value = -1
     file = snow_small.png
     threshold = 128
   [../]
@@ -69,8 +69,8 @@
 []
 
 [Adaptivity]
-  max_h_level = 7
-  initial_steps = 12
+  max_h_level = 3
+  initial_steps = 3
   marker = phi_marker
   initial_marker = phi_marker
   [./Indicators]
