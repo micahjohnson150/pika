@@ -63,7 +63,7 @@
   [./Periodic]
     [./phi_periodic]
       variable = phi
-      auto_direction = y
+      auto_direction = 'x y'
     [../]
   [../]
 []

@@ -142,7 +142,7 @@
   dtmax = 10
   nl_abs_tol = 1e-12
   nl_rel_tol = 1e-07
-  dtmin = 0.1
+  dtmin = 0.001
   [./TimeStepper]
     type = SolutionTimeAdaptiveDT
     dt = 0.1
