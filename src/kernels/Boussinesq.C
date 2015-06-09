@@ -49,7 +49,7 @@ Boussinesq::Boussinesq(const std::string & name, InputParameters parameters) :
 Real Boussinesq::computeQpResidual()
 {
   //return  -_xi * _rho * 0.5 * (1.0 - _phase[_qp]) * (1.0 -  _alpha * (_T[_qp] - _T_ref)) * _test[_i][_qp] * _gravity(_component);
-  return  -_xi * _rho * 0.5  * (1.0 -  _alpha * (_T[_qp] - _T_ref)) * _test[_i][_qp] * _gravity(_component);
+  return  _xi * _rho * 0.5  * (1.0 -  _alpha * (_T[_qp] - _T_ref)) * _test[_i][_qp] * _gravity(_component);
 }
 
 Real Boussinesq::computeQpJacobian()
@@ -61,7 +61,7 @@ Real Boussinesq::computeQpOffDiagJacobian(unsigned jvar)
 {
   if(jvar == _T_var_number)
   { //return  -_xi * _rho * 0.5 * (1.0 - _phase[_qp]) * ( -  _alpha * _phi[_j][_qp]) * _test[_i][_qp] * _gravity(_component);
-    return  -_xi * _rho * ( -  _alpha * _phi[_j][_qp]) * _test[_i][_qp] * _gravity(_component);
+    return  _xi * _rho * ( -  _alpha * _phi[_j][_qp]) * _test[_i][_qp] * _gravity(_component);
   }
 /*
   else if(jvar == _phase_var_number)
