@@ -94,6 +94,7 @@
   [../]
 []
 [BCs]
+#Based on a RE=400 where L=0.005m
   [./lid]
     type = DirichletBC
     variable = v_x
@@ -112,12 +113,6 @@
     boundary = 'left right bottom'
     value = 1
   [../]
-#  [./pressure_pin]
-#    type = DirichletBC
-#    variable = p
-#    boundary = 99
-#    value = 0
-#  [../]
 []
 
 [UserObjects]
@@ -158,8 +153,8 @@
 
 [Executioner]
   type = Transient
-  dt = 0.001
-  end_time = 0.001
+  dt = 0.01
+  end_time = 0.01
   solve_type = PJFNK
   petsc_options_iname = '-ksp_gmres_restart '
   petsc_options_value = '100 '

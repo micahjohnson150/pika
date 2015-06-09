@@ -9,7 +9,7 @@
     copy_files                     = *.e                                    # A list of files specifically to copy
     total_mpi_procs                = 24                                     # The total number of MPI processes to use divided evenly among chunks.
     walltime                       = 5:00:00                                # The requested walltime for this job.
-    job_name                       = h_100_ss                              # The name of the job
+    job_name                       = ldc_400                              # The name of the job
     type                           = PBSJob
     queue                          = MRI
     no_copy                        = *.sh , *.i
