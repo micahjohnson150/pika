@@ -109,6 +109,7 @@
     type = PikaTimeDerivative
     variable = T
     property = heat_capacity
+    use_temporal_scaling = false
     scale = 1.0
   [../]
   [./heat_convection]
@@ -165,7 +166,6 @@
     type =PhaseDirichletBC
     variable = v_y
     boundary = bottom
-    value = 1.1923937360179E-005
     phase_variable = phi
  
   [../]
@@ -185,13 +185,13 @@
     type = DirichletBC
     variable = T
     boundary = top
-    value = 267.5
+    value = 267
   [../]
   [./T_cold]
     type = DirichletBC
     variable = T
     boundary = bottom
-    value = 265
+    value = 262
   [../]
 
 []
@@ -271,7 +271,7 @@
 [PikaMaterials]
   temperature = T
   interface_thickness = 1e-05
-  temporal_scaling = 1
+  temporal_scaling = 1e-4
   condensation_coefficient = .01
   phase = phi
 []

@@ -49,7 +49,7 @@
     type = PhaseNoSlipForcing
     variable = v_x
     phase = phi
-    h = 100
+    h = 1000
   
   [../]
   [./y_momentum]
@@ -64,7 +64,7 @@
     type = PhaseNoSlipForcing
     variable = v_y
     phase = phi
-    h = 100
+    h = 1000
 
   [../]
   [./mass_conservation]

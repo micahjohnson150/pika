@@ -30,8 +30,8 @@
   [../]
   [./T]
   [../]
-  [./X]
-  [../]
+#  [./X]
+#  [../]
 
 []
 [Functions]
@@ -111,15 +111,20 @@
     mob_name = mobility
   [../]
 
+  [./heat_time]
+    type = PikaTimeDerivative
+    variable = T
+    property = heat_capacity
+    use_temporal_scaling = false
+  [../]
   [./heat_convection]
     type = PikaConvection
     property = heat_capacity
-    use_temporal_scaling = true
+    use_temporal_scaling = false
     variable = T
     vel_x = v_x
     vel_y = v_y
   [../]
-
   [./heat_diffusion]
     type = PikaDiffusion
     property = conductivity
@@ -127,21 +132,20 @@
     variable = T
   [../]
 
-  [./vapor_convection]
-    type = PikaConvection
-    coefficient = 1.0
-    use_temporal_scaling = true
-    variable = X
-    vel_x = v_x
-    vel_y = v_y
-  [../]
-  [./vapor_diffusion]
-    type = PikaDiffusion
-    property = diffusion_coefficient
-    use_temporal_scaling = true
-    variable = X
-  [../]
-
+#  [./vapor_convection]
+#    type = PikaConvection
+#    coefficient = 1.0
+#    use_temporal_scaling = true
+#    variable = X
+#    vel_x = v_x
+#    vel_y = v_y
+#  [../]
+#  [./vapor_diffusion]
+#    type = PikaDiffusion
+#    property = diffusion_coefficient
+#    use_temporal_scaling = true
+#    variable = X
+#  [../]
 
 []
 [BCs]
@@ -188,7 +192,7 @@
   [./uo_initial]
     type = SolutionUserObject
     execute_on = initial
-    mesh = phi_initial_out.e-s004
+    mesh = phi_initial_out.e-s002
     timestep = 1
   [../]
 []
@@ -202,8 +206,8 @@
 
 [Executioner]
   type = Transient
-  dt = 0.001
-  end_time = 0.001
+  dt = 0.01
+  end_time = 0.01
   solve_type = PJFNK
   petsc_options_iname = '-ksp_gmres_restart '
   petsc_options_value = '100 '
@@ -258,7 +262,7 @@
   phase = phi
   temperature = 263.15
   interface_thickness = 1e-05
-  temporal_scaling = 1e-4
+  temporal_scaling = 1
   gravity = '0 -9.81 0'
 []
 
@@ -273,13 +277,13 @@
     type = FunctionIC
     function =7717.3841788774*x+263.15
   [../]
-  [./X_ic]
-    variable = X
-    type = PikaChemicalPotentialIC
-    phase_variable = phi
-    variable = X
-    temperature = T
-  [../]
+#  [./X_ic]
+#    variable = X
+#    type = PikaChemicalPotentialIC
+#    phase_variable = phi
+#    variable = X
+#    temperature = T
+#  [../]
 
 
 []

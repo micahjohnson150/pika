@@ -203,13 +203,13 @@
    boundary = left
    value = 0
  [../]
- [./X_bc]
-   type = PikaChemicalPotentialBC
-   variable = X
-   boundary = 'bottom top'
-   phase_variable = phi
-   temperature = T
- [../]
+# [./X_bc]
+#   type = PikaChemicalPotentialBC
+#   variable = X
+#   boundary = 'left right'
+#   phase_variable = phi
+#   temperature = T
+# [../]
  [./T_hot]
     type = DirichletBC
     variable = T
@@ -243,24 +243,17 @@
 
 [Executioner]
   type = Transient
-  dt = 0.001
+  dt = 0.5
   end_time = 1000
   solve_type = PJFNK
   petsc_options_iname = '-ksp_gmres_restart '
   petsc_options_value = '100 '
-  l_max_its = 50
-  nl_max_its = 150
+  l_max_its = 500
+  nl_max_its = 550
   nl_rel_tol = 1e-06
   l_tol = 1e-08
   line_search = none
   scheme = 'crank-nicolson'
-  [./TimeStepper]
-    type = SolutionTimeAdaptiveDT
-    dt = 0.001
-    dt_max = 5
-    dt_min = 1e-4
-    percent_change = 1
- [../]
 
 
 []
@@ -286,16 +279,12 @@
   [../]
 []
 [Outputs]
-  [./console]
-    type = Console
-    output_linear = true
-    output_nonlinear = true
-  [../]
   [./exodus]
     file_base = phase_cyl
     type = Exodus
     output_final = true
     output_initial = true
+    interval = 100
   [../]
 []
 

@@ -23,7 +23,7 @@
 []
 
 [Kernels]
-active = ' phase_diffusion phase_double_well'
+active = 'phase_time phase_diffusion phase_double_well'
   [./phase_time]
     type = PikaTimeDerivative
     variable = phi
@@ -60,7 +60,7 @@ active = ' phase_diffusion phase_double_well'
 
 [Executioner]
   # Preconditioned JFNK (default)
-  type = Steady
+  type = Transient
   dt = 1
   end_time = 1000
   nl_max_its = 20

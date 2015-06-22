@@ -1,19 +1,19 @@
 [Mesh]
   type = GeneratedMesh
   dim = 2
-  nx = 200
-  ny = 100
+  nx = 400
+  ny = 200
   xmin = 0
+  xmax = 0.04
   ymin = 0
-  xmax = .02
-  ymax = .01
+  ymax = 0.02
   elem_type = QUAD9
 []
 [MeshModifiers]
   [./pin]
     type = AddExtraNodeset
     new_boundary = 99
-    coord = '0.004 0.005'
+    coord = '0.005 0.01'
     tolerance = 1e-04
   [../]
 []
@@ -133,7 +133,7 @@
   [./uo_initial]
     type = SolutionUserObject
     execute_on = initial
-    mesh = re_20_initial_out.e-s005
+    mesh = re_20_initial_out.e-s010
     timestep = 1
   [../]
 []
@@ -148,7 +148,7 @@
 [Executioner]
   type = Transient
   dt = 0.01
-  end_time = 0.01
+  end_time = 0.02
   solve_type = PJFNK
   petsc_options_iname = '-ksp_gmres_restart '
   petsc_options_value = '100 '
@@ -162,8 +162,8 @@
 
 []
 [Adaptivity]
-  max_h_level = 4
-  initial_steps = 4
+  max_h_level = 7
+  initial_steps = 7
   steps = 0
   marker = combo_marker
   initial_marker = phi_marker

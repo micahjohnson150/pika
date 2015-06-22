@@ -112,7 +112,7 @@ active = ' '
 []
 
 [ICs]
-active = 'phase_ic_tri'
+active = 'phase_ic'
   [./phase_ic]
     y1 = 0.0025
     variable = phi

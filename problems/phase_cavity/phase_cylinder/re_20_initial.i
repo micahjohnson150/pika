@@ -1,19 +1,19 @@
 [Mesh]
   type = GeneratedMesh
   dim = 2
-  nx = 200  
-  ny = 100
+  nx = 400  
+  ny = 200
   xmin = 0
-  xmax = 0.02
+  xmax = 0.04
   ymin = 0
-  ymax = 0.01
+  ymax = 0.02
   elem_type = QUAD9
 []
 
 [MeshModifiers]
   [./pin]
     type = AddExtraNodeset
-    coord = '0.004 0.005'
+    coord = '0.005 0.01'
     tolerance = 1e-4
     new_boundary = 99
   [../]
@@ -25,6 +25,11 @@
 []
 
 [Kernels]
+  [./phi_time_derivative]
+    type = PikaTimeDerivative
+    variable = phi
+    property = relaxation_time
+  [../]
   [./phi_diffusion]
     type = PikaDiffusion
     variable = phi
@@ -61,7 +66,9 @@
 
 [Executioner]
   # Preconditioned JFNK (default)
-  type = Steady
+  type = Transient
+  dt = 100
+  end_time = 1000
   nl_max_its = 20
   solve_type = PJFNK
   petsc_options_iname = '-ksp_gmres_restart -pc_type -pc_hypre_type'
@@ -72,8 +79,8 @@
   l_abs_step_tol = 1e-13
 []
 [Adaptivity]
-  max_h_level = 5
-  initial_steps = 5
+  max_h_level = 7
+  initial_steps = 7
   steps = 4
   marker = phi_marker
   initial_marker = phi_marker
@@ -106,7 +113,7 @@
 [PikaMaterials]
   phase = phi
   temperature = 263.15
-  interface_thickness = 1e-05
+  interface_thickness = 1e-06
   temporal_scaling = 1 # 1e-05
   gravity = '0 -9.81 0'
 []
@@ -114,9 +121,9 @@
 [ICs]
 active = 'phase_ic'
   [./phase_ic]
-    y1 = 0.005
+    y1 = 0.01
     variable = phi
-    x1 = 0.004
+    x1 = 0.005
     type = SmoothCircleIC
     int_width = 1e-5
     radius = 0.0005
@@ -124,18 +131,5 @@ active = 'phase_ic'
     invalue = 1
     3D_spheres = false
   [../]
-  [./phase_ic_tri]
-    z_positions = '0 0 0'
-    y_positions = '0 0.005 0'
-    x_positions = '0 0.0025 0.005'
-    variable = phi
-    type = SpecifiedSmoothCircleIC
-    int_width = 2e-5
-    radii = '0.001 0.001 0.001'
-    outvalue = -1
-    invalue = 1
-    3D_spheres = false
-  [../]
-
 []
 

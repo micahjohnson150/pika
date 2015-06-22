@@ -49,7 +49,7 @@
     type = PhaseNoSlipForcing
     variable = v_x
     phase = phi
-    h = 100
+    h = 2.757
   [../]
   [./y_momentum]
     type = PikaMomentum
@@ -63,7 +63,7 @@
     type = PhaseNoSlipForcing
     variable = v_y
     phase = phi
-    h = 100
+    h = 2.757
   [../]
   [./mass_conservation]
     type = INSMass
@@ -131,15 +131,15 @@
 
 [Executioner]
   type = Transient
-  dt = 0.001
+  dt = 0.0001
   end_time = 0.001
   solve_type = PJFNK
   petsc_options_iname = '-ksp_gmres_restart '
   petsc_options_value = '100 '
   l_max_its = 100
   nl_max_its = 150
-  nl_rel_tol = 1e-08
-  l_tol = 1e-08
+  nl_rel_tol = 1e-03
+  l_tol = 1e-03
   line_search = none
 
 []
@@ -165,6 +165,8 @@
   [../]
 []
 [Outputs]
+    output_final = true
+    output_initial = true
   [./console]
     type = Console
     output_linear = true
@@ -173,8 +175,6 @@
   [./exodus]
     file_base = phase_LDC_h_100
     type = Exodus
-    output_final = true
-    output_initial = true
   [../]
   [./csv]
     file_base = phase_cylinder_h_100

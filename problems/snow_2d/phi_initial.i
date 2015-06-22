@@ -1,11 +1,11 @@
 [Mesh]
-  # uniform_refine = 6
   type = GeneratedMesh
   dim = 2
-  nx = 6
-  ny = 6
+  nx = 10
+  ny = 10
   xmax = .005
   ymax = .005
+  elem_type = QUAD9
 []
 
 [MeshModifiers]
@@ -26,10 +26,10 @@
 [Functions]
   [./snow_ct]
     type = ImageFunction
-    upper_value = -1
-    lower_value = 1
     file = snow.png
-    threshold = 128
+    dimensions = '0.005 0.005 0.0'
+    upper_value = 1
+    lower_value = -1
   [../]
 []
 
@@ -69,8 +69,8 @@
 []
 
 [Adaptivity]
-  max_h_level = 7
-  initial_steps = 12
+  max_h_level = 8
+  initial_steps = 8
   marker = phi_marker
   initial_marker = phi_marker
   [./Indicators]
@@ -109,7 +109,7 @@
 
 [Outputs]
   output_initial = true
-  console = false
+  console = true
   print_linear_residuals = true
   print_perf_log = true
   [./out]
