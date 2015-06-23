@@ -30,18 +30,46 @@
   [../]
   [./T]
   [../]
-#  [./X]
-#  [../]
-
 []
 [Functions]
+#  [./phi_func]
+#    type = SolutionFunction
+#    from_variable = phi
+#    solution = uo_initial
+#  [../]
   [./phi_func]
     type = SolutionFunction
     from_variable = phi
-    solution = uo_initial
+    solution = uo_restart
+  [../]
+  [./p_func]
+    type = SolutionFunction
+    from_variable = p
+    solution = uo_restart
+  [../]
+  [./T_func]
+    type = SolutionFunction
+    from_variable = T
+    solution = uo_restart
+  [../]
+  [./v_x_func]
+    type = SolutionFunction
+    from_variable = v_x
+    solution = uo_restart
+  [../]
+  [./v_y_func]
+    type = SolutionFunction
+    from_variable = v_y
+    solution = uo_restart
   [../]
 []
 [Kernels]
+  [./x_momentum_time]
+    type = PikaTimeDerivative
+    variable = v_x
+    coefficient = 1.341
+    use_temporal_scaling = false
+  [../]
   [./x_momentum]
     type = PikaMomentum
     variable = v_x
@@ -63,6 +91,12 @@
     T = T
  [../]
 
+  [./y_momentum_time]
+    type = PikaTimeDerivative
+    variable = v_y
+    coefficient = 1.341
+    use_temporal_scaling = false
+  [../]
   [./y_momentum]
     type = PikaMomentum
     variable = v_y
@@ -132,36 +166,8 @@
     variable = T
   [../]
 
-#  [./vapor_convection]
-#    type = PikaConvection
-#    coefficient = 1.0
-#    use_temporal_scaling = true
-#    variable = X
-#    vel_x = v_x
-#    vel_y = v_y
-#  [../]
-#  [./vapor_diffusion]
-#    type = PikaDiffusion
-#    property = diffusion_coefficient
-#    use_temporal_scaling = true
-#    variable = X
-#  [../]
-
 []
 [BCs]
-#  [./y_no_slip_top]
-#    type = DirichletBC
-#    variable = v_y
-#    boundary = 'left right top bottom'
-#    value = 0.0
-#  [../]
-#  [./x_no_slip_top]
-#    type = DirichletBC
-#    variable = v_x
-#    boundary = 'left right top bottom'
-#    value = 0.0
-#  [../]
-
   [./solid_phase_wall]
     type = DirichletBC
     variable = phi
@@ -189,11 +195,17 @@
 []
 
 [UserObjects]
-  [./uo_initial]
+#  [./uo_initial]
+#    type = SolutionUserObject
+#    execute_on = initial
+#    mesh = phi_initial_out.e-s002
+#    timestep = 1
+#  [../]
+  [./uo_restart]
     type = SolutionUserObject
     execute_on = initial
-    mesh = phi_initial_out.e-s002
-    timestep = 1
+    mesh = ../ra_1000_002/phase_convection_out.e
+    timestep = 10
   [../]
 []
 
@@ -207,7 +219,8 @@
 [Executioner]
   type = Transient
   dt = 0.01
-  end_time = 0.01
+  start_time = 0.1
+  end_time = 0.15
   solve_type = PJFNK
   petsc_options_iname = '-ksp_gmres_restart '
   petsc_options_value = '100 '
@@ -242,11 +255,11 @@
 [Outputs]
   [./console]
     type = Console
-    output_linear = true
+    output_linear = false
     output_nonlinear = true
   [../]
   [./exodus]
-    file_base = phase_LDC_h_100
+    file_base = phase_convection_out
     type = Exodus
     output_final = true
     output_initial = true
@@ -267,25 +280,41 @@
 []
 
 [ICs]
+#  [./phase_ic]
+#    variable = phi
+#    type = FunctionIC
+#    function = phi_func
+#  [../]
+#  [./T_ic]
+#    variable = T
+#    type = FunctionIC
+#    function =7717.3841788774*x+263.15
+#  [../]
   [./phase_ic]
     variable = phi
     type = FunctionIC
     function = phi_func
   [../]
+  [./p_ic]
+    variable = p
+    type = FunctionIC
+    function = p_func
+  [../]
   [./T_ic]
     variable = T
     type = FunctionIC
-    function =7717.3841788774*x+263.15
+    function = T_func
   [../]
-#  [./X_ic]
-#    variable = X
-#    type = PikaChemicalPotentialIC
-#    phase_variable = phi
-#    variable = X
-#    temperature = T
-#  [../]
-
-
+  [./v_x_ic]
+    variable = v_x
+    type = FunctionIC
+    function = v_x_func
+  [../]
+  [./v_y_ic]
+    variable = v_y
+    type = FunctionIC
+    function = v_y_func
+  [../]
 []
 
 
