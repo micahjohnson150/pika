@@ -40,7 +40,7 @@
   [../]
   [./T_func]
     type = ParsedFunction
-    value = 500*y+260.5
+    value = -500*y+266
   [../]
 []
 
@@ -72,6 +72,7 @@
     h = 100
   [../]
 
+
   [./y_momentum_time]
     type = PikaTimeDerivative
     variable = v_y
@@ -99,6 +100,7 @@
     h = 100
   [../]
 
+
   [./mass_conservation]
     type = INSMass
     variable = p
@@ -106,6 +108,7 @@
     u = v_x
     p = p
   [../]
+
 
   [./phase_time]
     type = PikaTimeDerivative
@@ -124,13 +127,13 @@
     variable = phi
     mob_name = mobility
   [../]
+  
 
   [./heat_time]
     type = PikaTimeDerivative
     variable = T
     property = heat_capacity
     scale = 1.0
-    use_temporal_scaling = false
   [../]
   [./heat_convection]
     type = PikaConvection
@@ -160,11 +163,11 @@
   [./Periodic]
     [./periodic_v_x]
       variable = v_x
-      auto_direction = 'x y'
+      auto_direction = 'x'
     [../]
     [./periodic_v_y]
       variable = v_y
-      auto_direction = 'x y'
+      auto_direction = 'x'
     [../]
     [./periodic_phi]
       variable = phi
@@ -175,23 +178,29 @@
       auto_direction = 'x'
     [../]
   [../]
-  [./pressure]
+#  [./pressure]
+#    type = DirichletBC
+#    variable = p
+#    boundary = 99
+#    value = 0
+#  [../]
+  [./T_cold]
     type = DirichletBC
-    variable = p
-    boundary = 99
-    value = 0
+    variable = T
+    boundary = top
+    value = 263.5
   [../]
   [./T_hot]
     type = DirichletBC
     variable = T
     boundary = bottom
-    value = 263
+    value = 266
   [../]
-  [./T_cold]
+  [./free_slip]
     type = DirichletBC
-    variable = T
-    boundary = top
-    value = 260.5
+    variable = v_y
+    boundary = 'top bottom'
+    value = 0
   [../]
 []
 
@@ -214,22 +223,21 @@
 [Executioner]
   type = Transient
   dt = 0.01
-  end_time = 0.1
+  end_time = 0.05
   solve_type = PJFNK
   petsc_options_iname = '-ksp_gmres_restart '
-  petsc_options_value = '100'
+  petsc_options_value = '100 '
   l_max_its = 100
-  nl_max_its = 550
+  nl_max_its = 150
   nl_rel_tol = 1e-08
   l_tol = 1e-08
   line_search = none
-  scheme = 'crank-nicolson'
-[]
 
+[]
 [Adaptivity]
-  max_h_level = 5
+  max_h_level = 4
   marker = phi_marker
-  initial_steps = 5
+  initial_steps = 4
   initial_marker = phi_marker
   [./Indicators]
     [./phi_grad_indicator]
@@ -251,14 +259,10 @@
   output_initial = true
   output_final = true
   exodus = true
+#  console = true
   interval = 1
- output_nonlinears = true
- output_initial = true
- #exodus = true
- #csv = true
- #print_linear_residuals = true
- #print_perf_log = true
-
+#  print_linear_residuals = true 
+#  print_perf_log = true 
 []
 
 [PikaMaterials]
@@ -268,9 +272,7 @@
   condensation_coefficient = .01
   phase = phi
 #Slope of 30 degrees
-#  gravity = '4.905 -8.49571 0'
-   gravity = '0 -9.81 0'
-
+  gravity = '4.905 -8.49571 0'
 []
 
 [ICs]
@@ -285,3 +287,7 @@
     function = T_func
   [../]
 []
+
+
+
+

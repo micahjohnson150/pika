@@ -154,7 +154,7 @@
 [Executioner]
   type = Transient
   dt = 0.01
-  end_time = 0.01
+  end_time = 0.1
   solve_type = PJFNK
   petsc_options_iname = '-ksp_gmres_restart '
   petsc_options_value = '100 '

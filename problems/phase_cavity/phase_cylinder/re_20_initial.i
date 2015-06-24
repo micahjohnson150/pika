@@ -79,8 +79,8 @@
   l_abs_step_tol = 1e-13
 []
 [Adaptivity]
-  max_h_level = 7
-  initial_steps = 7
+  max_h_level = 5
+  initial_steps = 5
   steps = 4
   marker = phi_marker
   initial_marker = phi_marker
@@ -113,7 +113,7 @@
 [PikaMaterials]
   phase = phi
   temperature = 263.15
-  interface_thickness = 1e-06
+  interface_thickness = 1e-05
   temporal_scaling = 1 # 1e-05
   gravity = '0 -9.81 0'
 []

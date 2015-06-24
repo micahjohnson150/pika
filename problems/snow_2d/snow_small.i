@@ -125,6 +125,10 @@
       variable = phi
       auto_direction = ' y'
     [../]
+    [./periodic_X]
+      variable = X
+      auto_direction = ' y'
+    [../]
   [../]
   [./T_hot]
     type = DirichletBC

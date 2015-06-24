@@ -23,6 +23,11 @@
 []
 
 [Kernels]
+  [./phase_time]
+    type = PikaTimeDerivative
+    variable = phi
+    property = relaxation_time
+  [../]
   [./phase_diffusion]
     type = PikaDiffusion
     variable = phi
@@ -52,19 +57,21 @@
   [../]
 []
 [Executioner]
-  type = Steady
+  type = Transient
+  dt = 100
+  end_time = 1000
   nl_max_its = 20
   solve_type = PJFNK
   petsc_options_iname = '-ksp_gmres_restart -pc_type -pc_hypre_type'
   petsc_options_value = '50 hypre boomeramg'
-  nl_rel_tol = 1e-07
+  nl_rel_tol = 1e-08
   nl_abs_tol = 1e-12
-  l_tol = 1e-4
+  l_tol = 1e-8
   l_abs_step_tol = 1e-13
 []
 [Adaptivity]
-  max_h_level = 3
-  initial_steps = 3
+  max_h_level =5
+  initial_steps = 5
   steps = 5
   marker = phi_marker
   initial_marker = phi_marker

@@ -91,12 +91,12 @@
     T = T
  [../]
 
-  [./y_momentum_time]
-    type = PikaTimeDerivative
-    variable = v_y
-    coefficient = 1.341
-    use_temporal_scaling = false
-  [../]
+ [./y_momentum_time]
+   type = PikaTimeDerivative
+   variable = v_y
+   coefficient = 1.341
+   use_temporal_scaling = false
+ [../]
   [./y_momentum]
     type = PikaMomentum
     variable = v_y
@@ -145,7 +145,7 @@
     mob_name = mobility
   [../]
 
-  [./heat_time]
+ [./heat_time]
     type = PikaTimeDerivative
     variable = T
     property = heat_capacity
@@ -204,8 +204,8 @@
   [./uo_restart]
     type = SolutionUserObject
     execute_on = initial
-    mesh = ../ra_1000_002/phase_convection_out.e
-    timestep = 10
+    mesh =../ra_1000_004/phase_convection_out.e
+    timestep = 5
   [../]
 []
 
@@ -219,8 +219,8 @@
 [Executioner]
   type = Transient
   dt = 0.01
-  start_time = 0.1
-  end_time = 0.15
+  start_time = 0.2
+  end_time = 0.5
   solve_type = PJFNK
   petsc_options_iname = '-ksp_gmres_restart '
   petsc_options_value = '100 '

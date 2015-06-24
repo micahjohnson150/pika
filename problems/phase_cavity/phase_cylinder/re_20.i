@@ -30,14 +30,33 @@
   [../]
 []
 [Functions]
+#  [./phi_func]
+#    type = SolutionFunction
+#    from_variable = phi
+#    solution = uo_initial
+#  [../]
   [./phi_func]
     type = SolutionFunction
     from_variable = phi
-    solution = uo_initial
+    solution = uo_restart
+  [../]
+  [./p_func]
+    type = SolutionFunction
+    from_variable = p
+    solution = uo_restart
+  [../]
+  [./v_x_func]
+    type = SolutionFunction
+    from_variable = v_x
+    solution = uo_restart
+  [../]
+  [./v_y_func]
+    type = SolutionFunction
+    from_variable = v_y
+    solution = uo_restart
   [../]
 []
 [Kernels]
-
   [./x_momentum_time]
     type = PikaTimeDerivative
     variable = v_x
@@ -130,10 +149,16 @@
 []
 
 [UserObjects]
-  [./uo_initial]
+#  [./uo_initial]
+#    type = SolutionUserObject
+#    execute_on = initial
+#    mesh = re_20_initial_out.e-s010
+#    timestep = 1
+#  [../]
+  [./uo_restart]
     type = SolutionUserObject
     execute_on = initial
-    mesh = re_20_initial_out.e-s010
+    mesh = ../1e6_001/re_20_out.e-s004
     timestep = 1
   [../]
 []
@@ -148,7 +173,8 @@
 [Executioner]
   type = Transient
   dt = 0.01
-  end_time = 0.02
+  start_time = 0.045
+  end_time = 0.12
   solve_type = PJFNK
   petsc_options_iname = '-ksp_gmres_restart '
   petsc_options_value = '100 '
@@ -163,7 +189,7 @@
 []
 [Adaptivity]
   max_h_level = 7
-  initial_steps = 7
+  initial_steps =7
   steps = 0
   marker = combo_marker
   initial_marker = phi_marker
@@ -213,7 +239,7 @@
     type = Exodus
     output_final = true
     output_initial = true
-    interval = 100
+    interval = 1
   [../]
 []
 
@@ -221,7 +247,7 @@
 [PikaMaterials]
   phase = phi
   temperature = 263.15
-  interface_thickness = 1e-5
+  interface_thickness = 1e-6
   temporal_scaling = 1
 []
 
@@ -230,5 +256,20 @@
     variable = phi
     type = FunctionIC
     function = phi_func
+  [../]
+  [./p_ic]
+    variable = p
+    type = FunctionIC
+    function = p_func
+  [../]
+  [./v_x_ic]
+    variable = v_x
+    type = FunctionIC
+    function = v_x_func
+  [../]
+  [./v_y_ic]
+    variable = v_y
+    type = FunctionIC
+    function = v_y_func
   [../]
 []
