@@ -40,7 +40,7 @@
   [../]
   [./T_func]
     type = ParsedFunction
-    value = -500*y+266
+    value = -500*y+265.65
   [../]
 []
 
@@ -163,15 +163,15 @@
   [./Periodic]
     [./periodic_v_x]
       variable = v_x
-      auto_direction = 'x'
+      auto_direction = 'x y'
     [../]
     [./periodic_v_y]
       variable = v_y
-      auto_direction = 'x'
+      auto_direction = 'x y'
     [../]
     [./periodic_phi]
       variable = phi
-      auto_direction = ' y'
+      auto_direction = ' x y'
     [../]
     [./periodic_T]
       variable = T
@@ -188,20 +188,20 @@
     type = DirichletBC
     variable = T
     boundary = top
-    value = 263.5
+    value = 263.15
   [../]
   [./T_hot]
     type = DirichletBC
     variable = T
     boundary = bottom
-    value = 266
+    value = 265.65
   [../]
-  [./free_slip]
-    type = DirichletBC
-    variable = v_y
-    boundary = 'top bottom'
-    value = 0
-  [../]
+#  [./free_slip]
+#    type = DirichletBC
+#   variable = v_y
+#   boundary = 'top bottom'
+#   value = 0
+# [../]
 []
 
 [UserObjects]
@@ -223,7 +223,7 @@
 [Executioner]
   type = Transient
   dt = 0.01
-  end_time = 0.05
+  end_time = 0.5
   solve_type = PJFNK
   petsc_options_iname = '-ksp_gmres_restart '
   petsc_options_value = '100 '
@@ -232,8 +232,8 @@
   nl_rel_tol = 1e-08
   l_tol = 1e-08
   line_search = none
-
 []
+
 [Adaptivity]
   max_h_level = 4
   marker = phi_marker
@@ -287,7 +287,3 @@
     function = T_func
   [../]
 []
-
-
-
-

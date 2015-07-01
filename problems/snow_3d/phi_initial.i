@@ -27,7 +27,7 @@
 [Functions]
   [./image]
     type = ImageFunction
-    file_base = /home/johnmica/data/snow_3d/0930/0930_rr_rec_tra_bin__Tra
+    file_base =~/data/snow_images/0930/0930_rr_rec_tra_bin__Tra
     file_suffix = png
     threshold = 180
     lower_value = 1

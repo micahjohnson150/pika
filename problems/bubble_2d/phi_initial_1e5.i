@@ -3,7 +3,8 @@
   dim = 2
   nx = 50
   ny = 50
-  xmax = 0.0025
+#  xmax = 0.0025
+  xmax = 0.005
   ymax = 0.005
   elem_type = QUAD9
   []

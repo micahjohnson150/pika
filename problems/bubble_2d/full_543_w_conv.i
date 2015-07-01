@@ -147,7 +147,6 @@
     variable = T
     vel_x = v_x
     use_temporal_scaling = false
-    phase = phi
     property = heat_capacity
     vel_y = v_y
   [../]
@@ -215,25 +214,6 @@
     boundary = top
     value = 264.8
   [../]
-#  [./x_no_slip]
-#    type = DirichletBC
-#    variable = v_x
-#    boundary = 'top left right bottom'
-#    value = 0
-#  [../]
-#  [./y_no_slip]
-#    type = DirichletBC
-#    variable = v_y
-#    boundary = 'top bottom left '
-#    value = 0
-#  [../]
-#
-  [./pressure_pin]
-    type = DirichletBC
-    variable = p
-    boundary = 99
-    value = 0
-  [../]
 
 []
 
@@ -243,15 +223,15 @@
 [UserObjects]
   [./phi_initial]
     type = SolutionUserObject
-    mesh = phi_initial_1e5_out.e-s010
+    mesh = phi_initial_1e5_out.e-s009
     system_variables = phi
   [../]
 []
 
 [Executioner]
   type = Transient
-  dt = 1
-  end_time = 0.001
+  dt = 0.01
+  end_time = 1000
   solve_type = PJFNK
   petsc_options_iname = '-ksp_gmres_restart '
   petsc_options_value = '100 '
@@ -260,13 +240,7 @@
   nl_rel_tol = 1e-08
   l_tol = 1e-08
   line_search = none
-  scheme = 'Crank-Nicolson'
-  [./TimeStepper]
-    dtmin = 1
-    type = SolutionTimeAdaptiveDT
-    dt = 0.001
-    percent_change = 1
-  [../]
+  scheme = 'crank-nicolson'
 []
 
 [Adaptivity]
@@ -335,7 +309,7 @@
 [PikaMaterials]
   temperature = T
   interface_thickness = 1e-5
-  temporal_scaling = 1e-4
+  temporal_scaling = 1
   condensation_coefficient = .01
   phase = phi
   gravity = '0 -9.81 0'

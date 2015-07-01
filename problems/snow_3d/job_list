@@ -1,17 +1,16 @@
 [Jobs]
   [./PBSJob]
     notify_address                 = micahjohnson1@u.boisestate.edu        # The email address to use for PBS notifications
-    template_script                = /home/johnmica/projects/pika/problems/pbs_submit.sh  # The template job script to use.
+    template_script                = /home/mjohnson/projects/pika/problems/pbs_submit.sh  # The template job script to use.
     input_file                     = phi_initial.i                     # The input file name.
-    moose_application              = /home/johnmica/projects/pika/pika-opt  # The full path to the application to run.
+    moose_application              = /home/mjohnson/projects/pika/pika-opt  # The full path to the application to run.
     test_name                      = 3d_snow_gen                            # The name of the test
     chunks                         = 3                                    # The number of PBS chunks.
-    copy_files                     = *.e                                    # A list of files specifically to copy
-    total_mpi_procs                = 24                                     # The total number of MPI processes to use divided evenly among chunks.
-    walltime                       = 5:00:00                                # The requested walltime for this job.
-    job_name                       = thin_snow                              # The name of the job
+    total_mpi_procs                = 48                                     # The total number of MPI processes to use divided evenly among chunks.
+    walltime                       = 10:00:00                                # The requested walltime for this job.
+    job_name                       = thin_snow                             # The name of the job
     type                           = PBSJob
-    queue                          = general
+    queue                          = MRI
     no_copy                        = *.sh , *.i
   [../]
 

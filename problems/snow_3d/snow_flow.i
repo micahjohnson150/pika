@@ -1,17 +1,19 @@
+
 [Mesh]
   type = GeneratedMesh
   dim = 3
   nx = 5
   ny = 5
-  nz = 5
+  nz = 2
   xmin= 0.003
   ymin = 0.003
   zmin = 0.003
   xmax = 0.004
   ymax = 0.004
-  zmax = 0.0032
+  zmax = 0.0031
   elem_type = TET10
 []
+
 [Variables]
   [./v_x]
     order = SECOND
@@ -137,10 +139,11 @@
 []
 [BCs]
   [./inlet]
-    type = DirichletBC
+    type =PhaseDirichletBC
     variable = v_y
     boundary = front
     value = 1.1923937360179E-005
+    phase_variable = phi
  
   [../]
   [./x_free_slip]

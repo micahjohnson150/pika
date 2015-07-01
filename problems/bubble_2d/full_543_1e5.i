@@ -129,7 +129,7 @@
 [UserObjects]
   [./phi_initial]
     type = SolutionUserObject
-    mesh = phi_initial_1e5_out.e-s010
+    mesh = phi_initial_1e5_out.e-s009
     system_variables = phi
   [../]
 []
@@ -219,7 +219,7 @@
 [PikaMaterials]
   temperature = T
   interface_thickness = 1e-5
-  temporal_scaling = 1e-4
+  temporal_scaling = 1
   condensation_coefficient = .01
   phase = phi
 []

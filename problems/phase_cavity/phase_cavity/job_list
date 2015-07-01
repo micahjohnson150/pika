@@ -2,14 +2,14 @@
   [./PBSJob]
     notify_address                 = micahjohnson1@u.boisestate.edu        # The email address to use for PBS notifications
     template_script                = /home/mjohnson/projects/pika/problems/pbs_submit.sh  # The template job script to use.
-    input_file                     = gau_cavity.i                     # The input file name.
+    input_file                     = gau_basic.i                     # The input file name.
     moose_application              = /home/mjohnson/projects/pika/pika-opt  # The gau path to the application to run.
     test_name                      = gau_cavity                            # The name of the test
     chunks                         = 3                                     # The number of PBS chunks.
     copy_files                     = *.e                                    # A list of files specifically to copy
     total_mpi_procs                = 24                                     # The total number of MPI processes to use divided evenly among chunks.
-    walltime                       = 200:00:00                                # The requested walltime for this job.
-    job_name                       = gau_cavity                              # The name of the job
+    walltime                       = 2:00:00                                # The requested walltime for this job.
+    job_name                       = gau_basic                              # The name of the job
     type                           = PBSJob
     queue                          = MRI
     no_copy                        = *.sh,*.csv,phi*,full* 
