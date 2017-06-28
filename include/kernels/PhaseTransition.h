@@ -26,12 +26,11 @@ InputParameters validParams<PhaseTransition>();
 
 class PhaseTransition :
   public ACBulk,
-  public PropertyUserObjectInterface,
   public CoefficientKernelInterface
 {
 public:
 
-  PhaseTransition(const std::string & name, InputParameters parameters);
+  PhaseTransition(const InputParameters & parameters);
 
 protected:
   virtual Real computeDFDOP(PFFunctionType type);
@@ -39,9 +38,9 @@ protected:
 private:
   VariableValue & _s;
 
-  MaterialProperty<Real> & _lambda;
+  const MaterialProperty<Real> & _lambda;
 
-  MaterialProperty<Real> & _s_eq;
+  const MaterialProperty<Real> & _s_eq;
 
 };
 #endif // PHASETRANSITION_H

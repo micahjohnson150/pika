@@ -85,11 +85,9 @@ InputParameters validParams<PikaApp>()
   return params;
 }
 
-PikaApp::PikaApp(const std::string & name, InputParameters parameters) :
-    MooseApp(name, parameters)
+PikaApp::PikaApp(InputParameters parameters) :
+    MooseApp(parameters)
 {
-  srand(processor_id());
-
   Moose::registerObjects(_factory);
   PhaseFieldApp::registerObjects(_factory);
   HeatConductionApp::registerObjects(_factory);

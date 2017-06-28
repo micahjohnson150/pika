@@ -36,13 +36,13 @@ public:
    * @param name
    * @param parameters
    */
-  PhaseEvolutionSourceMMS(const std::string & name, InputParameters parameters);
+  PhaseEvolutionSourceMMS(const InputParameters & parameters);
 
 protected:
   virtual Real computeQpResidual();
 
 private:
-   MaterialProperty<Real> & _tau;
+  const MaterialProperty<Real> & _tau;
   const MaterialProperty<Real> & _w;
   const MaterialProperty<Real> & _lambda;
   const bool  & _use_potential_transition;

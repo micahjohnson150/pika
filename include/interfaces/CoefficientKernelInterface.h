@@ -15,6 +15,9 @@
 // libMesh includes
 #include "libmesh/libmesh_common.h"
 
+// PIKA includes
+#include "PropertyUserObjectInterface.h"
+
 // Forward declarations
 class CoefficientKernelInterface;
 class InputParameters;
@@ -26,10 +29,10 @@ InputParameters validParams<CoefficientKernelInterface>();
 /**
  * A class providing common functionality for coefficient Kernels.
  */
-class CoefficientKernelInterface
+class CoefficientKernelInterface : public PropertyUserObjectInterface
 {
 public:
-  CoefficientKernelInterface(const std::string & name, InputParameters & parameters);
+  CoefficientKernelInterface(const InputParameters & parameters);
 
 protected:
 
@@ -49,7 +52,7 @@ protected:
    *   if (useMaterial())
    *      setMaterialPropertyPointer(&getMaterialProperty<Real>("property"));
    */
-  void setMaterialPropertyPointer(MaterialProperty<libMesh::Real> * ptr);
+  void setMaterialPropertyPointer(const MaterialProperty<libMesh::Real> * ptr);
 
   /**
    * Returns the proper, scaled coefficient
@@ -64,7 +67,7 @@ protected:
   /// Pointer to material property to utilize as a coefficient
   /* This must be a pointer because getMaterialProperty returns a const reference and
    * this member is optional, so NULL is a valid value */
-  MaterialProperty<libMesh::Real> * _material_coefficient;
+  const MaterialProperty<libMesh::Real> * _material_coefficient;
 
   /// Scalar coefficient
   const libMesh::Real _coefficient;

@@ -28,7 +28,6 @@ InputParameters validParams<TensorDiffusion>();
  */
 class TensorDiffusion :
   public Diffusion,
-  public PropertyUserObjectInterface,
   public CoefficientKernelInterface
 
 {
@@ -39,7 +38,7 @@ public:
    * @param name
    * @param parameters
    */
-  TensorDiffusion(const std::string & name, InputParameters parameters);
+  TensorDiffusion(const InputParameters & parameters);
 
   /**
    * Class destructor
@@ -51,9 +50,7 @@ protected:
   Real computeQpJacobian();
 
 private:
-  MaterialProperty<RealTensorValue> & _coef;
-
-
+  const MaterialProperty<RealTensorValue> & _coef;
 };
 
 #endif //TENSORDIFFUSION_H
